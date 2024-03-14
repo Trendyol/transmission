@@ -29,7 +29,7 @@ repositories {
 **Add the library to the dependencies block of your app's module build.gradle** (And any module you need to use)
 
 ```kotlin
-implementation("com.Trendyol:transmission:<latest_version>")
+implementation("com.github.Trendyol:transmission:<latest_version>")
 ```
 
 ## How to use it?
