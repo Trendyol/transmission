@@ -1,5 +1,7 @@
 # Transmission
 
+[![](https://jitpack.io/v/Trendyol/transmission.svg)](https://jitpack.io/#Trendyol/transmission)
+
 Abstraction experiment. Kotlin library to create a communication network between different business logic blocks for your Android Projects.
 
 ## Motivation
