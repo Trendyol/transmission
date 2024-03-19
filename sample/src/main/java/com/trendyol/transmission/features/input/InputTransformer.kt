@@ -11,8 +11,7 @@ import javax.inject.Inject
 
 class InputTransformer @Inject constructor() : Transformer() {
 
-	private val _inputState = MutableStateFlow(InputUiState())
-	private val inputState = _inputState.reflectUpdates()
+	private val _inputState = MutableStateFlow(InputUiState()).reflectUpdates()
 
 	override val signalHandler: SignalHandler = SignalHandler { signal ->
 		when (signal) {

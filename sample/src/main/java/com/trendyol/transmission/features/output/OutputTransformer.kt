@@ -11,8 +11,7 @@ import javax.inject.Inject
 
 class OutputTransformer @Inject constructor() : Transformer() {
 
-	private val _outputState = MutableStateFlow(OutputUiState())
-	private val outputState = _outputState.reflectUpdates()
+	private val _outputState = MutableStateFlow(OutputUiState()).reflectUpdates()
 
 	override val effectHandler: EffectHandler = EffectHandler { effect ->
 		when (effect) {

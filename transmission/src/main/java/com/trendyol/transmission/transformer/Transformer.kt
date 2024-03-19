@@ -61,13 +61,13 @@ open class Transformer {
 		jobMap.update(key, newJob)
 	}
 
-	protected fun <T : Transmission.Data?> MutableStateFlow<T>.reflectUpdates(): StateFlow<T> {
+	protected fun <T : Transmission.Data?> MutableStateFlow<T>.reflectUpdates(): MutableStateFlow<T> {
 		jobMap.update(JobType("data")) {
 			coroutineScope.launch {
 				this@reflectUpdates.collect { sendData(it) }
 			}
 		}
-		return this.asStateFlow()
+		return this
 	}
 
 

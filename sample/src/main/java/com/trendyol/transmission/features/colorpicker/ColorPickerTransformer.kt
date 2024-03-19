@@ -10,8 +10,7 @@ import javax.inject.Inject
 
 class ColorPickerTransformer @Inject constructor() : Transformer() {
 
-	private val _colorPickerState = MutableStateFlow(ColorPickerUiState())
-	private val colorPickerState = _colorPickerState.reflectUpdates()
+	private val _colorPickerState = MutableStateFlow(ColorPickerUiState()).reflectUpdates()
 
 	override val signalHandler: SignalHandler = SignalHandler { signal ->
 		when (signal) {
