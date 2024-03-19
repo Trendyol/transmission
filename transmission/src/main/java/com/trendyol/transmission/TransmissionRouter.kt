@@ -48,6 +48,9 @@ class TransmissionRouter(private val transformerSet: Set<Transformer>) {
 		onData: ((Transmission.Data) -> Unit),
 		onEffect: (Transmission.Effect) -> Unit = {},
 	) {
+		if (transformerSet.isEmpty()) {
+			throw IllegalStateException("transformerSet should not be empty")
+		}
 		initializationJob = coroutineScope.launch {
 			launch { sharedIncomingEffects.onEach { onEffect(it) }.collect() }
 			launch { outGoingDataChannel.consumeAsFlow().onEach { onData(it) }.collect() }
