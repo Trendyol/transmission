@@ -56,22 +56,25 @@ graph TD;
 Transformers are responsible for handling `signal`s and `effect`s. They have an internal extension method that can be used in any `MutableStateFlow` that holds `Transmission.Data` called `reflectUpdates`.
 
 ```kotlin
-class InputTransformer @Inject constructor() : Transformer() {  
+class InputTransformer @Inject constructor() : Transformer() {
 
-	private val _inputState = MutableStateFlow(InputUiState())  
-	private val inputState = _inputState.reflectUpdates()
-  
-	override suspend fun onSignal(signal: Transmission.Signal) {  
-	    when (signal) {  
-		    is InputSignal.InputUpdate -> {  
-		       _inputState.update { it.copy(writtenText = signal.value) }  
-		       sendEffect(InputEffect.InputUpdate(signal.value))  
-		    }  
+	private val _inputState = MutableStateFlow(InputUiState()).reflectUpdates()
+
+	override val signalHandler: SignalHandler = SignalHandler { signal ->
+		when (signal) {
+			is InputSignal.InputUpdate -> {
+				_inputState.update { it.copy(writtenText = signal.value) }
+				sendEffect(InputEffect.InputUpdate(signal.value))
+			}
 		}
-	}  
-	  
-	override suspend fun onEffect(effect: Transmission.Effect) {  
-	    TODO("Not yet implemented")  
+	}
+
+	override val effectHandler: EffectHandler = EffectHandler { effect ->
+		when (effect) {
+			is ColorPickerEffect.BackgroundColorUpdate -> {
+				_inputState.update { it.copy(backgroundColor = effect.color) }
+			}
+		}
 	}
 }
 ```
