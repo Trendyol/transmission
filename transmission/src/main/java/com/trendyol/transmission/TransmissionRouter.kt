@@ -1,6 +1,7 @@
 package com.trendyol.transmission
 
 import com.trendyol.transmission.transformer.Transformer
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -12,9 +13,12 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.launch
 
-class TransmissionRouter(private val transformerSet: Set<Transformer>) {
+class TransmissionRouter(
+	private val transformerSet: Set<Transformer>,
+	private val dispatcher: CoroutineDispatcher = Dispatchers.Default
+) {
 
-	private val coroutineScope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
+	private val coroutineScope = CoroutineScope(SupervisorJob() + dispatcher)
 
 	private var initializationJob: Job? = null
 
