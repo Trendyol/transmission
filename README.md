@@ -85,9 +85,7 @@ Possibly in your ViewModel:
 
 ```kotlin
 init {  
-    viewModelScope.launch {  
-       transmissionRouter.initialize(onData = {}, onEffect = {})  
-    }  
+    transmissionRouter.initialize(onData = {}, onEffect = {})    
 }
 ```
 
