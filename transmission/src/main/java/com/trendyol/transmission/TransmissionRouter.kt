@@ -8,8 +8,6 @@ import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.consumeAsFlow
-import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.launch
@@ -44,15 +42,18 @@ class TransmissionRouter(private val transformerSet: Set<Transformer>) {
 
 	private val outGoingDataChannel = Channel<Transmission.Data>(capacity = Channel.BUFFERED)
 
-	suspend fun initialize(
+	fun initialize(
 		onData: ((Transmission.Data) -> Unit),
 		onEffect: (Transmission.Effect) -> Unit = {},
 	) {
+		if (transformerSet.isEmpty()) {
+			throw IllegalStateException("transformerSet should not be empty")
+		}
 		initializationJob = coroutineScope.launch {
-			launch { sharedIncomingEffects.onEach { onEffect(it) }.collect() }
-			launch { outGoingDataChannel.consumeAsFlow().onEach { onData(it) }.collect() }
-			launch {
-				transformerSet.forEach { transformer ->
+			launch { sharedIncomingEffects.collect { onEffect(it) } }
+			launch { outGoingDataChannel.consumeAsFlow().collect { onData(it) } }
+			transformerSet.map { transformer ->
+				launch {
 					transformer.initialize(
 						incomingSignal = sharedIncomingSignals,
 						incomingEffect = sharedIncomingEffects,
