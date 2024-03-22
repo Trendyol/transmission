@@ -3,6 +3,7 @@ package com.trendyol.transmission.transformer
 import com.trendyol.transmission.Transmission
 import com.trendyol.transmission.transformer.handler.EffectHandler
 import com.trendyol.transmission.transformer.handler.SignalHandler
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -14,13 +15,13 @@ import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 
-open class Transformer {
+open class Transformer(private val dispatcher: CoroutineDispatcher = Dispatchers.Default) {
 
 	open val signalHandler: SignalHandler? = null
 
 	open val effectHandler: EffectHandler? = null
 
-	private val coroutineScope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
+	private val coroutineScope = CoroutineScope(SupervisorJob() + dispatcher)
 
 	fun initialize(
 		incomingSignal: SharedFlow<Transmission.Signal>,
