@@ -2,6 +2,7 @@ package com.trendyol.transmission.transformer
 
 import com.trendyol.transmission.Transmission
 import com.trendyol.transmission.transformer.handler.EffectHandler
+import com.trendyol.transmission.transformer.handler.HandlerScope
 import com.trendyol.transmission.transformer.handler.SignalHandler
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
@@ -23,6 +24,17 @@ open class Transformer(private val dispatcher: CoroutineDispatcher = Dispatchers
 
 	private val coroutineScope = CoroutineScope(SupervisorJob() + dispatcher)
 
+	private val handlerScope: HandlerScope = object : HandlerScope {
+		override fun publishData(data: Transmission.Data?) {
+			data?.let { dataChannel.trySend(it) }
+		}
+
+		override fun publishEffect(effect: Transmission.Effect) {
+			effectChannel.trySend(effect)
+		}
+
+	}
+
 	fun initialize(
 		incomingSignal: SharedFlow<Transmission.Signal>,
 		incomingEffect: SharedFlow<Transmission.Effect>,
@@ -31,22 +43,22 @@ open class Transformer(private val dispatcher: CoroutineDispatcher = Dispatchers
 	) {
 		jobMap.update("initialization") {
 			coroutineScope.launch {
-				launch { incomingSignal.collect { signalHandler?.onSignal(it) } }
-				launch { incomingEffect.collect { effectHandler?.onEffect(it) } }
+				launch {
+					incomingSignal.collect {
+						signalHandler?.apply { with(handlerScope) { onSignal(it) } }
+					}
+				}
+				launch {
+					incomingEffect.collect {
+						effectHandler?.apply { with(handlerScope) { onEffect(it) } }
+					}
+				}
 				launch { dataChannel.receiveAsFlow().collect { outGoingData.trySend(it) } }
 				launch {
 					effectChannel.receiveAsFlow().collect { outGoingEffect.trySend(it) }
 				}
 			}
 		}
-	}
-
-	private fun sendData(data: Transmission.Data?) {
-		data?.let { dataChannel.trySend(it) }
-	}
-
-	protected fun sendEffect(effect: Transmission.Effect) {
-		effectChannel.trySend(effect)
 	}
 
 	private val dataChannel: Channel<Transmission.Data> = Channel(capacity = Channel.UNLIMITED)
@@ -61,7 +73,7 @@ open class Transformer(private val dispatcher: CoroutineDispatcher = Dispatchers
 	protected fun <T : Transmission.Data?> MutableStateFlow<T>.reflectUpdates(): MutableStateFlow<T> {
 		jobMap.update("data") {
 			coroutineScope.launch {
-				this@reflectUpdates.collect { sendData(it) }
+				this@reflectUpdates.collect { it?.let { dataChannel.trySend(it) } }
 			}
 		}
 		return this
