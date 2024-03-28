@@ -18,12 +18,10 @@ class ColorPickerTransformer @Inject constructor() : Transformer() {
 		when (signal) {
 			is ColorPickerSignal.SelectColor -> {
 				_colorPickerState.update { it.copy(selectedColorIndex = signal.index) }
-				sendEffect(
+				publishEffect(
 					ColorPickerEffect.BackgroundColorUpdate(signal.selectedColor.copy(alpha = 0.1f))
 				)
-				sendEffect(
-					ColorPickerEffect.SelectedColorUpdate(signal.selectedColor)
-				)
+				publishEffect(ColorPickerEffect.SelectedColorUpdate(signal.selectedColor))
 			}
 		}
 	}

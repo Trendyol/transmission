@@ -19,7 +19,7 @@ class InputTransformer @Inject constructor() : Transformer() {
 		when (signal) {
 			is InputSignal.InputUpdate -> {
 				_inputState.update { it.copy(writtenText = signal.value) }
-				sendEffect(InputEffect.InputUpdate(signal.value))
+				publishEffect(InputEffect.InputUpdate(signal.value))
 			}
 		}
 	}
