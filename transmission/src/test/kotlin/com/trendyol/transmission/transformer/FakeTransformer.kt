@@ -18,7 +18,7 @@ open class FakeTransformer(dispatcher: CoroutineDispatcher) : Transformer(dispat
 	override val signalHandler: SignalHandler = buildGenericSignalHandler { signal ->
 		signalList.add(signal)
 		publishEffect(TestEffect)
-		holder.update { TestData("update with ${this.javaClass.simpleName}") }
+		holder.update { TestData("update with ${this@FakeTransformer.javaClass.simpleName}") }
 	}
 
 	override val effectHandler: EffectHandler = buildGenericEffectHandler { effect ->
