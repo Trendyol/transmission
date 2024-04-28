@@ -6,22 +6,20 @@ import com.trendyol.transmission.transformer.Transformer
 import com.trendyol.transmission.transformer.handler.EffectHandler
 import com.trendyol.transmission.transformer.handler.buildGenericEffectHandler
 import com.trendyol.transmission.ui.OutputUiState
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.update
 import javax.inject.Inject
 
 class OutputTransformer @Inject constructor() : Transformer() {
 
-	private val _outputState = MutableStateFlow(OutputUiState()).reflectUpdates()
+	private val holder = TransmissionDataHolder(OutputUiState())
 
 	override val effectHandler: EffectHandler = buildGenericEffectHandler { effect ->
 		when (effect) {
 			is InputEffect.InputUpdate -> {
-				_outputState.update { it.copy(outputText = effect.value) }
+				holder.update { it.copy(outputText = effect.value) }
 			}
 
 			is ColorPickerEffect.BackgroundColorUpdate -> {
-				_outputState.update { it.copy(backgroundColor = effect.color) }
+				holder.update { it.copy(backgroundColor = effect.color) }
 			}
 		}
 	}

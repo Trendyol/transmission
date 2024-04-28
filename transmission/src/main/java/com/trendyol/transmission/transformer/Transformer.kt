@@ -17,7 +17,12 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
-open class Transformer(private val dispatcher: CoroutineDispatcher = Dispatchers.Default) {
+open class Transformer(dispatcher: CoroutineDispatcher = Dispatchers.Default) {
+
+	private val dataChannel: Channel<Transmission.Data> = Channel(capacity = Channel.UNLIMITED)
+	private val effectChannel: Channel<Transmission.Effect> = Channel(capacity = Channel.UNLIMITED)
+
+	private val jobList: MutableList<Job?> = mutableListOf()
 
 	open val signalHandler: SignalHandler? = null
 
@@ -59,18 +64,23 @@ open class Transformer(private val dispatcher: CoroutineDispatcher = Dispatchers
 		}
 	}
 
-	private val dataChannel: Channel<Transmission.Data> = Channel(capacity = Channel.UNLIMITED)
-	private val effectChannel: Channel<Transmission.Effect> = Channel(capacity = Channel.UNLIMITED)
+	protected inner class TransmissionDataHolder<T : Transmission.Data?>(initialValue: T) {
 
-	protected fun <T : Transmission.Data?> MutableStateFlow<T>.reflectUpdates(): MutableStateFlow<T> {
-		jobMap.update("data") {
-			coroutineScope.launch {
-				this@reflectUpdates.collect { it?.let { dataChannel.trySend(it) } }
+		private val holder = MutableStateFlow(initialValue)
+
+		val value: T
+			get() = holder.value
+
+		init {
+			jobList += coroutineScope.launch {
+				holder.collect { it?.let { dataChannel.trySend(it) } }
 			}
 		}
-		return this
+
+		fun update(updater: (T) -> T) {
+			holder.update(updater)
+		}
 	}
-	private val jobList: MutableList<Job?> = mutableListOf()
 
 	fun clear() {
 		jobList.clearJobs()
