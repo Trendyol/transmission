@@ -97,29 +97,29 @@ The TransmissionRouter takes a set of `Transformer`s as a parameter. Building th
 interface FeaturesModule {  
   
     @Multibinds  
-    fun bindTransformerSet(): Set<Transformer<Transmission.Data>>  
+    fun bindTransformerSet(): Set<DefaultTransformer>  
   
     @Binds  
     @IntoSet    
-    fun bindInputTransformer(impl: InputTransformer): Transformer<Transmission.Data>  
+    fun bindInputTransformer(impl: InputTransformer): DefaultTransformer
   
     @Binds    
     @IntoSet    
-    fun bindOutputTransformer(impl: OutputTransformer): Transformer<Transmission.Data>  
+    fun bindOutputTransformer(impl: OutputTransformer): DefaultTransformer  
   
     @Binds    
     @IntoSet    
-    fun bindColorPickerTransformer(impl: ColorPickerTransformer): Transformer<Transmission.Data>  
+    fun bindColorPickerTransformer(impl: ColorPickerTransformer): DefaultTransformer  
   
     @Binds    
     @IntoSet    
-    fun bindMultiOutputTransformer(impl: MultiOutputTransformer): Transformer<Transmission.Data>  
+    fun bindMultiOutputTransformer(impl: MultiOutputTransformer): DefaultTransformer
   
     companion object {  
        @Provides  
        fun provideRouter(
-           transformerSet: @JvmSuppressWildcards Set<Transformer<Transmission.Data>>
-       ): TransmissionRouter<Transmission.Data>{
+           transformerSet: @JvmSuppressWildcards Set<DefaultTransformer>
+       ): DefaultTransmissionRouter {
           return TransmissionRouter(transformerSet)  
        }  
     }  

@@ -13,8 +13,10 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.launch
 
-class TransmissionRouter<D: Transmission.Data>(
-	private val transformerSet: Set<Transformer<D>>,
+typealias DefaultTransmissionRouter = TransmissionRouter<Transmission.Data, Transmission.Effect>
+
+class TransmissionRouter<D: Transmission.Data, E: Transmission.Effect>(
+	private val transformerSet: Set<Transformer<D,E>>,
 	private val dispatcher: CoroutineDispatcher = Dispatchers.Default
 ) {
 
@@ -37,7 +39,7 @@ class TransmissionRouter<D: Transmission.Data>(
 
 	// region effects
 
-	private val effectChannel = Channel<Transmission.Effect>(capacity = Channel.UNLIMITED)
+	private val effectChannel = Channel<E>(capacity = Channel.UNLIMITED)
 
 	private val sharedIncomingEffects = effectChannel.receiveAsFlow()
 		.shareIn(coroutineScope, SharingStarted.Lazily)
@@ -48,7 +50,7 @@ class TransmissionRouter<D: Transmission.Data>(
 
 	fun initialize(
 		onData: ((D) -> Unit),
-		onEffect: (Transmission.Effect) -> Unit = {},
+		onEffect: (E) -> Unit = {},
 	) {
 		if (transformerSet.isEmpty()) {
 			throw IllegalStateException("transformerSet should not be empty")
