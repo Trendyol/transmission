@@ -8,7 +8,7 @@ fun interface EffectHandler<D : Transmission.Data, E : Transmission.Effect> {
 }
 
 fun <D : Transmission.Data, E : Transmission.Effect> Transformer<D, E>.buildGenericEffectHandler(
-	onEffect: HandlerScope<D, E>.(effect: Transmission.Effect) -> Unit
+	onEffect: suspend HandlerScope<D, E>.(effect: Transmission.Effect) -> Unit
 ): EffectHandler<D, E> {
 	return EffectHandler { effect -> onEffect(effect) }
 }

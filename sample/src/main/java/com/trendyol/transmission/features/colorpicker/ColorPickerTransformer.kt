@@ -1,14 +1,16 @@
 package com.trendyol.transmission.features.colorpicker
 
+import com.trendyol.transmission.Transmission
 import com.trendyol.transmission.transformer.DefaultTransformer
 import com.trendyol.transmission.transformer.handler.buildGenericEffectHandler
 import com.trendyol.transmission.transformer.handler.buildGenericSignalHandler
 import com.trendyol.transmission.ui.ColorPickerUiState
+import kotlinx.coroutines.coroutineScope
 import javax.inject.Inject
 
 class ColorPickerTransformer @Inject constructor() : DefaultTransformer() {
 
-	private val holder = TransmissionDataHolder(ColorPickerUiState())
+	private val holder = buildDataHolder(ColorPickerUiState())
 
 	override val signalHandler = buildGenericSignalHandler { signal ->
 		when (signal) {
