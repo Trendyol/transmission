@@ -56,11 +56,11 @@ graph TD;
 Transformers are responsible for handling `signal`s and `effect`s. They have an internal extension method that can be used in any `MutableStateFlow` that holds `Transmission.Data` called `reflectUpdates`.
 
 ```kotlin
-class InputTransformer @Inject constructor() : Transformer() {
+class InputTransformer @Inject constructor() : Transformer<Transmission.Data>() {
     
     private val holder = TransmissionDataHolder(InputUiState())
 
-	override val signalHandler: SignalHandler = SignalHandler { signal ->
+	override val signalHandler = buildGenericSignalHandler { signal ->
 		when (signal) {
 			is InputSignal.InputUpdate -> { 
                 holder.update { it.copy(writtenText = signal.value) }
@@ -69,7 +69,7 @@ class InputTransformer @Inject constructor() : Transformer() {
 		}
 	}
 
-	override val effectHandler: EffectHandler = EffectHandler { effect ->
+	override val effectHandler = buildGenericEffectHandler { effect ->
 		when (effect) {
 			is ColorPickerEffect.BackgroundColorUpdate -> {
 				holder.update { it.copy(backgroundColor = effect.color) }
@@ -97,27 +97,29 @@ The TransmissionRouter takes a set of `Transformer`s as a parameter. Building th
 interface FeaturesModule {  
   
     @Multibinds  
-    fun bindTransformerSet(): Set<Transformer>  
+    fun bindTransformerSet(): Set<Transformer<Transmission.Data>>  
   
     @Binds  
     @IntoSet    
-    fun bindInputTransformer(impl: InputTransformer): Transformer  
+    fun bindInputTransformer(impl: InputTransformer): Transformer<Transmission.Data>  
   
     @Binds    
     @IntoSet    
-    fun bindOutputTransformer(impl: OutputTransformer): Transformer  
+    fun bindOutputTransformer(impl: OutputTransformer): Transformer<Transmission.Data>  
   
     @Binds    
     @IntoSet    
-    fun bindColorPickerTransformer(impl: ColorPickerTransformer): Transformer  
+    fun bindColorPickerTransformer(impl: ColorPickerTransformer): Transformer<Transmission.Data>  
   
     @Binds    
     @IntoSet    
-    fun bindMultiOutputTransformer(impl: MultiOutputTransformer): Transformer  
+    fun bindMultiOutputTransformer(impl: MultiOutputTransformer): Transformer<Transmission.Data>  
   
     companion object {  
        @Provides  
-       fun provideRouter(transformerSet: @JvmSuppressWildcards Set<Transformer>): TransmissionRouter {
+       fun provideRouter(
+           transformerSet: @JvmSuppressWildcards Set<Transformer<Transmission.Data>>
+       ): TransmissionRouter<Transmission.Data>{
           return TransmissionRouter(transformerSet)  
        }  
     }  
