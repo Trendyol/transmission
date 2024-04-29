@@ -18,7 +18,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class SampleViewModel @Inject constructor(
-	private val transmissionRouter: TransmissionRouter<Transmission.Data>
+	private val transmissionRouter: DefaultTransmissionRouter
 ) : ViewModel() {
 
 	private val _uiState = MutableStateFlow(SampleScreenUiState())

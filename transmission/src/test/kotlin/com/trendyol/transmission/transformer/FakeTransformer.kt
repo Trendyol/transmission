@@ -7,8 +7,7 @@ import com.trendyol.transmission.transformer.handler.buildGenericEffectHandler
 import com.trendyol.transmission.transformer.handler.buildGenericSignalHandler
 import kotlinx.coroutines.CoroutineDispatcher
 
-open class FakeTransformer(dispatcher: CoroutineDispatcher) :
-	Transformer<Transmission.Data>(dispatcher) {
+open class FakeTransformer(dispatcher: CoroutineDispatcher) : DefaultTransformer(dispatcher) {
 	val signalList = mutableListOf<Transmission.Signal>()
 	val effectList = mutableListOf<Transmission.Effect>()
 

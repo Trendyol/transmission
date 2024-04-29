@@ -19,7 +19,7 @@ import kotlin.test.assertEquals
 @OptIn(ExperimentalCoroutinesApi::class)
 class TransmissionRouterTest {
 
-	private lateinit var sut: TransmissionRouter<Transmission.Data>
+	private lateinit var sut: DefaultTransmissionRouter
 
 	@get:Rule
 	val testCoroutineRule = TestCoroutineRule()

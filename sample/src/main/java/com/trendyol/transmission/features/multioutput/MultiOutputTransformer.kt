@@ -1,14 +1,13 @@
 package com.trendyol.transmission.features.multioutput
 
-import com.trendyol.transmission.Transmission
 import com.trendyol.transmission.features.colorpicker.ColorPickerEffect
 import com.trendyol.transmission.features.input.InputEffect
-import com.trendyol.transmission.transformer.Transformer
+import com.trendyol.transmission.transformer.DefaultTransformer
 import com.trendyol.transmission.transformer.handler.buildGenericEffectHandler
 import com.trendyol.transmission.ui.MultiOutputUiState
 import javax.inject.Inject
 
-class MultiOutputTransformer @Inject constructor() : Transformer<Transmission.Data>() {
+class MultiOutputTransformer @Inject constructor() : DefaultTransformer() {
 
 	private val holder = TransmissionDataHolder(MultiOutputUiState())
 
