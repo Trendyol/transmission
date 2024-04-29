@@ -27,35 +27,37 @@ class TransmissionRouterTest {
 	private val testDispatcher = UnconfinedTestDispatcher()
 
 	@Test
-	fun `GIVEN Router with no transformers, WHEN initialize is called, THEN router should throw IllegalStateException`() = runTest {
-		// Given
-		sut = TransmissionRouter(setOf())
-		// When
-		try {
-			sut.initialize(onData = {}, onEffect = {})
-		} catch(e: IllegalStateException) {
+	fun `GIVEN Router with no transformers, WHEN initialize is called, THEN router should throw IllegalStateException`() =
+		runTest {
+			// Given
+			sut = TransmissionRouter(setOf())
+			// When
+			try {
+				sut.initialize(onData = {}, onEffect = {})
+			} catch (e: IllegalStateException) {
+				// Then
+				assertEquals(e.message, "transformerSet should not be empty")
+			}
+		}
+
+	@Test
+	fun `GIVEN Router with one transformer, WHEN initialize is called, THEN router should not throw IllegalStateException`() =
+		runTest {
+			// Given
+			sut = TransmissionRouter(setOf(FakeTransformer(testDispatcher)))
+			// When
+			val exception = try {
+				sut.initialize(onData = {}, onEffect = {})
+				null
+			} catch (e: IllegalStateException) {
+				e
+			}
 			// Then
-			assertEquals(e.message, "transformerSet should not be empty")
+			assertEquals(exception, null)
 		}
-	}
 
 	@Test
-	fun `GIVEN Router with one transformer, WHEN initialize is called, THEN router should not throw IllegalStateException`() = runTest {
-		// Given
-		sut = TransmissionRouter(setOf(FakeTransformer(testDispatcher)))
-		// When
-		val exception = try {
-			sut.initialize(onData = {}, onEffect = {})
-			null
-		} catch(e: IllegalStateException) {
-			e
-		}
-		// Then
-		assertEquals(exception, null)
-	}
-
-	@Test
-	fun `GIVEN initialized Router with one Transformer, WHEN processSignal is called, THEN transformer should contain the signal`(){
+	fun `GIVEN initialized Router with one Transformer, WHEN processSignal is called, THEN transformer should contain the signal`() {
 		// Given
 		val transformer = FakeTransformer(testDispatcher)
 		sut = TransmissionRouter(setOf(transformer), testDispatcher)
@@ -68,7 +70,7 @@ class TransmissionRouterTest {
 	}
 
 	@Test
-	fun `GIVEN initialized Router with multiple Transformers, WHEN processSignal is called, THEN all transformers should contain the signal`(){
+	fun `GIVEN initialized Router with multiple Transformers, WHEN processSignal is called, THEN all transformers should contain the signal`() {
 		// Given
 		val transformer1 = TestTransformer1(testDispatcher)
 		val transformer2 = TestTransformer2(testDispatcher)
@@ -89,7 +91,7 @@ class TransmissionRouterTest {
 	 * the effect broadcast.
 	 */
 	@Test
-	fun `GIVEN initialized Router with multiple Transformers, WHEN processSignal is called, THEN all transformers should contain the FakeTransformer's Signal`(){
+	fun `GIVEN initialized Router with multiple Transformers, WHEN processSignal is called, THEN all transformers should contain the FakeTransformer's Signal`() {
 		// Given
 		val transformer1 = TestTransformer1(testDispatcher)
 		val transformer2 = TestTransformer2(testDispatcher)
@@ -106,7 +108,7 @@ class TransmissionRouterTest {
 	}
 
 	@Test
-	fun `GIVEN initialized Router with multiple Transformers, WHEN processSignal is called, THEN all effects should be sent through onEffect`(){
+	fun `GIVEN initialized Router with multiple Transformers, WHEN processSignal is called, THEN all effects should be sent through onEffect`() {
 		// Given
 		val transformer1 = TestTransformer1(testDispatcher)
 		val transformer2 = TestTransformer2(testDispatcher)
@@ -122,7 +124,7 @@ class TransmissionRouterTest {
 	}
 
 	@Test
-	fun `GIVEN initialized Router with multiple Transformers, WHEN processSignal is called, THEN all transformers should send the correct TestData`(){
+	fun `GIVEN initialized Router with multiple Transformers, WHEN processSignal is called, THEN all transformers should send the correct TestData`() {
 		// Given
 		val transformer1 = TestTransformer1(testDispatcher)
 		val transformer2 = TestTransformer2(testDispatcher)
@@ -135,8 +137,8 @@ class TransmissionRouterTest {
 
 		// Then
 		assertEquals(dataList.size, 3)
-		assertEquals(dataList[0], TestData("update with TestTransformer1"))
-		assertEquals(dataList[1], TestData("update with TestTransformer2"))
-		assertEquals(dataList[2], TestData("update with TestTransformer3"))
+		assertEquals(TestData("update with TestTransformer1"), dataList[0])
+		assertEquals(TestData("update with TestTransformer2"), dataList[1])
+		assertEquals(TestData("update with TestTransformer3"), dataList[2])
 	}
 }

@@ -14,9 +14,15 @@ import kotlinx.coroutines.channels.SendChannel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
-open class Transformer(private val dispatcher: CoroutineDispatcher = Dispatchers.Default) {
+open class Transformer(dispatcher: CoroutineDispatcher = Dispatchers.Default) {
+
+	private val dataChannel: Channel<Transmission.Data> = Channel(capacity = Channel.UNLIMITED)
+	private val effectChannel: Channel<Transmission.Effect> = Channel(capacity = Channel.UNLIMITED)
+
+	private val jobList: MutableList<Job?> = mutableListOf()
 
 	open val signalHandler: SignalHandler? = null
 
@@ -32,7 +38,6 @@ open class Transformer(private val dispatcher: CoroutineDispatcher = Dispatchers
 		override fun publishEffect(effect: Transmission.Effect) {
 			effectChannel.trySend(effect)
 		}
-
 	}
 
 	fun initialize(
@@ -41,45 +46,43 @@ open class Transformer(private val dispatcher: CoroutineDispatcher = Dispatchers
 		outGoingData: SendChannel<Transmission.Data>,
 		outGoingEffect: SendChannel<Transmission.Effect>,
 	) {
-		jobMap.update("initialization") {
-			coroutineScope.launch {
-				launch {
-					incomingSignal.collect {
-						signalHandler?.apply { with(handlerScope) { onSignal(it) } }
-					}
+		jobList += coroutineScope.launch {
+			launch {
+				incomingSignal.collect {
+					signalHandler?.apply { with(handlerScope) { onSignal(it) } }
 				}
-				launch {
-					incomingEffect.collect {
-						effectHandler?.apply { with(handlerScope) { onEffect(it) } }
-					}
+			}
+			launch {
+				incomingEffect.collect {
+					effectHandler?.apply { with(handlerScope) { onEffect(it) } }
 				}
-				launch { dataChannel.receiveAsFlow().collect { outGoingData.trySend(it) } }
-				launch {
-					effectChannel.receiveAsFlow().collect { outGoingEffect.trySend(it) }
-				}
+			}
+			launch { dataChannel.receiveAsFlow().collect { outGoingData.trySend(it) } }
+			launch {
+				effectChannel.receiveAsFlow().collect { outGoingEffect.trySend(it) }
 			}
 		}
 	}
 
-	private val dataChannel: Channel<Transmission.Data> = Channel(capacity = Channel.UNLIMITED)
-	private val effectChannel: Channel<Transmission.Effect> = Channel(capacity = Channel.UNLIMITED)
+	protected inner class TransmissionDataHolder<T : Transmission.Data?>(initialValue: T) {
 
-	private val jobMap: MutableMap<JobType, Job?> = mutableMapOf()
+		private val holder = MutableStateFlow(initialValue)
 
-	protected fun updateJobMap(key: String, newJob: () -> Job) {
-		jobMap.update(key, newJob)
-	}
+		val value: T
+			get() = holder.value
 
-	protected fun <T : Transmission.Data?> MutableStateFlow<T>.reflectUpdates(): MutableStateFlow<T> {
-		jobMap.update("data") {
-			coroutineScope.launch {
-				this@reflectUpdates.collect { it?.let { dataChannel.trySend(it) } }
+		init {
+			jobList += coroutineScope.launch {
+				holder.collect { it?.let { dataChannel.trySend(it) } }
 			}
 		}
-		return this
+
+		fun update(updater: (T) -> T) {
+			holder.update(updater)
+		}
 	}
 
 	fun clear() {
-		jobMap.clearJobs()
+		jobList.clearJobs()
 	}
 }

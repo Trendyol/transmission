@@ -6,18 +6,16 @@ import com.trendyol.transmission.transformer.handler.SignalHandler
 import com.trendyol.transmission.transformer.handler.buildGenericEffectHandler
 import com.trendyol.transmission.transformer.handler.buildGenericSignalHandler
 import com.trendyol.transmission.ui.ColorPickerUiState
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.update
 import javax.inject.Inject
 
 class ColorPickerTransformer @Inject constructor() : Transformer() {
 
-	private val _colorPickerState = MutableStateFlow(ColorPickerUiState()).reflectUpdates()
+	private val holder = TransmissionDataHolder(ColorPickerUiState())
 
 	override val signalHandler: SignalHandler = buildGenericSignalHandler { signal ->
 		when (signal) {
 			is ColorPickerSignal.SelectColor -> {
-				_colorPickerState.update { it.copy(selectedColorIndex = signal.index) }
+				holder.update { it.copy(selectedColorIndex = signal.index) }
 				publishEffect(
 					ColorPickerEffect.BackgroundColorUpdate(signal.selectedColor.copy(alpha = 0.1f))
 				)
@@ -29,7 +27,7 @@ class ColorPickerTransformer @Inject constructor() : Transformer() {
 	override val effectHandler: EffectHandler = buildGenericEffectHandler { effect ->
 		when (effect) {
 			is ColorPickerEffect.BackgroundColorUpdate -> {
-				_colorPickerState.update {
+				holder.update {
 					it.copy(backgroundColor = effect.color)
 				}
 			}
