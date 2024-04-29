@@ -4,6 +4,8 @@ import com.trendyol.transmission.Transmission
 import com.trendyol.transmission.transformer.handler.EffectHandler
 import com.trendyol.transmission.transformer.handler.HandlerScope
 import com.trendyol.transmission.transformer.handler.SignalHandler
+import com.trendyol.transmission.transformer.query.DataQuery
+import com.trendyol.transmission.transformer.query.QueryResponse
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -13,9 +15,12 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.SendChannel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlin.reflect.KClass
 
 typealias DefaultTransformer = Transformer<Transmission.Data, Transmission.Effect>
 
@@ -23,16 +28,28 @@ open class Transformer<D : Transmission.Data, E : Transmission.Effect>(
 	dispatcher: CoroutineDispatcher = Dispatchers.Default
 ) {
 
+	private val transformerName = this::class.java.simpleName
+
 	private val dataChannel: Channel<D> = Channel(capacity = Channel.UNLIMITED)
 	private val effectChannel: Channel<E> = Channel(capacity = Channel.UNLIMITED)
 
+	private val outGoingQueryChannel: Channel<DataQuery> = Channel()
+	private val queryResponseChannel: Channel<D?> = Channel()
+
+	private val holderDataReference: MutableStateFlow<D?> = MutableStateFlow(null)
+	val holderData = holderDataReference.asStateFlow()
+
 	private val jobList: MutableList<Job?> = mutableListOf()
+
+	protected var transmissionDataHolderStateInternal: HolderState = HolderState.Undefined
+	val transmissionDataHolderState: HolderState
+		get() = transmissionDataHolderStateInternal
 
 	open val signalHandler: SignalHandler<D, E>? = null
 
 	open val effectHandler: EffectHandler<D, E>? = null
 
-	private val coroutineScope = CoroutineScope(SupervisorJob() + dispatcher)
+	private val transformerScope = CoroutineScope(SupervisorJob() + dispatcher)
 
 	private val handlerScope: HandlerScope<D, E> = object : HandlerScope<D, E> {
 		override fun publishData(data: D?) {
@@ -44,16 +61,35 @@ open class Transformer<D : Transmission.Data, E : Transmission.Effect>(
 		}
 	}
 
+	@Suppress("UNCHECKED_CAST")
+	protected suspend fun <D : Transmission.Data> queryDataFor(type: KClass<D>): D? {
+		outGoingQueryChannel.trySend(
+			DataQuery(
+				sender = transformerName,
+				type = type.simpleName.orEmpty()
+			)
+		)
+		return queryResponseChannel.receive() as? D
+	}
+
+
 	fun initialize(
 		incomingSignal: SharedFlow<Transmission.Signal>,
 		incomingEffect: SharedFlow<Transmission.Effect>,
 		outGoingData: SendChannel<D>,
 		outGoingEffect: SendChannel<E>,
+		outGoingQuery: SendChannel<DataQuery>,
+		incomingQueryResponse: SharedFlow<QueryResponse<D>>
 	) {
-		jobList += coroutineScope.launch {
+		jobList += transformerScope.launch {
 			launch {
 				incomingSignal.collect {
 					signalHandler?.apply { with(handlerScope) { onSignal(it) } }
+				}
+			}
+			launch {
+				incomingQueryResponse.filter { it.owner == transformerName }.collect {
+					queryResponseChannel.trySend(it.data)
 				}
 			}
 			launch {
@@ -61,6 +97,7 @@ open class Transformer<D : Transmission.Data, E : Transmission.Effect>(
 					effectHandler?.apply { with(handlerScope) { onEffect(it) } }
 				}
 			}
+			launch { outGoingQueryChannel.receiveAsFlow().collect { outGoingQuery.trySend(it) } }
 			launch { dataChannel.receiveAsFlow().collect { outGoingData.trySend(it) } }
 			launch {
 				effectChannel.receiveAsFlow().collect { outGoingEffect.trySend(it) }
@@ -68,7 +105,13 @@ open class Transformer<D : Transmission.Data, E : Transmission.Effect>(
 		}
 	}
 
-	protected inner class TransmissionDataHolder<T : D?>(initialValue: T) {
+	fun clear() {
+		jobList.clearJobs()
+	}
+
+	// region DataHolder
+
+	inner class TransmissionDataHolder<T : D?>(initialValue: T) {
 
 		private val holder = MutableStateFlow(initialValue)
 
@@ -76,19 +119,29 @@ open class Transformer<D : Transmission.Data, E : Transmission.Effect>(
 			get() = holder.value
 
 		init {
-			jobList += coroutineScope.launch {
-				holder.collect { it?.let { dataChannel.trySend(it) } }
+			jobList += transformerScope.launch {
+				holder.collect {
+					it?.let { holderData ->
+						holderDataReference.update { holderData }
+						dataChannel.trySend(it)
+					}
+				}
 			}
 		}
 
-		fun update(updater: (T) -> T) {
+		fun update(updater: (T) -> @UnsafeVariance T) {
 			holder.update(updater)
 		}
 	}
 
-	fun clear() {
-		jobList.clearJobs()
+	protected inline fun <reified T : D> Transformer<D, E>.buildDataHolder(
+		initialValue: T
+	): TransmissionDataHolder<T> {
+		transmissionDataHolderStateInternal = HolderState.Initialized(T::class.java.simpleName)
+		return TransmissionDataHolder(initialValue)
 	}
+
+	// endregion
 
 	// region handler extensions
 
@@ -113,4 +166,5 @@ open class Transformer<D : Transmission.Data, E : Transmission.Effect>(
 	}
 
 	// endregion
+
 }
