@@ -53,7 +53,7 @@ graph TD;
 
 ### How to create a Transformer
 
-Transformers are responsible for handling `signal`s and `effect`s. They have an internal extension method that can be used in any `MutableStateFlow` that holds `Transmission.Data` called `reflectUpdates`.
+Transformers are responsible for handling `signal`s and `effect`s. They have an inner class called `TransmissionHataHolder` which can hold any Data type that is extended from `Transmission.Data`. Any update to the dataHolder automatically publishes the latest version to Data Channel. 
 
 ```kotlin
 class InputTransformer @Inject constructor() : Transformer() {
