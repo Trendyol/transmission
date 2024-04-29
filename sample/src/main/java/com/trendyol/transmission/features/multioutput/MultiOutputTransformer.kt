@@ -9,7 +9,7 @@ import javax.inject.Inject
 
 class MultiOutputTransformer @Inject constructor() : DefaultTransformer() {
 
-	private val holder = TransmissionDataHolder(MultiOutputUiState())
+	private val holder = buildDataHolder(MultiOutputUiState())
 
 	override val effectHandler = buildGenericEffectHandler { effect ->
 		when (effect) {

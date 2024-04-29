@@ -4,17 +4,29 @@ import com.trendyol.transmission.features.colorpicker.ColorPickerEffect
 import com.trendyol.transmission.features.input.InputEffect
 import com.trendyol.transmission.transformer.DefaultTransformer
 import com.trendyol.transmission.transformer.handler.buildGenericEffectHandler
+import com.trendyol.transmission.ui.ColorPickerUiState
+import com.trendyol.transmission.ui.InputUiState
 import com.trendyol.transmission.ui.OutputUiState
+import kotlinx.coroutines.delay
 import javax.inject.Inject
 
 class OutputTransformer @Inject constructor() : DefaultTransformer() {
 
-	private val holder = TransmissionDataHolder(OutputUiState())
+	private val holder = buildDataHolder(OutputUiState())
 
 	override val effectHandler = buildGenericEffectHandler { effect ->
 		when (effect) {
 			is InputEffect.InputUpdate -> {
-				holder.update { it.copy(outputText = effect.value) }
+				delay(2000L)
+				val output = queryDataFor(InputUiState::class)
+				output?.let { testData ->
+					holder.update { it.copy(outputText = testData.writtenText) }
+				}
+				delay(2000L)
+				val selectedColor = queryDataFor(ColorPickerUiState::class)
+				holder.update {
+					it.copy(outputText = it.outputText + " and Selected color index is ${selectedColor?.selectedColorIndex}")
+				}
 			}
 
 			is ColorPickerEffect.BackgroundColorUpdate -> {

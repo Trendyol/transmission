@@ -8,7 +8,7 @@ import javax.inject.Inject
 
 class InputTransformer @Inject constructor() : DefaultTransformer() {
 
-	private val holder = TransmissionDataHolder(InputUiState())
+	private val holder = buildDataHolder(InputUiState())
 
 	override val signalHandler = buildTypedSignalHandler<InputSignal> { signal ->
 		when (signal) {
