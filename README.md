@@ -57,13 +57,13 @@ Transformers are responsible for handling `signal`s and `effect`s. They have an 
 
 ```kotlin
 class InputTransformer @Inject constructor() : Transformer() {
-
-	private val _inputState = MutableStateFlow(InputUiState()).reflectUpdates()
+    
+    private val holder = TransmissionDataHolder(InputUiState())
 
 	override val signalHandler: SignalHandler = SignalHandler { signal ->
 		when (signal) {
-			is InputSignal.InputUpdate -> {
-				_inputState.update { it.copy(writtenText = signal.value) }
+			is InputSignal.InputUpdate -> { 
+                holder.update { it.copy(writtenText = signal.value) }
 				sendEffect(InputEffect.InputUpdate(signal.value))
 			}
 		}
@@ -72,7 +72,7 @@ class InputTransformer @Inject constructor() : Transformer() {
 	override val effectHandler: EffectHandler = EffectHandler { effect ->
 		when (effect) {
 			is ColorPickerEffect.BackgroundColorUpdate -> {
-				_inputState.update { it.copy(backgroundColor = effect.color) }
+				holder.update { it.copy(backgroundColor = effect.color) }
 			}
 		}
 	}
