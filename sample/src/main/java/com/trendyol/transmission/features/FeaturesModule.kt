@@ -1,5 +1,6 @@
 package com.trendyol.transmission.features
 
+import com.trendyol.transmission.Transmission
 import com.trendyol.transmission.TransmissionRouter
 import com.trendyol.transmission.features.colorpicker.ColorPickerTransformer
 import com.trendyol.transmission.features.input.InputTransformer
@@ -19,27 +20,29 @@ import dagger.multibindings.Multibinds
 interface FeaturesModule {
 
 	@Multibinds
-	fun bindTransformerSet(): Set<Transformer>
+	fun bindTransformerSet(): Set<Transformer<Transmission.Data>>
 
 	@Binds
 	@IntoSet
-	fun bindInputTransformer(impl: InputTransformer): Transformer
+	fun bindInputTransformer(impl: InputTransformer): Transformer<Transmission.Data>
 
 	@Binds
 	@IntoSet
-	fun bindOutputTransformer(impl: OutputTransformer): Transformer
+	fun bindOutputTransformer(impl: OutputTransformer): Transformer<Transmission.Data>
 
 	@Binds
 	@IntoSet
-	fun bindColorPickerTransformer(impl: ColorPickerTransformer): Transformer
+	fun bindColorPickerTransformer(impl: ColorPickerTransformer): Transformer<Transmission.Data>
 
 	@Binds
 	@IntoSet
-	fun bindMultiOutputTransformer(impl: MultiOutputTransformer): Transformer
+	fun bindMultiOutputTransformer(impl: MultiOutputTransformer): Transformer<Transmission.Data>
 
 	companion object {
 		@Provides
-		fun provideRouter(transformerSet: @JvmSuppressWildcards Set<Transformer>): TransmissionRouter {
+		fun provideRouter(
+			transformerSet: @JvmSuppressWildcards Set<Transformer<Transmission.Data>>
+		): TransmissionRouter<Transmission.Data> {
 			return TransmissionRouter(transformerSet)
 		}
 	}

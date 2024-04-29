@@ -1,18 +1,17 @@
 package com.trendyol.transmission.features.colorpicker
 
+import com.trendyol.transmission.Transmission
 import com.trendyol.transmission.transformer.Transformer
-import com.trendyol.transmission.transformer.handler.EffectHandler
-import com.trendyol.transmission.transformer.handler.SignalHandler
 import com.trendyol.transmission.transformer.handler.buildGenericEffectHandler
 import com.trendyol.transmission.transformer.handler.buildGenericSignalHandler
 import com.trendyol.transmission.ui.ColorPickerUiState
 import javax.inject.Inject
 
-class ColorPickerTransformer @Inject constructor() : Transformer() {
+class ColorPickerTransformer @Inject constructor() : Transformer<Transmission.Data>() {
 
 	private val holder = TransmissionDataHolder(ColorPickerUiState())
 
-	override val signalHandler: SignalHandler = buildGenericSignalHandler { signal ->
+	override val signalHandler = buildGenericSignalHandler { signal ->
 		when (signal) {
 			is ColorPickerSignal.SelectColor -> {
 				holder.update { it.copy(selectedColorIndex = signal.index) }
@@ -24,7 +23,8 @@ class ColorPickerTransformer @Inject constructor() : Transformer() {
 		}
 	}
 
-	override val effectHandler: EffectHandler = buildGenericEffectHandler { effect ->
+
+	override val effectHandler = buildGenericEffectHandler { effect ->
 		when (effect) {
 			is ColorPickerEffect.BackgroundColorUpdate -> {
 				holder.update {
