@@ -17,21 +17,21 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
-open class Transformer(dispatcher: CoroutineDispatcher = Dispatchers.Default) {
+open class Transformer<D: Transmission.Data>(dispatcher: CoroutineDispatcher = Dispatchers.Default) {
 
-	private val dataChannel: Channel<Transmission.Data> = Channel(capacity = Channel.UNLIMITED)
+	private val dataChannel: Channel<D> = Channel(capacity = Channel.UNLIMITED)
 	private val effectChannel: Channel<Transmission.Effect> = Channel(capacity = Channel.UNLIMITED)
 
 	private val jobList: MutableList<Job?> = mutableListOf()
 
-	open val signalHandler: SignalHandler? = null
+	open val signalHandler: SignalHandler<D>? = null
 
-	open val effectHandler: EffectHandler? = null
+	open val effectHandler: EffectHandler<D>? = null
 
 	private val coroutineScope = CoroutineScope(SupervisorJob() + dispatcher)
 
-	private val handlerScope: HandlerScope = object : HandlerScope {
-		override fun publishData(data: Transmission.Data?) {
+	private val handlerScope: HandlerScope<D> = object : HandlerScope<D> {
+		override fun publishData(data: D?) {
 			data?.let { dataChannel.trySend(it) }
 		}
 
@@ -43,7 +43,7 @@ open class Transformer(dispatcher: CoroutineDispatcher = Dispatchers.Default) {
 	fun initialize(
 		incomingSignal: SharedFlow<Transmission.Signal>,
 		incomingEffect: SharedFlow<Transmission.Effect>,
-		outGoingData: SendChannel<Transmission.Data>,
+		outGoingData: SendChannel<D>,
 		outGoingEffect: SendChannel<Transmission.Effect>,
 	) {
 		jobList += coroutineScope.launch {
@@ -64,7 +64,7 @@ open class Transformer(dispatcher: CoroutineDispatcher = Dispatchers.Default) {
 		}
 	}
 
-	protected inner class TransmissionDataHolder<T : Transmission.Data?>(initialValue: T) {
+	protected inner class TransmissionDataHolder<T : D?>(initialValue: T) {
 
 		private val holder = MutableStateFlow(initialValue)
 

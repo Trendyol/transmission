@@ -13,8 +13,8 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.launch
 
-class TransmissionRouter(
-	private val transformerSet: Set<Transformer>,
+class TransmissionRouter<D: Transmission.Data>(
+	private val transformerSet: Set<Transformer<D>>,
 	private val dispatcher: CoroutineDispatcher = Dispatchers.Default
 ) {
 
@@ -44,10 +44,10 @@ class TransmissionRouter(
 
 	// endregion
 
-	private val outGoingDataChannel = Channel<Transmission.Data>(capacity = Channel.BUFFERED)
+	private val outGoingDataChannel = Channel<D>(capacity = Channel.BUFFERED)
 
 	fun initialize(
-		onData: ((Transmission.Data) -> Unit),
+		onData: ((D) -> Unit),
 		onEffect: (Transmission.Effect) -> Unit = {},
 	) {
 		if (transformerSet.isEmpty()) {
