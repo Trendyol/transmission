@@ -56,9 +56,9 @@ graph TD;
 Transformers are responsible for handling `signal`s and `effect`s. They have an internal extension method that can be used in any `MutableStateFlow` that holds `Transmission.Data` called `reflectUpdates`.
 
 ```kotlin
-class InputTransformer @Inject constructor() : Transformer<Transmission.Data>() {
+class InputTransformer @Inject constructor() : DefaultTransformer() {
     
-    private val holder = TransmissionDataHolder(InputUiState())
+    private val holder = buildDataHolder(InputUiState())
 
 	override val signalHandler = buildGenericSignalHandler { signal ->
 		when (signal) {
