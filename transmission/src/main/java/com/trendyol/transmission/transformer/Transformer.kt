@@ -1,6 +1,7 @@
 package com.trendyol.transmission.transformer
 
 import com.trendyol.transmission.Transmission
+import com.trendyol.transmission.effect.EffectWrapper
 import com.trendyol.transmission.effect.RouterPayloadEffect
 import com.trendyol.transmission.transformer.handler.EffectHandler
 import com.trendyol.transmission.transformer.handler.HandlerScope
@@ -18,7 +19,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.filter
-import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.filterNot
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
@@ -34,7 +34,8 @@ open class Transformer<D : Transmission.Data, E : Transmission.Effect>(
 	private val transformerName = this::class.java.simpleName
 
 	private val dataChannel: Channel<D> = Channel(capacity = Channel.UNLIMITED)
-	private val effectChannel: Channel<E> = Channel(capacity = Channel.UNLIMITED)
+	private val effectChannel: Channel<EffectWrapper<E, D, Transformer<D, E>>> =
+		Channel(capacity = Channel.UNLIMITED)
 
 	private val outGoingQueryChannel: Channel<DataQuery> = Channel()
 	private val queryResponseChannel: Channel<D?> = Channel()
@@ -60,7 +61,11 @@ open class Transformer<D : Transmission.Data, E : Transmission.Effect>(
 		}
 
 		override fun publishEffect(effect: E) {
-			effectChannel.trySend(effect)
+			effectChannel.trySend(EffectWrapper(effect))
+		}
+
+		override fun sendEffect(effect: E, to: KClass<out Transformer<D, E>>) {
+			effectChannel.trySend(EffectWrapper(effect, to))
 		}
 	}
 
@@ -78,10 +83,10 @@ open class Transformer<D : Transmission.Data, E : Transmission.Effect>(
 
 	fun initialize(
 		incomingSignal: SharedFlow<Transmission.Signal>,
-		incomingEffect: SharedFlow<Transmission.Effect>,
+		incomingEffect: SharedFlow<EffectWrapper<E, D, Transformer<D, E>>>,
 		incomingQueryResponse: SharedFlow<QueryResponse<D>>,
 		outGoingData: SendChannel<D>,
-		outGoingEffect: SendChannel<E>,
+		outGoingEffect: SendChannel<EffectWrapper<E, D, Transformer<D, E>>>,
 		outGoingQuery: SendChannel<DataQuery>,
 	) {
 		jobList += transformerScope.launch {
@@ -91,9 +96,20 @@ open class Transformer<D : Transmission.Data, E : Transmission.Effect>(
 				}
 			}
 			launch {
-				incomingEffect.filterNot { it is RouterPayloadEffect }.collect {
-					effectHandler?.apply { with(handlerScope) { onEffect(it) } }
-				}
+				incomingEffect
+					.filterNot { it.effect is RouterPayloadEffect }
+					.collect { incomingEffect ->
+						val effectToProcess = incomingEffect.takeIf {
+							incomingEffect.to == null ||
+								incomingEffect.to == this@Transformer::class
+						}?.effect ?: return@collect
+
+						effectHandler?.apply {
+							with(handlerScope) {
+								onEffect(effectToProcess)
+							}
+						}
+					}
 			}
 			launch {
 				incomingQueryResponse.filter { it.owner == transformerName }.collect {
