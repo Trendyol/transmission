@@ -1,6 +1,7 @@
 package com.trendyol.transmission.transformer
 
 import com.trendyol.transmission.Transmission
+import com.trendyol.transmission.effect.RouterPayloadEffect
 import com.trendyol.transmission.transformer.handler.EffectHandler
 import com.trendyol.transmission.transformer.handler.HandlerScope
 import com.trendyol.transmission.transformer.handler.SignalHandler
@@ -17,6 +18,8 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.filterIsInstance
+import kotlinx.coroutines.flow.filterNot
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -62,7 +65,7 @@ open class Transformer<D : Transmission.Data, E : Transmission.Effect>(
 	}
 
 	@Suppress("UNCHECKED_CAST")
-	protected suspend fun <D : Transmission.Data> queryDataFor(type: KClass<D>): D? {
+	protected suspend fun <D : Transmission.Data> queryRouterForData(type: KClass<D>): D? {
 		outGoingQueryChannel.trySend(
 			DataQuery(
 				sender = transformerName,
@@ -76,10 +79,10 @@ open class Transformer<D : Transmission.Data, E : Transmission.Effect>(
 	fun initialize(
 		incomingSignal: SharedFlow<Transmission.Signal>,
 		incomingEffect: SharedFlow<Transmission.Effect>,
+		incomingQueryResponse: SharedFlow<QueryResponse<D>>,
 		outGoingData: SendChannel<D>,
 		outGoingEffect: SendChannel<E>,
 		outGoingQuery: SendChannel<DataQuery>,
-		incomingQueryResponse: SharedFlow<QueryResponse<D>>
 	) {
 		jobList += transformerScope.launch {
 			launch {
@@ -88,13 +91,13 @@ open class Transformer<D : Transmission.Data, E : Transmission.Effect>(
 				}
 			}
 			launch {
-				incomingQueryResponse.filter { it.owner == transformerName }.collect {
-					queryResponseChannel.trySend(it.data)
+				incomingEffect.filterNot { it is RouterPayloadEffect }.collect {
+					effectHandler?.apply { with(handlerScope) { onEffect(it) } }
 				}
 			}
 			launch {
-				incomingEffect.collect {
-					effectHandler?.apply { with(handlerScope) { onEffect(it) } }
+				incomingQueryResponse.filter { it.owner == transformerName }.collect {
+					queryResponseChannel.trySend(it.data)
 				}
 			}
 			launch { outGoingQueryChannel.receiveAsFlow().collect { outGoingQuery.trySend(it) } }
