@@ -8,6 +8,7 @@ import com.trendyol.transmission.transformer.handler.buildGenericEffectHandler
 import com.trendyol.transmission.ui.ColorPickerUiState
 import com.trendyol.transmission.ui.InputUiState
 import com.trendyol.transmission.ui.OutputUiState
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
 import javax.inject.Inject
 
@@ -19,12 +20,12 @@ class OutputTransformer @Inject constructor() : DefaultTransformer() {
 		when (effect) {
 			is InputEffect.InputUpdate -> {
 				delay(2000L)
-				val output = queryRouterForData(InputUiState::class)
+				val output = queryData(InputUiState::class)
 				output?.let { testData ->
 					holder.update { it.copy(outputText = testData.writtenText) }
 				}
 				delay(2000L)
-				val selectedColor = queryRouterForData(ColorPickerUiState::class)
+				val selectedColor = queryData(ColorPickerUiState::class)
 				holder.update {
 					it.copy(outputText = it.outputText + " and Selected color index is ${selectedColor?.selectedColorIndex}")
 				}

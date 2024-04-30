@@ -3,8 +3,8 @@ package com.trendyol.transmission.transformer
 import com.trendyol.transmission.Transmission
 import com.trendyol.transmission.effect.EffectWrapper
 import com.trendyol.transmission.effect.RouterPayloadEffect
+import com.trendyol.transmission.transformer.handler.CommunicationScope
 import com.trendyol.transmission.transformer.handler.EffectHandler
-import com.trendyol.transmission.transformer.handler.HandlerScope
 import com.trendyol.transmission.transformer.handler.SignalHandler
 import com.trendyol.transmission.transformer.query.DataQuery
 import com.trendyol.transmission.transformer.query.QueryResponse
@@ -15,6 +15,7 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.SendChannel
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -55,7 +56,7 @@ open class Transformer<D : Transmission.Data, E : Transmission.Effect>(
 
 	private val transformerScope = CoroutineScope(SupervisorJob() + dispatcher)
 
-	private val handlerScope: HandlerScope<D, E> = object : HandlerScope<D, E> {
+	private val communicationScope: CommunicationScope<D, E> = object : CommunicationScope<D, E> {
 		override fun publishData(data: D?) {
 			data?.let { dataChannel.trySend(it) }
 		}
@@ -67,19 +68,18 @@ open class Transformer<D : Transmission.Data, E : Transmission.Effect>(
 		override fun sendEffect(effect: E, to: KClass<out Transformer<D, E>>) {
 			effectChannel.trySend(EffectWrapper(effect, to))
 		}
-	}
 
-	@Suppress("UNCHECKED_CAST")
-	protected suspend fun <D : Transmission.Data> queryRouterForData(type: KClass<D>): D? {
-		outGoingQueryChannel.trySend(
-			DataQuery(
-				sender = transformerName,
-				type = type.simpleName.orEmpty()
+		@Suppress("UNCHECKED_CAST")
+		override suspend fun <D : Transmission.Data> queryData(type: KClass<D>): D? {
+			outGoingQueryChannel.trySend(
+				DataQuery(
+					sender = transformerName,
+					type = type.simpleName.orEmpty()
+				)
 			)
-		)
-		return queryResponseChannel.receive() as? D
+			return queryResponseChannel.receive() as? D
+		}
 	}
-
 
 	fun initialize(
 		incomingSignal: SharedFlow<Transmission.Signal>,
@@ -92,7 +92,7 @@ open class Transformer<D : Transmission.Data, E : Transmission.Effect>(
 		jobList += transformerScope.launch {
 			launch {
 				incomingSignal.collect {
-					signalHandler?.apply { with(handlerScope) { onSignal(it) } }
+					signalHandler?.apply { with(communicationScope) { onSignal(it) } }
 				}
 			}
 			launch {
@@ -105,7 +105,7 @@ open class Transformer<D : Transmission.Data, E : Transmission.Effect>(
 						}?.effect ?: return@collect
 
 						effectHandler?.apply {
-							with(handlerScope) {
+							with(communicationScope) {
 								onEffect(effectToProcess)
 							}
 						}
@@ -165,7 +165,7 @@ open class Transformer<D : Transmission.Data, E : Transmission.Effect>(
 	// region handler extensions
 
 	inline fun <reified S : Transmission.Signal> Transformer<D, E>.buildTypedSignalHandler(
-		crossinline onSignal: suspend HandlerScope<D, E>.(signal: S) -> Unit
+		crossinline onSignal: suspend CommunicationScope<D, E>.(signal: S) -> Unit
 	): SignalHandler<D, E> {
 		return SignalHandler { incomingSignal ->
 			incomingSignal
@@ -175,7 +175,7 @@ open class Transformer<D : Transmission.Data, E : Transmission.Effect>(
 	}
 
 	inline fun <reified E : Transmission.Effect> Transformer<D, E>.buildTypedEffectHandler(
-		crossinline onEffect: suspend HandlerScope<D, E>.(effect: E) -> Unit
+		crossinline onEffect: suspend CommunicationScope<D, E>.(effect: E) -> Unit
 	): EffectHandler<D, E> {
 		return EffectHandler { incomingEffect ->
 			incomingEffect
