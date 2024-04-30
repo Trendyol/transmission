@@ -1,5 +1,6 @@
 package com.trendyol.transmission
 
+import com.trendyol.transmission.effect.RouterPayloadEffect
 import com.trendyol.transmission.transformer.FakeTransformer
 import com.trendyol.transmission.transformer.TestTransformer1
 import com.trendyol.transmission.transformer.TestTransformer2
@@ -140,5 +141,22 @@ class TransmissionRouterTest {
 		assertEquals(TestData("update with TestTransformer1"), dataList[0])
 		assertEquals(TestData("update with TestTransformer2"), dataList[1])
 		assertEquals(TestData("update with TestTransformer3"), dataList[2])
+	}
+
+	@Test
+	fun `GIVEN initialized Router with multiple Transformers, WHEN processSignal is called, THEN all transformers should not contain the RouterPayloadEffect`() {
+		// Given
+		val transformer1 = TestTransformer1(testDispatcher)
+		val transformer2 = TestTransformer2(testDispatcher)
+		val transformer3 = TestTransformer3(testDispatcher)
+		sut = TransmissionRouter(setOf(transformer1, transformer2, transformer3), testDispatcher)
+		sut.initialize(onEffect = {}, onData = {})
+		// When
+		sut.processSignal(TestSignal)
+
+		// Then
+		assertEquals(transformer1.effectList.contains(RouterPayloadEffect("")),false )
+		assertEquals(transformer2.effectList.contains(RouterPayloadEffect("")),false )
+		assertEquals(transformer3.effectList.contains(RouterPayloadEffect("")),false )
 	}
 }
