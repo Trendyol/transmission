@@ -56,9 +56,9 @@ graph TD;
 Transformers are responsible for handling `signal`s and `effect`s. They have an inner class called `TransmissionHataHolder` which can hold any Data type that is extended from `Transmission.Data`. Any update to the dataHolder automatically publishes the latest version to Data Channel. 
 
 ```kotlin
-class InputTransformer @Inject constructor() : Transformer<Transmission.Data>() {
+class InputTransformer @Inject constructor() : DefaultTransformer() {
     
-    private val holder = TransmissionDataHolder(InputUiState())
+    private val holder = buildDataHolder(InputUiState())
 
 	override val signalHandler = buildGenericSignalHandler { signal ->
 		when (signal) {

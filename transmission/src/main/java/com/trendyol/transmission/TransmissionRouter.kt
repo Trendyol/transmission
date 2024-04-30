@@ -1,5 +1,6 @@
 package com.trendyol.transmission
 
+import com.trendyol.transmission.effect.EffectWrapper
 import com.trendyol.transmission.transformer.HolderState
 import com.trendyol.transmission.transformer.Transformer
 import com.trendyol.transmission.transformer.query.DataQuery
@@ -43,7 +44,8 @@ class TransmissionRouter<D : Transmission.Data, E : Transmission.Effect>(
 
 	// region effects
 
-	private val effectChannel = Channel<E>(capacity = Channel.UNLIMITED)
+	private val effectChannel =
+		Channel<EffectWrapper<E, D, Transformer<D, E>>>(capacity = Channel.UNLIMITED)
 
 	private val sharedIncomingEffects = effectChannel.receiveAsFlow()
 		.shareIn(coroutineScope, SharingStarted.Lazily)
@@ -82,7 +84,7 @@ class TransmissionRouter<D : Transmission.Data, E : Transmission.Effect>(
 			throw IllegalStateException("transformerSet should not be empty")
 		}
 		initializationJob = coroutineScope.launch {
-			launch { sharedIncomingEffects.collect { onEffect(it) } }
+			launch { sharedIncomingEffects.collect { onEffect(it.effect) } }
 			launch { outGoingQueryChannel.consumeAsFlow().collect { processQuery(it) } }
 			launch { outGoingDataChannel.consumeAsFlow().collect { onData(it) } }
 			transformerSet.map { transformer ->

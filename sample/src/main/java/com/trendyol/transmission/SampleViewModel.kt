@@ -2,8 +2,7 @@ package com.trendyol.transmission
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.trendyol.transmission.Transmission
-import com.trendyol.transmission.TransmissionRouter
+import com.trendyol.transmission.effect.RouterPayloadEffect
 import com.trendyol.transmission.ui.ColorPickerUiState
 import com.trendyol.transmission.ui.InputUiState
 import com.trendyol.transmission.ui.MultiOutputUiState
@@ -40,6 +39,13 @@ class SampleViewModel @Inject constructor(
 
 	fun onEffect(effect: Transmission.Effect) {
 		_transmissionList.update { it.plus("Effect: $effect") }
+		if (effect is RouterPayloadEffect) {
+			when (effect.payload) {
+				is OutputUiState -> {
+					_transmissionList.update { it.plus("Generic Effect: $effect")}
+				}
+			}
+		}
 	}
 
 
