@@ -31,7 +31,7 @@ open class Transformer<D : Transmission.Data, E : Transmission.Effect>(
     dispatcher: CoroutineDispatcher = Dispatchers.Default
 ) {
 
-    private val transformerName = this::class.java.simpleName
+    val transformerName: String = this::class.java.simpleName
 
     private val dataChannel: Channel<D> = Channel(capacity = Channel.UNLIMITED)
     private val effectChannel: Channel<EffectWrapper<E, D, Transformer<D, E>>> =
@@ -74,6 +74,21 @@ open class Transformer<D : Transmission.Data, E : Transmission.Effect>(
             outGoingQueryChannel.trySend(
                 DataQuery(
                     sender = transformerName,
+                    type = type.simpleName.orEmpty()
+                )
+            )
+            return queryResponseChannel.receive() as? D
+        }
+
+        @Suppress("UNCHECKED_CAST")
+        override suspend fun <D : Transmission.Data, T : Transformer<D, E>> queryData(
+            type: KClass<D>,
+            owner: KClass<T>
+        ): D? {
+            outGoingQueryChannel.trySend(
+                DataQuery(
+                    sender = transformerName,
+                    dataOwner = owner.simpleName.orEmpty(),
                     type = type.simpleName.orEmpty()
                 )
             )

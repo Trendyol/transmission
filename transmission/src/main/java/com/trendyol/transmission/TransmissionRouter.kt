@@ -28,11 +28,11 @@ typealias DefaultTransmissionRouter = TransmissionRouter<Transmission.Data, Tran
 class TransmissionRouter<D : Transmission.Data, E : Transmission.Effect>(
 	private val transformerSet: Set<Transformer<D, E>>,
 	private val dispatcher: CoroutineDispatcher = Dispatchers.Default
-): QuerySender<D,E> {
+) : QuerySender<D, E> {
 
 	private val coroutineScope = CoroutineScope(SupervisorJob() + dispatcher)
 
-	private val routerName = this::class.java.simpleName
+	private val routerName: String = this::class.java.simpleName
 
 	private var initializationJob: Job? = null
 
@@ -76,6 +76,7 @@ class TransmissionRouter<D : Transmission.Data, E : Transmission.Effect>(
 	private suspend fun processQuery(query: DataQuery) = withContext(dispatcher) {
 		val dataHolder = transformerSet
 			.filter { it.transmissionDataHolderState is HolderState.Initialized }
+			.filter { if (query.dataOwner != null) query.dataOwner == it.transformerName else true }
 			.find {
 				(it.transmissionDataHolderState as HolderState.Initialized)
 					.valueSet.contains(query.type)
@@ -149,5 +150,4 @@ class TransmissionRouter<D : Transmission.Data, E : Transmission.Effect>(
 		)
 		return routerQueryResponseChannel.filterIsInstance(type).firstOrNull()
 	}
-
 }
