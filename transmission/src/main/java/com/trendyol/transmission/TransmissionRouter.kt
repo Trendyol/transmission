@@ -5,27 +5,34 @@ import com.trendyol.transmission.transformer.HolderState
 import com.trendyol.transmission.transformer.Transformer
 import com.trendyol.transmission.transformer.query.DataQuery
 import com.trendyol.transmission.transformer.query.QueryResponse
+import com.trendyol.transmission.transformer.query.QuerySender
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.consumeAsFlow
+import kotlinx.coroutines.flow.filterIsInstance
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import kotlin.reflect.KClass
 
 typealias DefaultTransmissionRouter = TransmissionRouter<Transmission.Data, Transmission.Effect>
 
 class TransmissionRouter<D : Transmission.Data, E : Transmission.Effect>(
 	private val transformerSet: Set<Transformer<D, E>>,
 	private val dispatcher: CoroutineDispatcher = Dispatchers.Default
-) {
+) : QuerySender<D, E> {
 
 	private val coroutineScope = CoroutineScope(SupervisorJob() + dispatcher)
+
+	private val routerName: String = this::class.java.simpleName
 
 	private var initializationJob: Job? = null
 
@@ -56,6 +63,8 @@ class TransmissionRouter<D : Transmission.Data, E : Transmission.Effect>(
 
 	// region data query
 
+	private val routerQueryResponseChannel: MutableSharedFlow<D?> = MutableSharedFlow()
+
 	private val outGoingQueryChannel: Channel<DataQuery> = Channel(capacity = Channel.BUFFERED)
 
 	private val queryResponseChannel: Channel<QueryResponse<D>> =
@@ -66,12 +75,22 @@ class TransmissionRouter<D : Transmission.Data, E : Transmission.Effect>(
 
 	private suspend fun processQuery(query: DataQuery) = withContext(dispatcher) {
 		val dataHolder = transformerSet
-			.filter { it.transmissionDataHolderState != HolderState.Undefined }
+			.filter { it.transmissionDataHolderState is HolderState.Initialized }
+			.filter { if (query.dataOwner != null) query.dataOwner == it.transformerName else true }
 			.find {
-				it.transmissionDataHolderState is HolderState.Initialized &&
-					(it.transmissionDataHolderState as HolderState.Initialized).value == query.type
+				(it.transmissionDataHolderState as HolderState.Initialized)
+					.valueSet.contains(query.type)
 			}
-		queryResponseChannel.trySend(QueryResponse(query.sender, dataHolder?.holderData?.value))
+		if (query.sender == routerName) {
+			routerQueryResponseChannel.emit(dataHolder?.holderData?.value?.get(query.type))
+		} else {
+			queryResponseChannel.trySend(
+				QueryResponse(
+					owner = query.sender,
+					data = dataHolder?.holderData?.value?.get(query.type)
+				)
+			)
+		}
 	}
 
 	// endregion
@@ -107,4 +126,28 @@ class TransmissionRouter<D : Transmission.Data, E : Transmission.Effect>(
 		transformerSet.forEach { it.clear() }
 	}
 
+	@Suppress("UNCHECKED_CAST")
+	override suspend fun <D : Transmission.Data> queryData(type: KClass<D>): D? {
+		outGoingQueryChannel.trySend(
+			DataQuery(
+				sender = routerName,
+				type = type.simpleName.orEmpty()
+			)
+		)
+		return routerQueryResponseChannel.filterIsInstance(type).firstOrNull()
+	}
+
+	override suspend fun <D : Transmission.Data, TD : Transmission.Data, T : Transformer<TD, E>> queryData(
+		type: KClass<D>,
+		owner: KClass<out T>
+	): D? {
+		outGoingQueryChannel.trySend(
+			DataQuery(
+				sender = routerName,
+				dataOwner = owner.simpleName.orEmpty(),
+				type = type.simpleName.orEmpty()
+			)
+		)
+		return routerQueryResponseChannel.filterIsInstance(type).firstOrNull()
+	}
 }

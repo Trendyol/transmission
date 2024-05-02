@@ -15,7 +15,6 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.SendChannel
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -32,7 +31,7 @@ open class Transformer<D : Transmission.Data, E : Transmission.Effect>(
 	dispatcher: CoroutineDispatcher = Dispatchers.Default
 ) {
 
-	private val transformerName = this::class.java.simpleName
+	val transformerName: String = this::class.java.simpleName
 
 	private val dataChannel: Channel<D> = Channel(capacity = Channel.UNLIMITED)
 	private val effectChannel: Channel<EffectWrapper<E, D, Transformer<D, E>>> =
@@ -41,14 +40,15 @@ open class Transformer<D : Transmission.Data, E : Transmission.Effect>(
 	private val outGoingQueryChannel: Channel<DataQuery> = Channel()
 	private val queryResponseChannel: Channel<D?> = Channel()
 
-	private val holderDataReference: MutableStateFlow<D?> = MutableStateFlow(null)
+	private val holderDataReference: MutableStateFlow<MutableMap<String, D?>> =
+		MutableStateFlow(mutableMapOf())
 	val holderData = holderDataReference.asStateFlow()
 
 	private val jobList: MutableList<Job?> = mutableListOf()
 
-	protected var transmissionDataHolderStateInternal: HolderState = HolderState.Undefined
+	protected var internalTransmissionHolderSet: HolderState = HolderState.Undefined
 	val transmissionDataHolderState: HolderState
-		get() = transmissionDataHolderStateInternal
+		get() = internalTransmissionHolderSet
 
 	open val signalHandler: SignalHandler<D, E>? = null
 
@@ -74,6 +74,21 @@ open class Transformer<D : Transmission.Data, E : Transmission.Effect>(
 			outGoingQueryChannel.trySend(
 				DataQuery(
 					sender = transformerName,
+					type = type.simpleName.orEmpty()
+				)
+			)
+			return queryResponseChannel.receive() as? D
+		}
+
+		@Suppress("UNCHECKED_CAST")
+		override suspend fun <D : Transmission.Data, TD : Transmission.Data, T : Transformer<TD, E>> queryData(
+			type: KClass<D>,
+			owner: KClass<out T>
+		): D? {
+			outGoingQueryChannel.trySend(
+				DataQuery(
+					sender = transformerName,
+					dataOwner = owner.simpleName.orEmpty(),
 					type = type.simpleName.orEmpty()
 				)
 			)
@@ -141,7 +156,10 @@ open class Transformer<D : Transmission.Data, E : Transmission.Effect>(
 			jobList += transformerScope.launch {
 				holder.collect {
 					it?.let { holderData ->
-						holderDataReference.update { holderData }
+						holderDataReference.update { holderDataReference ->
+							holderDataReference[holderData::class.java.simpleName] = holderData
+							holderDataReference
+						}
 						dataChannel.trySend(it)
 					}
 				}
@@ -156,7 +174,23 @@ open class Transformer<D : Transmission.Data, E : Transmission.Effect>(
 	protected inline fun <reified T : D> Transformer<D, E>.buildDataHolder(
 		initialValue: T
 	): TransmissionDataHolder<T> {
-		transmissionDataHolderStateInternal = HolderState.Initialized(T::class.java.simpleName)
+		val dataHolderToTrack = T::class.java.simpleName
+		when (internalTransmissionHolderSet) {
+			is HolderState.Initialized -> {
+				val currentSet =
+					(internalTransmissionHolderSet as HolderState.Initialized).valueSet
+				require(!currentSet.contains(dataHolderToTrack)) {
+					"Multiple data holders with the same type is not allowed: $dataHolderToTrack"
+				}
+				internalTransmissionHolderSet =
+					HolderState.Initialized(currentSet + dataHolderToTrack)
+			}
+
+			HolderState.Undefined -> {
+				internalTransmissionHolderSet =
+					HolderState.Initialized(setOf(dataHolderToTrack))
+			}
+		}
 		return TransmissionDataHolder(initialValue)
 	}
 

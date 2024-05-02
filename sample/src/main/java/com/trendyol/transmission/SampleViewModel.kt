@@ -3,17 +3,20 @@ package com.trendyol.transmission
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.trendyol.transmission.effect.RouterPayloadEffect
+import com.trendyol.transmission.features.input.InputTransformer
 import com.trendyol.transmission.ui.ColorPickerUiState
 import com.trendyol.transmission.ui.InputUiState
 import com.trendyol.transmission.ui.MultiOutputUiState
 import com.trendyol.transmission.ui.OutputUiState
 import com.trendyol.transmission.ui.SampleScreenUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+import kotlin.time.Duration.Companion.seconds
 
 @HiltViewModel
 class SampleViewModel @Inject constructor(
@@ -37,15 +40,23 @@ class SampleViewModel @Inject constructor(
 		_transmissionList.update { it.plus("Signal: $signal") }
 	}
 
-	fun onEffect(effect: Transmission.Effect) {
+	fun onEffect(effect: Transmission.Effect) = viewModelScope.launch {
 		_transmissionList.update { it.plus("Effect: $effect") }
 		if (effect is RouterPayloadEffect) {
 			when (effect.payload) {
 				is OutputUiState -> {
-					_transmissionList.update { it.plus("Generic Effect: $effect")}
+					_transmissionList.update { it.plus("Generic Effect: $effect") }
 				}
 			}
 		}
+		val inputData = transmissionRouter.queryData(
+			type = InputUiState::class,
+			owner = InputTransformer::class
+		)
+		delay(1.seconds)
+		val colorPicker = transmissionRouter.queryData(ColorPickerUiState::class)
+		_transmissionList.update { it.plus("Current InputData: $inputData") }
+		_transmissionList.update { it.plus("Current ColorPickerData: $colorPicker") }
 	}
 
 
