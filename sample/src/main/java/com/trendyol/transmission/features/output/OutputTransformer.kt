@@ -1,34 +1,39 @@
 package com.trendyol.transmission.features.output
 
+import com.trendyol.transmission.effect.RouterPayloadEffect
 import com.trendyol.transmission.features.colorpicker.ColorPickerEffect
+import com.trendyol.transmission.features.colorpicker.ColorPickerTransformer
 import com.trendyol.transmission.features.input.InputEffect
 import com.trendyol.transmission.transformer.DefaultTransformer
-import com.trendyol.transmission.effect.RouterPayloadEffect
 import com.trendyol.transmission.transformer.handler.buildGenericEffectHandler
 import com.trendyol.transmission.ui.ColorPickerUiState
-import com.trendyol.transmission.ui.InputUiState
 import com.trendyol.transmission.ui.OutputUiState
 import kotlinx.coroutines.delay
 import javax.inject.Inject
+import kotlin.time.Duration.Companion.seconds
 
 class OutputTransformer @Inject constructor() : DefaultTransformer() {
 
 	private val holder = buildDataHolder(OutputUiState())
 
+	private val holder2 = buildDataHolder(ColorPickerUiState())
+
 	override val effectHandler = buildGenericEffectHandler { effect ->
 		when (effect) {
 			is InputEffect.InputUpdate -> {
-				delay(2000L)
-				val output = queryData(InputUiState::class)
-				output?.let { testData ->
-					holder.update { it.copy(outputText = testData.writtenText) }
-				}
-				delay(2000L)
-				val selectedColor = queryData(ColorPickerUiState::class)
+				holder.update { it.copy(outputText = effect.value) }
+				delay(3.seconds)
+				val selectedColor =
+					queryData(ColorPickerUiState::class, owner = ColorPickerTransformer::class)
 				holder.update {
 					it.copy(outputText = it.outputText + " and Selected color index is ${selectedColor?.selectedColorIndex}")
 				}
 				publishEffect(RouterPayloadEffect(holder.value))
+				delay(1.seconds)
+				sendEffect(
+					ColorPickerEffect.BackgroundColorUpdate(holder2.value.backgroundColor),
+					to = ColorPickerTransformer::class
+				)
 			}
 
 			is ColorPickerEffect.BackgroundColorUpdate -> {
