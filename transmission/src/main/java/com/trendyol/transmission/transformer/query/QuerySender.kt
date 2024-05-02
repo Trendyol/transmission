@@ -6,8 +6,8 @@ import kotlin.reflect.KClass
 
 interface QuerySender<D : Transmission.Data, E : Transmission.Effect>{
 	suspend fun <D : Transmission.Data> queryData(type: KClass<D>): D?
-	suspend fun <D : Transmission.Data, T : Transformer<D, E>> queryData(
+	suspend fun <D : Transmission.Data, TD: Transmission.Data, T : Transformer<TD, E>> queryData(
 		type: KClass<D>,
-		owner: KClass<T>
+		owner: KClass<out T>
 	): D?
 }

@@ -3,6 +3,7 @@ package com.trendyol.transmission
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.trendyol.transmission.effect.RouterPayloadEffect
+import com.trendyol.transmission.features.input.InputTransformer
 import com.trendyol.transmission.ui.ColorPickerUiState
 import com.trendyol.transmission.ui.InputUiState
 import com.trendyol.transmission.ui.MultiOutputUiState
@@ -44,11 +45,14 @@ class SampleViewModel @Inject constructor(
 		if (effect is RouterPayloadEffect) {
 			when (effect.payload) {
 				is OutputUiState -> {
-					_transmissionList.update { it.plus("Generic Effect: $effect")}
+					_transmissionList.update { it.plus("Generic Effect: $effect") }
 				}
 			}
 		}
-		val inputData = transmissionRouter.queryData(InputUiState::class)
+		val inputData = transmissionRouter.queryData(
+			type = InputUiState::class,
+			owner = InputTransformer::class
+		)
 		delay(1.seconds)
 		val colorPicker = transmissionRouter.queryData(ColorPickerUiState::class)
 		_transmissionList.update { it.plus("Current InputData: $inputData") }

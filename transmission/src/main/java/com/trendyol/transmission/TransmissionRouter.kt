@@ -137,9 +137,9 @@ class TransmissionRouter<D : Transmission.Data, E : Transmission.Effect>(
 		return routerQueryResponseChannel.filterIsInstance(type).firstOrNull()
 	}
 
-	override suspend fun <D : Transmission.Data, T : Transformer<D, E>> queryData(
+	override suspend fun <D : Transmission.Data, TD : Transmission.Data, T : Transformer<TD, E>> queryData(
 		type: KClass<D>,
-		owner: KClass<T>
+		owner: KClass<out T>
 	): D? {
 		outGoingQueryChannel.trySend(
 			DataQuery(
