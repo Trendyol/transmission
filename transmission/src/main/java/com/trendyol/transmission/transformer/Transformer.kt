@@ -94,6 +94,10 @@ open class Transformer<D : Transmission.Data, E : Transmission.Effect>(
 		}
 	}
 
+	protected suspend fun communicate(scope: suspend CommunicationScope<D,E>.() -> Unit) {
+		communicationScope.apply { scope() }
+	}
+
 	fun initialize(
 		incomingSignal: SharedFlow<Transmission.Signal>,
 		incomingEffect: SharedFlow<EffectWrapper<E, D, Transformer<D, E>>>,
