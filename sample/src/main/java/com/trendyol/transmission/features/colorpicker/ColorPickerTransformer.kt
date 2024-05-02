@@ -1,11 +1,10 @@
 package com.trendyol.transmission.features.colorpicker
 
-import com.trendyol.transmission.Transmission
+import com.trendyol.transmission.features.multioutput.MultiOutputTransformer
 import com.trendyol.transmission.transformer.DefaultTransformer
 import com.trendyol.transmission.transformer.handler.buildGenericEffectHandler
 import com.trendyol.transmission.transformer.handler.buildGenericSignalHandler
 import com.trendyol.transmission.ui.ColorPickerUiState
-import kotlinx.coroutines.coroutineScope
 import javax.inject.Inject
 
 class ColorPickerTransformer @Inject constructor() : DefaultTransformer() {
@@ -19,7 +18,10 @@ class ColorPickerTransformer @Inject constructor() : DefaultTransformer() {
 				publishEffect(
 					ColorPickerEffect.BackgroundColorUpdate(signal.selectedColor.copy(alpha = 0.1f))
 				)
-				publishEffect(ColorPickerEffect.SelectedColorUpdate(signal.selectedColor))
+				sendEffect(
+					effect = ColorPickerEffect.SelectedColorUpdate(signal.selectedColor),
+					to = MultiOutputTransformer::class
+				)
 			}
 		}
 	}

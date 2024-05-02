@@ -171,7 +171,11 @@ open class Transformer<D : Transmission.Data, E : Transmission.Effect>(
 		}
 	}
 
-	protected inline fun <reified T : D> Transformer<D, E>.buildDataHolder(
+	/**
+	* Throws [IllegalArgumentException] when multiple data holders with same type
+	 * is defined inside a [Transformer]
+	* */
+	protected inline fun <reified T : D?> Transformer<D, E>.buildDataHolder(
 		initialValue: T
 	): TransmissionDataHolder<T> {
 		val dataHolderToTrack = T::class.java.simpleName

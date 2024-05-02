@@ -25,6 +25,9 @@ import kotlin.reflect.KClass
 
 typealias DefaultTransmissionRouter = TransmissionRouter<Transmission.Data, Transmission.Effect>
 
+/**
+ * Throws [IllegalStateException] when supplied [Transformer] set is empty
+ */
 class TransmissionRouter<D : Transmission.Data, E : Transmission.Effect>(
 	private val transformerSet: Set<Transformer<D, E>>,
 	private val dispatcher: CoroutineDispatcher = Dispatchers.Default
@@ -99,8 +102,8 @@ class TransmissionRouter<D : Transmission.Data, E : Transmission.Effect>(
 		onData: ((D) -> Unit),
 		onEffect: (E) -> Unit = {},
 	) {
-		if (transformerSet.isEmpty()) {
-			throw IllegalStateException("transformerSet should not be empty")
+		require(transformerSet.isNotEmpty()) {
+			"transformerSet should not be empty"
 		}
 		initializationJob = coroutineScope.launch {
 			launch { sharedIncomingEffects.collect { onEffect(it.effect) } }
