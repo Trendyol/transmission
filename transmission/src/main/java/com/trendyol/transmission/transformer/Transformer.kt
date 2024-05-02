@@ -145,7 +145,7 @@ open class Transformer<D : Transmission.Data, E : Transmission.Effect>(
 
 	// region DataHolder
 
-	inner class TransmissionDataHolder<T : D?>(initialValue: T) {
+	inner class TransmissionDataHolder<T : D?>(initialValue: T, publishUpdates: Boolean) {
 
 		private val holder = MutableStateFlow(initialValue)
 
@@ -160,7 +160,9 @@ open class Transformer<D : Transmission.Data, E : Transmission.Effect>(
 							holderDataReference[holderData::class.java.simpleName] = holderData
 							holderDataReference
 						}
-						dataChannel.trySend(it)
+						if (publishUpdates) {
+							dataChannel.trySend(it)
+						}
 					}
 				}
 			}
@@ -174,9 +176,13 @@ open class Transformer<D : Transmission.Data, E : Transmission.Effect>(
 	/**
 	* Throws [IllegalArgumentException] when multiple data holders with same type
 	 * is defined inside a [Transformer]
+	 * @param initialValue Initial value of the Data Holder.
+	 * Must be a type extended from [Transmission.Data]
+	 * @param [publishUpdates] Controls sending updates to the [TransmissionRouter]
 	* */
 	protected inline fun <reified T : D?> Transformer<D, E>.buildDataHolder(
-		initialValue: T
+		initialValue: T,
+		publishUpdates: Boolean = true,
 	): TransmissionDataHolder<T> {
 		val dataHolderToTrack = T::class.java.simpleName
 		when (internalTransmissionHolderSet) {
@@ -195,7 +201,7 @@ open class Transformer<D : Transmission.Data, E : Transmission.Effect>(
 					HolderState.Initialized(setOf(dataHolderToTrack))
 			}
 		}
-		return TransmissionDataHolder(initialValue)
+		return TransmissionDataHolder(initialValue, publishUpdates)
 	}
 
 	// endregion
