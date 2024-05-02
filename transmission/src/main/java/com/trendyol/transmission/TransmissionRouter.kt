@@ -11,6 +11,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -36,8 +37,6 @@ class TransmissionRouter<D : Transmission.Data, E : Transmission.Effect>(
 	private val coroutineScope = CoroutineScope(SupervisorJob() + dispatcher)
 
 	private val routerName: String = this::class.java.simpleName
-
-	private var initializationJob: Job? = null
 
 	// region signals
 
@@ -105,7 +104,7 @@ class TransmissionRouter<D : Transmission.Data, E : Transmission.Effect>(
 		require(transformerSet.isNotEmpty()) {
 			"transformerSet should not be empty"
 		}
-		initializationJob = coroutineScope.launch {
+		coroutineScope.launch {
 			launch { sharedIncomingEffects.collect { onEffect(it.effect) } }
 			launch { outGoingQueryChannel.consumeAsFlow().collect { processQuery(it) } }
 			launch { outGoingDataChannel.consumeAsFlow().collect { onData(it) } }
@@ -125,8 +124,8 @@ class TransmissionRouter<D : Transmission.Data, E : Transmission.Effect>(
 	}
 
 	fun clear() {
-		initializationJob?.cancel()
 		transformerSet.forEach { it.clear() }
+		coroutineScope.cancel()
 	}
 
 	@Suppress("UNCHECKED_CAST")

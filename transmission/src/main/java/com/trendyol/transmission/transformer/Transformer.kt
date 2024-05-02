@@ -11,8 +11,8 @@ import com.trendyol.transmission.transformer.query.QueryResponse
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.SendChannel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -44,8 +44,6 @@ open class Transformer<D : Transmission.Data, E : Transmission.Effect>(
 		MutableStateFlow(mutableMapOf())
 	val holderData = holderDataReference.asStateFlow()
 
-	private val jobList: MutableList<Job?> = mutableListOf()
-
 	protected var internalTransmissionHolderSet: HolderState = HolderState.Undefined
 	val transmissionDataHolderState: HolderState
 		get() = internalTransmissionHolderSet
@@ -54,7 +52,7 @@ open class Transformer<D : Transmission.Data, E : Transmission.Effect>(
 
 	open val effectHandler: EffectHandler<D, E>? = null
 
-	private val transformerScope = CoroutineScope(SupervisorJob() + dispatcher)
+	protected val transformerScope = CoroutineScope(SupervisorJob() + dispatcher)
 
 	private val communicationScope: CommunicationScope<D, E> = object : CommunicationScope<D, E> {
 		override fun publishData(data: D?) {
@@ -104,7 +102,7 @@ open class Transformer<D : Transmission.Data, E : Transmission.Effect>(
 		outGoingEffect: SendChannel<EffectWrapper<E, D, Transformer<D, E>>>,
 		outGoingQuery: SendChannel<DataQuery>,
 	) {
-		jobList += transformerScope.launch {
+		transformerScope.launch {
 			launch {
 				incomingSignal.collect {
 					signalHandler?.apply { with(communicationScope) { onSignal(it) } }
@@ -140,7 +138,7 @@ open class Transformer<D : Transmission.Data, E : Transmission.Effect>(
 	}
 
 	fun clear() {
-		jobList.clearJobs()
+		transformerScope.cancel()
 	}
 
 	// region DataHolder
@@ -153,7 +151,7 @@ open class Transformer<D : Transmission.Data, E : Transmission.Effect>(
 			get() = holder.value
 
 		init {
-			jobList += transformerScope.launch {
+			transformerScope.launch {
 				holder.collect {
 					it?.let { holderData ->
 						holderDataReference.update { holderDataReference ->
