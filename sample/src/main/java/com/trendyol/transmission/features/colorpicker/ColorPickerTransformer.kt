@@ -15,10 +15,10 @@ class ColorPickerTransformer @Inject constructor() : DefaultTransformer() {
 		when (signal) {
 			is ColorPickerSignal.SelectColor -> {
 				holder.update { it.copy(selectedColorIndex = signal.index) }
-				publishEffect(
+				publish(
 					ColorPickerEffect.BackgroundColorUpdate(signal.selectedColor.copy(alpha = 0.1f))
 				)
-				sendEffect(
+				send(
 					effect = ColorPickerEffect.SelectedColorUpdate(signal.selectedColor),
 					to = MultiOutputTransformer::class
 				)

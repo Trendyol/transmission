@@ -17,8 +17,13 @@ class MultiOutputTransformer @Inject constructor() : DefaultTransformer() {
 		when (effect) {
 			is InputEffect.InputUpdate -> {
 				holder.update { it.copy(writtenUppercaseText = effect.value.uppercase()) }
-				val result = queryComputation(OutputCalculationResult::class, OutputTransformer::class)
-				holder.update { it.copy(writtenUppercaseText = it.writtenUppercaseText + " ${result?.result}") }
+				val result = queryComputation(
+					type = OutputCalculationResult::class,
+					owner = OutputTransformer::class
+				)
+				holder.update {
+					it.copy(writtenUppercaseText = it.writtenUppercaseText + " ${result?.result}")
+				}
 			}
 
 			is ColorPickerEffect.BackgroundColorUpdate -> {

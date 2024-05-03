@@ -12,12 +12,12 @@ open class FakeTransformer(dispatcher: CoroutineDispatcher) : DefaultTransformer
 	val signalList = mutableListOf<Transmission.Signal>()
 	val effectList = mutableListOf<Transmission.Effect>()
 
-	private val holder = TransmissionDataHolder<TestData?>(null)
+	private val holder = buildDataHolder<TestData?>(null)
 
 	override val signalHandler = buildGenericSignalHandler { signal ->
 		signalList.add(signal)
-		publishEffect(TestEffect)
-		publishEffect(RouterPayloadEffect(""))
+		publish(TestEffect)
+		publish(RouterPayloadEffect(""))
 		holder.update { TestData("update with ${this@FakeTransformer.javaClass.simpleName}") }
 	}
 

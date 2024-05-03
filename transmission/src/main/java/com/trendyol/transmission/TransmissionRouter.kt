@@ -26,7 +26,7 @@ import kotlin.reflect.KClass
 typealias DefaultTransmissionRouter = TransmissionRouter<Transmission.Data, Transmission.Effect>
 
 /**
- * Throws [IllegalStateException] when supplied [Transformer] set is empty
+ * Throws [IllegalArgumentException] when supplied [Transformer] set is empty
  */
 class TransmissionRouter<D : Transmission.Data, E : Transmission.Effect>(
 	private val transformerSet: Set<Transformer<D, E>>,
@@ -111,7 +111,7 @@ class TransmissionRouter<D : Transmission.Data, E : Transmission.Effect>(
 				coroutineScope.launch {
 					routerQueryResponseChannel.emit(
 						computationHolder?.computationMap?.get(query.type)
-							?.invoke(computationHolder.communicationScope)
+							?.getResult(computationHolder.communicationScope, query.invalidate)
 					)
 				}
 			} else {
@@ -120,7 +120,7 @@ class TransmissionRouter<D : Transmission.Data, E : Transmission.Effect>(
 						QueryResponse.Computation(
 							owner = query.sender,
 							data = computationHolder?.computationMap?.get(query.type)
-								?.invoke(computationHolder.communicationScope)
+								?.getResult(computationHolder.communicationScope, query.invalidate)
 						)
 					)
 				}
@@ -173,13 +173,15 @@ class TransmissionRouter<D : Transmission.Data, E : Transmission.Effect>(
 
 	override suspend fun <D : Transmission.Data, TD : Transmission.Data, T : Transformer<TD, E>> queryComputation(
 		type: KClass<D>,
-		owner: KClass<out T>
+		owner: KClass<out T>,
+		invalidate: Boolean
 	): D? {
 		outGoingQueryChannel.trySend(
 			Query.Computation(
 				sender = routerName,
 				computationOwner = owner.simpleName.orEmpty(),
-				type = type.simpleName.orEmpty()
+				type = type.simpleName.orEmpty(),
+				invalidate = invalidate
 			)
 		)
 		return routerQueryResponseChannel.filterIsInstance(type).firstOrNull()
