@@ -5,6 +5,7 @@ sealed interface Query {
 	data class Computation(
 		val sender: String,
 		val computationOwner: String,
-		val type: String
+		val type: String,
+		val invalidate: Boolean = false,
 	) : Query
 }
