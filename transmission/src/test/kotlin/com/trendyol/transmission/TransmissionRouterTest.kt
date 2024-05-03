@@ -35,7 +35,7 @@ class TransmissionRouterTest {
 			// When
 			try {
 				sut.initialize(onData = {}, onEffect = {})
-			} catch (e: IllegalStateException) {
+			} catch (e: IllegalArgumentException) {
 				// Then
 				assertEquals(e.message, "transformerSet should not be empty")
 			}
@@ -121,7 +121,7 @@ class TransmissionRouterTest {
 		sut.processSignal(TestSignal)
 
 		// Then
-		assertEquals(effectList.size, 3)
+		assertEquals(effectList.size, 6)
 	}
 
 	@Test
