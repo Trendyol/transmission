@@ -242,8 +242,8 @@ open class Transformer<D : Transmission.Data, E : Transmission.Effect>(
     // endregion
 
     /**
-     * Throws [IllegalArgumentException] when multiple computations are defined
-     * inside the [Transformer].
+     * Throws [IllegalArgumentException] when multiple computations with the same return type
+     * are defined inside the [Transformer].
      *
      * Adds a computation to [Transformer] to be queried.
      * @param useCache Stores the result after first computation
