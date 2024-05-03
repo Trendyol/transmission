@@ -6,21 +6,26 @@ import com.trendyol.transmission.effect.RouterPayloadEffect
 import com.trendyol.transmission.transformer.handler.CommunicationScope
 import com.trendyol.transmission.transformer.handler.EffectHandler
 import com.trendyol.transmission.transformer.handler.SignalHandler
-import com.trendyol.transmission.transformer.query.DataQuery
+import com.trendyol.transmission.transformer.query.Query
 import com.trendyol.transmission.transformer.query.QueryResponse
+import com.trendyol.transmission.transformer.query.QuerySender
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.SendChannel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.filterNot
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlin.reflect.KClass
@@ -33,30 +38,38 @@ open class Transformer<D : Transmission.Data, E : Transmission.Effect>(
 
 	val transformerName: String = this::class.java.simpleName
 
+	protected val transformerScope = CoroutineScope(SupervisorJob() + dispatcher)
+
 	private val dataChannel: Channel<D> = Channel(capacity = Channel.UNLIMITED)
 	private val effectChannel: Channel<EffectWrapper<E, D, Transformer<D, E>>> =
 		Channel(capacity = Channel.UNLIMITED)
 
-	private val outGoingQueryChannel: Channel<DataQuery> = Channel()
-	private val queryResponseChannel: Channel<D?> = Channel()
+	private val outGoingQueryChannel: Channel<Query> = Channel(capacity = Channel.BUFFERED)
+	private val queryResponseChannel: Channel<QueryResponse<D>> =
+		Channel(capacity = Channel.BUFFERED)
+
+	private val queryResponseSharedFlow = queryResponseChannel.receiveAsFlow()
+		.shareIn(transformerScope, SharingStarted.WhileSubscribed())
 
 	private val holderDataReference: MutableStateFlow<MutableMap<String, D?>> =
 		MutableStateFlow(mutableMapOf())
 	val holderData = holderDataReference.asStateFlow()
 
-	private val jobList: MutableList<Job?> = mutableListOf()
-
 	protected var internalTransmissionHolderSet: HolderState = HolderState.Undefined
 	val transmissionDataHolderState: HolderState
 		get() = internalTransmissionHolderSet
+
+	protected val internalComputationMap: MutableMap<String, suspend QuerySender<D, E>.() -> D?> =
+		mutableMapOf()
+	val computationMap: Map<String, suspend QuerySender<D, E>.() -> D?> = internalComputationMap
 
 	open val signalHandler: SignalHandler<D, E>? = null
 
 	open val effectHandler: EffectHandler<D, E>? = null
 
-	private val transformerScope = CoroutineScope(SupervisorJob() + dispatcher)
 
-	private val communicationScope: CommunicationScope<D, E> = object : CommunicationScope<D, E> {
+	@Suppress("UNCHECKED_CAST")
+	val communicationScope: CommunicationScope<D, E> = object : CommunicationScope<D, E> {
 		override fun publishData(data: D?) {
 			data?.let { dataChannel.trySend(it) }
 		}
@@ -69,31 +82,42 @@ open class Transformer<D : Transmission.Data, E : Transmission.Effect>(
 			effectChannel.trySend(EffectWrapper(effect, to))
 		}
 
-		@Suppress("UNCHECKED_CAST")
 		override suspend fun <D : Transmission.Data> queryData(type: KClass<D>): D? {
 			outGoingQueryChannel.trySend(
-				DataQuery(
-					sender = transformerName,
-					type = type.simpleName.orEmpty()
+				Query.Data(
+					sender = transformerName, type = type.simpleName.orEmpty()
 				)
 			)
-			return queryResponseChannel.receive() as? D
+			return queryResponseSharedFlow.filterIsInstance<QueryResponse.Data<D>>().first().data
 		}
 
-		@Suppress("UNCHECKED_CAST")
 		override suspend fun <D : Transmission.Data, TD : Transmission.Data, T : Transformer<TD, E>> queryData(
-			type: KClass<D>,
-			owner: KClass<out T>
+			type: KClass<D>, owner: KClass<out T>
 		): D? {
 			outGoingQueryChannel.trySend(
-				DataQuery(
+				Query.Data(
 					sender = transformerName,
 					dataOwner = owner.simpleName.orEmpty(),
 					type = type.simpleName.orEmpty()
 				)
 			)
-			return queryResponseChannel.receive() as? D
+			return queryResponseSharedFlow.filterIsInstance<QueryResponse.Data<D>>().first().data
 		}
+
+		override suspend fun <D : Transmission.Data, TD : Transmission.Data, T : Transformer<TD, E>> queryComputation(
+			type: KClass<D>, owner: KClass<out T>
+		): D? {
+			outGoingQueryChannel.trySend(
+				Query.Computation(
+					sender = transformerName,
+					computationOwner = owner.simpleName.orEmpty(),
+					type = type.simpleName.orEmpty()
+				)
+			)
+			return queryResponseSharedFlow.filterIsInstance<QueryResponse.Computation<D>>()
+				.first().data
+		}
+
 	}
 
 	fun initialize(
@@ -102,21 +126,19 @@ open class Transformer<D : Transmission.Data, E : Transmission.Effect>(
 		incomingQueryResponse: SharedFlow<QueryResponse<D>>,
 		outGoingData: SendChannel<D>,
 		outGoingEffect: SendChannel<EffectWrapper<E, D, Transformer<D, E>>>,
-		outGoingQuery: SendChannel<DataQuery>,
+		outGoingQuery: SendChannel<Query>,
 	) {
-		jobList += transformerScope.launch {
+		transformerScope.launch {
 			launch {
 				incomingSignal.collect {
 					signalHandler?.apply { with(communicationScope) { onSignal(it) } }
 				}
 			}
 			launch {
-				incomingEffect
-					.filterNot { it.effect is RouterPayloadEffect }
+				incomingEffect.filterNot { it.effect is RouterPayloadEffect }
 					.collect { incomingEffect ->
 						val effectToProcess = incomingEffect.takeIf {
-							incomingEffect.to == null ||
-								incomingEffect.to == this@Transformer::class
+							incomingEffect.to == null || incomingEffect.to == this@Transformer::class
 						}?.effect ?: return@collect
 
 						effectHandler?.apply {
@@ -128,7 +150,7 @@ open class Transformer<D : Transmission.Data, E : Transmission.Effect>(
 			}
 			launch {
 				incomingQueryResponse.filter { it.owner == transformerName }.collect {
-					queryResponseChannel.trySend(it.data)
+					queryResponseChannel.trySend(it)
 				}
 			}
 			launch { outGoingQueryChannel.receiveAsFlow().collect { outGoingQuery.trySend(it) } }
@@ -140,12 +162,13 @@ open class Transformer<D : Transmission.Data, E : Transmission.Effect>(
 	}
 
 	fun clear() {
-		jobList.clearJobs()
+		transformerScope.cancel()
+		internalComputationMap.clear()
 	}
 
 	// region DataHolder
 
-	inner class TransmissionDataHolder<T : D?>(initialValue: T) {
+	inner class TransmissionDataHolder<T : D?>(initialValue: T, publishUpdates: Boolean) {
 
 		private val holder = MutableStateFlow(initialValue)
 
@@ -153,14 +176,16 @@ open class Transformer<D : Transmission.Data, E : Transmission.Effect>(
 			get() = holder.value
 
 		init {
-			jobList += transformerScope.launch {
+			transformerScope.launch {
 				holder.collect {
 					it?.let { holderData ->
 						holderDataReference.update { holderDataReference ->
 							holderDataReference[holderData::class.java.simpleName] = holderData
 							holderDataReference
 						}
-						dataChannel.trySend(it)
+						if (publishUpdates) {
+							dataChannel.trySend(it)
+						}
 					}
 				}
 			}
@@ -172,33 +197,40 @@ open class Transformer<D : Transmission.Data, E : Transmission.Effect>(
 	}
 
 	/**
-	* Throws [IllegalArgumentException] when multiple data holders with same type
+	 * Throws [IllegalArgumentException] when multiple data holders with same type
 	 * is defined inside a [Transformer]
-	* */
+	 * @param initialValue Initial value of the Data Holder.
+	 * Must be a type extended from [Transmission.Data]
+	 * @param [publishUpdates] Controls sending updates to the [TransmissionRouter]
+	 * */
 	protected inline fun <reified T : D?> Transformer<D, E>.buildDataHolder(
-		initialValue: T
+		initialValue: T,
+		publishUpdates: Boolean = true,
 	): TransmissionDataHolder<T> {
 		val dataHolderToTrack = T::class.java.simpleName
-		when (internalTransmissionHolderSet) {
+		internalTransmissionHolderSet = when (internalTransmissionHolderSet) {
 			is HolderState.Initialized -> {
-				val currentSet =
-					(internalTransmissionHolderSet as HolderState.Initialized).valueSet
+				val currentSet = (internalTransmissionHolderSet as HolderState.Initialized).valueSet
 				require(!currentSet.contains(dataHolderToTrack)) {
 					"Multiple data holders with the same type is not allowed: $dataHolderToTrack"
 				}
-				internalTransmissionHolderSet =
-					HolderState.Initialized(currentSet + dataHolderToTrack)
+				HolderState.Initialized(currentSet + dataHolderToTrack)
 			}
 
 			HolderState.Undefined -> {
-				internalTransmissionHolderSet =
-					HolderState.Initialized(setOf(dataHolderToTrack))
+				HolderState.Initialized(setOf(dataHolderToTrack))
 			}
 		}
-		return TransmissionDataHolder(initialValue)
+		return TransmissionDataHolder(initialValue, publishUpdates)
 	}
 
 	// endregion
+
+	protected inline fun <reified T : D?> registerComputation(
+		noinline scope: suspend QuerySender<D, E>.() -> T
+	) {
+		internalComputationMap[T::class.java.simpleName] = scope
+	}
 
 	// region handler extensions
 
@@ -206,9 +238,7 @@ open class Transformer<D : Transmission.Data, E : Transmission.Effect>(
 		crossinline onSignal: suspend CommunicationScope<D, E>.(signal: S) -> Unit
 	): SignalHandler<D, E> {
 		return SignalHandler { incomingSignal ->
-			incomingSignal
-				.takeIf { it is S }
-				?.let { signal -> onSignal(signal as S) }
+			incomingSignal.takeIf { it is S }?.let { signal -> onSignal(signal as S) }
 		}
 	}
 
@@ -216,9 +246,7 @@ open class Transformer<D : Transmission.Data, E : Transmission.Effect>(
 		crossinline onEffect: suspend CommunicationScope<D, E>.(effect: E) -> Unit
 	): EffectHandler<D, E> {
 		return EffectHandler { incomingEffect ->
-			incomingEffect
-				.takeIf { it is E }
-				?.let { effect -> onEffect(effect as E) }
+			incomingEffect.takeIf { it is E }?.let { effect -> onEffect(effect as E) }
 		}
 	}
 
