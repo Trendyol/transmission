@@ -19,15 +19,15 @@ class OutputTransformer @Inject constructor() : DefaultTransformer() {
 
 	private val holder = buildDataHolder(OutputUiState())
 
-	private val holder2 = buildDataHolder(ColorPickerUiState())
+	private val holder2 = buildDataHolder(ColorPickerUiState(), publishUpdates = false)
 
 	init {
 		registerComputation<OutputCalculationResult> {
 			delay(2.seconds)
-			val data = queryData(ColorPickerUiState::class)
-			val writtenOutput = data?.selectedColorIndex.toString()
+			val data = queryData(ColorPickerUiState::class)?.selectedColorIndex
+			val writtenOutput = queryComputation(WrittenInput::class, InputTransformer::class)
 			val result = Random.nextInt(5, 15) * Random.nextInt(5, 15)
-			OutputCalculationResult("result is $result with ($writtenOutput)")
+			OutputCalculationResult("result is $result with ($writtenOutput) and $data")
 		}
 	}
 
@@ -41,10 +41,10 @@ class OutputTransformer @Inject constructor() : DefaultTransformer() {
 				holder.update {
 					it.copy(outputText = it.outputText + " and Selected color index is ${selectedColor?.selectedColorIndex}")
 				}
-				publishEffect(RouterPayloadEffect(holder.value))
+				publish(effect = RouterPayloadEffect(holder.value))
 				delay(1.seconds)
-				sendEffect(
-					ColorPickerEffect.BackgroundColorUpdate(holder2.value.backgroundColor),
+				send(
+					effect = ColorPickerEffect.BackgroundColorUpdate(holder2.value.backgroundColor),
 					to = ColorPickerTransformer::class
 				)
 			}
