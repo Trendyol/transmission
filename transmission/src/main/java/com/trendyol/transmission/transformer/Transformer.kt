@@ -134,7 +134,13 @@ open class Transformer<D : Transmission.Data, E : Transmission.Effect>(
         transformerScope.launch {
             launch {
                 incomingSignal.collect {
-                    signalHandler?.apply { with(communicationScope) { onSignal(it) } }
+                    transformerScope.launch {
+                        signalHandler?.apply {
+                            with(communicationScope) {
+                                onSignal(it)
+                            }
+                        }
+                    }
                 }
             }
             launch {
@@ -143,10 +149,11 @@ open class Transformer<D : Transmission.Data, E : Transmission.Effect>(
                         val effectToProcess = incomingEffect.takeIf {
                             incomingEffect.to == null || incomingEffect.to == this@Transformer::class
                         }?.effect ?: return@collect
-
-                        effectHandler?.apply {
-                            with(communicationScope) {
-                                onEffect(effectToProcess)
+                        transformerScope.launch {
+                            effectHandler?.apply {
+                                with(communicationScope) {
+                                    onEffect(effectToProcess)
+                                }
                             }
                         }
                     }
