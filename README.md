@@ -57,14 +57,21 @@ Transformers are responsible for handling `signal`s and `effect`s. They have an 
 
 ```kotlin
 class InputTransformer @Inject constructor() : DefaultTransformer() {
-    
-    private val holder = buildDataHolder(InputUiState())
 
-	override val signalHandler = buildGenericSignalHandler { signal ->
+	private val holder = buildDataHolder(InputUiState())
+
+	init {
+		registerComputation<WrittenInput> {
+			delay(1.seconds)
+			WrittenInput(holder.value.writtenText)
+		}
+	}
+
+	override val signalHandler = buildTypedSignalHandler<InputSignal> { signal ->
 		when (signal) {
-			is InputSignal.InputUpdate -> { 
-                holder.update { it.copy(writtenText = signal.value) }
-				sendEffect(InputEffect.InputUpdate(signal.value))
+			is InputSignal.InputUpdate -> {
+				holder.update { it.copy(writtenText = signal.value) }
+				publish(effect = InputEffect.InputUpdate(signal.value))
 			}
 		}
 	}
