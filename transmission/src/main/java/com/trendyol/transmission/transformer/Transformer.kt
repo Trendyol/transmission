@@ -1,6 +1,7 @@
 package com.trendyol.transmission.transformer
 
 import com.trendyol.transmission.Transmission
+import com.trendyol.transmission.TransmissionRouter
 import com.trendyol.transmission.effect.EffectWrapper
 import com.trendyol.transmission.effect.RouterPayloadEffect
 import com.trendyol.transmission.transformer.handler.CommunicationScope
@@ -87,14 +88,16 @@ open class Transformer<D : Transmission.Data, E : Transmission.Effect>(
         override suspend fun <D : Transmission.Data> queryData(type: KClass<D>): D? {
             outGoingQueryChannel.trySend(
                 Query.Data(
-                    sender = transformerName, type = type.simpleName.orEmpty()
+                    sender = transformerName,
+                    type = type.simpleName.orEmpty()
                 )
             )
             return queryResponseSharedFlow.filterIsInstance<QueryResponse.Data<D>>().first().data
         }
 
         override suspend fun <D : Transmission.Data, TD : Transmission.Data, T : Transformer<TD, E>> queryData(
-            type: KClass<D>, owner: KClass<out T>
+            type: KClass<D>,
+            owner: KClass<out T>
         ): D? {
             outGoingQueryChannel.trySend(
                 Query.Data(
@@ -107,7 +110,9 @@ open class Transformer<D : Transmission.Data, E : Transmission.Effect>(
         }
 
         override suspend fun <D : Transmission.Data, TD : Transmission.Data, T : Transformer<TD, E>> queryComputation(
-            type: KClass<D>, owner: KClass<out T>, invalidate: Boolean
+            type: KClass<D>,
+            owner: KClass<out T>,
+            invalidate: Boolean
         ): D? {
             outGoingQueryChannel.trySend(
                 Query.Computation(
@@ -236,12 +241,24 @@ open class Transformer<D : Transmission.Data, E : Transmission.Effect>(
 
     // endregion
 
-
+    /**
+     * Throws [IllegalArgumentException] when multiple computations are defined
+     * inside the [Transformer].
+     *
+     * Adds a computation to [Transformer] to be queried.
+     * @param useCache Stores the result after first computation
+     * @param computation Computation to get the result [Transmission.Data]
+     */
     protected inline fun <reified T : D> registerComputation(
         useCache: Boolean = false,
-        noinline scope: suspend QuerySender<D, E>.() -> T?,
+        noinline computation: suspend QuerySender<D, E>.() -> T?,
     ) {
-        internalComputationMap[T::class.java.simpleName] = ComputationDelegate(useCache, scope)
+        val typeName = T::class.java.simpleName
+        require(!internalComputationMap.containsKey(typeName)) {
+           "Multiple computatins with the same type is not allowed: $typeName"
+        }
+        internalComputationMap[T::class.java.simpleName] =
+            ComputationDelegate(useCache, computation)
     }
 
     // region handler extensions
