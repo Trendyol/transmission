@@ -16,9 +16,9 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.consumeAsFlow
+import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.launch
@@ -94,7 +94,8 @@ class TransmissionRouter<D : Transmission.Data, E : Transmission.Effect>(
             }
         val dataToSend = QueryResponse.Data(
             owner = query.sender,
-            data = dataHolder?.holderData?.value?.get(query.type)
+            data = dataHolder?.holderData?.value?.get(query.type),
+            type = query.type
         )
         if (query.sender == routerName) {
             routerQueryResponseChannel.emit(dataToSend)
@@ -112,7 +113,8 @@ class TransmissionRouter<D : Transmission.Data, E : Transmission.Effect>(
                 QueryResponse.Computation(
                     owner = query.sender,
                     data = computationHolder?.computationMap?.get(query.type)
-                        ?.getResult(computationHolder.communicationScope, query.invalidate)
+                        ?.getResult(computationHolder.communicationScope, query.invalidate),
+                    type = query.type
                 )
             }
             if (query.sender == routerName) {
@@ -167,7 +169,10 @@ class TransmissionRouter<D : Transmission.Data, E : Transmission.Effect>(
                 type = type.simpleName.orEmpty()
             )
         )
-        return routerQueryResponseChannel.filterIsInstance<QueryResponse.Data<D>>().first().data
+        return routerQueryResponseChannel
+            .filterIsInstance<QueryResponse.Data<D>>()
+            .filter { it.type == type.simpleName }
+            .first().data
     }
 
     override suspend fun <D : Transmission.Data, TD : Transmission.Data, T : Transformer<TD, E>> queryComputation(
@@ -183,7 +188,9 @@ class TransmissionRouter<D : Transmission.Data, E : Transmission.Effect>(
                 invalidate = invalidate
             )
         )
-        return routerQueryResponseChannel.filterIsInstance<QueryResponse.Computation<D>>()
+        return routerQueryResponseChannel
+            .filterIsInstance<QueryResponse.Computation<D>>()
+            .filter { it.type == type.simpleName }
             .first().data
     }
 
@@ -198,6 +205,9 @@ class TransmissionRouter<D : Transmission.Data, E : Transmission.Effect>(
                 type = type.simpleName.orEmpty()
             )
         )
-        return routerQueryResponseChannel.filterIsInstance<QueryResponse.Data<D>>().first().data
+        return routerQueryResponseChannel
+            .filterIsInstance<QueryResponse.Data<D>>()
+            .filter { it.type == type.simpleName }
+            .first().data
     }
 }
