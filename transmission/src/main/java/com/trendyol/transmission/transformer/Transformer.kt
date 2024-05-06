@@ -92,7 +92,10 @@ open class Transformer<D : Transmission.Data, E : Transmission.Effect>(
                     type = type.simpleName.orEmpty()
                 )
             )
-            return queryResponseSharedFlow.filterIsInstance<QueryResponse.Data<D>>().first().data
+            return queryResponseSharedFlow
+                .filterIsInstance<QueryResponse.Data<D>>()
+                .filter { it.type == type.simpleName }
+                .first().data
         }
 
         override suspend fun <D : Transmission.Data, TD : Transmission.Data, T : Transformer<TD, E>> queryData(
@@ -106,7 +109,10 @@ open class Transformer<D : Transmission.Data, E : Transmission.Effect>(
                     type = type.simpleName.orEmpty()
                 )
             )
-            return queryResponseSharedFlow.filterIsInstance<QueryResponse.Data<D>>().first().data
+            return queryResponseSharedFlow
+                .filterIsInstance<QueryResponse.Data<D>>()
+                .filter { it.type == type.simpleName }
+                .first().data
         }
 
         override suspend fun <D : Transmission.Data, TD : Transmission.Data, T : Transformer<TD, E>> queryComputation(
@@ -122,7 +128,9 @@ open class Transformer<D : Transmission.Data, E : Transmission.Effect>(
                     invalidate = invalidate
                 )
             )
-            return queryResponseSharedFlow.filterIsInstance<QueryResponse.Computation<D>>()
+            return queryResponseSharedFlow
+                .filterIsInstance<QueryResponse.Computation<D>>()
+                .filter { it.type == type.simpleName }
                 .first().data
         }
 
@@ -242,8 +250,8 @@ open class Transformer<D : Transmission.Data, E : Transmission.Effect>(
     // endregion
 
     /**
-     * Throws [IllegalArgumentException] when multiple computations are defined
-     * inside the [Transformer].
+     * Throws [IllegalArgumentException] when multiple computations with the same return type
+     * are defined inside the [Transformer].
      *
      * Adds a computation to [Transformer] to be queried.
      * @param useCache Stores the result after first computation
