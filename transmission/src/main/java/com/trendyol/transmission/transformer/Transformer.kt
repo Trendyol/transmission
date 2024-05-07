@@ -279,11 +279,11 @@ open class Transformer<D : Transmission.Data, E : Transmission.Effect>(
         }
     }
 
-    inline fun <reified E : Transmission.Effect> Transformer<D, E>.buildTypedEffectHandler(
-        crossinline onEffect: suspend CommunicationScope<D, E>.(effect: E) -> Unit
+    inline fun <reified HE : Transmission.Effect> Transformer<D, E>.buildTypedEffectHandler(
+        crossinline onEffect: suspend CommunicationScope<D, E>.(effect: HE) -> Unit
     ): EffectHandler<D, E> {
         return EffectHandler { incomingEffect ->
-            incomingEffect.takeIf { it is E }?.let { effect -> onEffect(effect as E) }
+            incomingEffect.takeIf { it is HE }?.let { effect -> onEffect(effect as HE) }
         }
     }
 
