@@ -263,7 +263,7 @@ open class Transformer<D : Transmission.Data, E : Transmission.Effect>(
     ) {
         val typeName = T::class.java.simpleName
         require(!internalComputationMap.containsKey(typeName)) {
-           "Multiple computatins with the same type is not allowed: $typeName"
+           "Multiple computations with the same type is not allowed: $typeName"
         }
         internalComputationMap[T::class.java.simpleName] =
             ComputationDelegate(useCache, computation)
