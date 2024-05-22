@@ -13,12 +13,14 @@ import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.async
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.consumeAsFlow
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.launch
@@ -60,9 +62,14 @@ class TransmissionRouter<D : Transmission.Data, E : Transmission.Effect>(
     private val sharedIncomingEffects = effectChannel.receiveAsFlow()
         .shareIn(coroutineScope, SharingStarted.Lazily)
 
+    val effectStream: Flow<E> = sharedIncomingEffects.map { it.effect }
+
     // endregion
 
     private val outGoingDataChannel = Channel<D>(capacity = Channel.BUFFERED)
+
+    val dataStream = outGoingDataChannel.consumeAsFlow()
+        .shareIn(coroutineScope, SharingStarted.Lazily)
 
     // region query
 
@@ -130,17 +137,16 @@ class TransmissionRouter<D : Transmission.Data, E : Transmission.Effect>(
 
     // endregion
 
-    fun initialize(
-        onData: ((D) -> Unit),
-        onEffect: (E) -> Unit = {},
-    ) {
+    init {
+        initialize()
+    }
+
+    private fun initialize() {
         require(transformerSet.isNotEmpty()) {
             "transformerSet should not be empty"
         }
         coroutineScope.launch {
-            launch { sharedIncomingEffects.collect { onEffect(it.effect) } }
             launch { outGoingQueryChannel.consumeAsFlow().collect { processQuery(it) } }
-            launch { outGoingDataChannel.consumeAsFlow().collect { onData(it) } }
             transformerSet.map { transformer ->
                 launch {
                     transformer.initialize(

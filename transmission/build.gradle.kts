@@ -14,6 +14,7 @@ dependencies {
 	testImplementation(libs.kotlinx.coroutines.test)
 	testImplementation(libs.junit)
 	testImplementation(kotlin("test"))
+	testImplementation(libs.turbine)
 }
 
 tasks.test {
