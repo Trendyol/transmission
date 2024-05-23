@@ -33,11 +33,7 @@ class InputTransformerTest {
     fun `GIVEN inputTransformer, WHEN inputUpdate signal is sent, THEN inputUpdate effect is published`() =
         runTest {
             turbineScope {
-                sut.testWith {
-                    sendSignal(InputSignal.InputUpdate("test"))
-//                    effectStream.test {
-//                        assertEquals(InputEffect.InputUpdate("test"),awaitItem())
-//                    }
+                sut.testWith(InputSignal.InputUpdate("test")) {
                     dataStream.test {
                         assertEquals(InputUiState("test"), expectMostRecentItem())
                     }
