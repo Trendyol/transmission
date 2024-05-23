@@ -56,6 +56,7 @@ android {
 
 dependencies {
 	implementation(project(":transmission"))
+	testImplementation(project(":transmission-testing"))
 
 	implementation(libs.androidx.core.ktx)
 	implementation(libs.androidx.lifecycle.runtime.ktx)
@@ -65,6 +66,7 @@ dependencies {
 	implementation(libs.androidx.ui.graphics)
 	implementation(libs.androidx.ui.tooling.preview)
 
+
 	implementation(libs.androidx.lifecycle.viewmodel)
 	implementation(libs.androidx.lifecycle.runtime.compose)
 
@@ -73,6 +75,12 @@ dependencies {
 
 	implementation(libs.androidx.material3)
 	testImplementation(libs.junit)
+
+	testImplementation(libs.kotlinx.coroutines.test)
+	testImplementation(libs.junit)
+	testImplementation(kotlin("test"))
+	testImplementation(libs.turbine)
+
 	androidTestImplementation(libs.androidx.junit)
 	androidTestImplementation(libs.androidx.espresso.core)
 	androidTestImplementation(platform(libs.androidx.compose.bom))
