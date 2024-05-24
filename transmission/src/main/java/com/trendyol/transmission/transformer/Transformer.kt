@@ -160,7 +160,7 @@ open class Transformer<D : Transmission.Data, E : Transmission.Effect>(
                 incomingEffect.filterNot { it.effect is RouterPayloadEffect }
                     .collect { incomingEffect ->
                         val effectToProcess = incomingEffect.takeIf {
-                            incomingEffect.to == null || incomingEffect.to == this@Transformer::class
+                            incomingEffect.receiver == null || incomingEffect.receiver == this@Transformer::class
                         }?.effect ?: return@collect
                         transformerScope.launch {
                             effectHandler?.apply {

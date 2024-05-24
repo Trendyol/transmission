@@ -6,5 +6,5 @@ import kotlin.reflect.KClass
 
 data class EffectWrapper<E : Transmission.Effect, D: Transmission.Data,T : Transformer<D, E>>(
 	val effect: E,
-	val to: KClass<out T>? = null
+	val receiver: KClass<out T>? = null
 )

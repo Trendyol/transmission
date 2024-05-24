@@ -3,6 +3,7 @@ package com.trendyol.transmission.features.input
 import androidx.compose.ui.graphics.Color
 import app.cash.turbine.test
 import com.trendyol.transmission.features.colorpicker.ColorPickerEffect
+import com.trendyol.transmission.features.colorpicker.ColorPickerTransformer
 import com.trendyol.transmission.transformer.util.TestCoroutineRule
 import com.trendyol.transmission.ui.InputUiState
 import com.yigitozgumus.transmissiontesting.testWith
@@ -35,7 +36,7 @@ class InputTransformerTest {
         runTest {
             sut.testWith(InputSignal.InputUpdate("test")) {
                 effectStream.test {
-                    assertEquals(InputEffect.InputUpdate("test"), awaitItem())
+                    assertEquals(InputEffect.InputUpdate("test"), awaitItem().effect)
                 }
                 dataStream.test {
                     assertEquals(InputUiState("test"), expectMostRecentItem())

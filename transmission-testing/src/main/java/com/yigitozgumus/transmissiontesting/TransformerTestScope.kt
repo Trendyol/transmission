@@ -13,14 +13,13 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.consumeAsFlow
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 
 interface TransformerTestScope<D : Transmission.Data, E : Transmission.Effect> {
-    val effectStream: Flow<E>
+    val effectStream: Flow<EffectWrapper<E, D, Transformer<D, E>>>
     val dataStream: SharedFlow<D>
 }
 
@@ -44,7 +43,8 @@ internal class TransformerTestScopeImpl<D : Transmission.Data, E : Transmission.
     private val outGoingEffects =
         Channel<EffectWrapper<E, D, Transformer<D, E>>>(capacity = Channel.BUFFERED)
 
-    override val effectStream: Flow<E> = outGoingEffects.consumeAsFlow().map { it.effect }
+    override val effectStream: Flow<EffectWrapper<E, D, Transformer<D, E>>> =
+        outGoingEffects.consumeAsFlow()
 
     private val outGoingDataChannel = Channel<D>(capacity = Channel.BUFFERED)
 
