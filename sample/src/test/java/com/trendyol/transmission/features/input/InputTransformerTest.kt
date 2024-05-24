@@ -1,7 +1,8 @@
 package com.trendyol.transmission.features.input
 
+import androidx.compose.ui.graphics.Color
 import app.cash.turbine.test
-import app.cash.turbine.turbineScope
+import com.trendyol.transmission.features.colorpicker.ColorPickerEffect
 import com.trendyol.transmission.transformer.util.TestCoroutineRule
 import com.trendyol.transmission.ui.InputUiState
 import com.yigitozgumus.transmissiontesting.testWith
@@ -32,15 +33,22 @@ class InputTransformerTest {
     @Test
     fun `GIVEN inputTransformer, WHEN inputUpdate signal is sent, THEN inputUpdate effect is published`() =
         runTest {
-            turbineScope {
-                sut.testWith(InputSignal.InputUpdate("test")) {
-                    effectStream.test {
-                        assertEquals(InputEffect.InputUpdate("test"), awaitItem())
-                    }
-                    dataStream.test {
-                        assertEquals(InputUiState("test"), expectMostRecentItem())
-                    }
+            sut.testWith(InputSignal.InputUpdate("test")) {
+                effectStream.test {
+                    assertEquals(InputEffect.InputUpdate("test"), awaitItem())
+                }
+                dataStream.test {
+                    assertEquals(InputUiState("test"), expectMostRecentItem())
                 }
             }
         }
+
+    @Test
+    fun `GIVEN inputTransformer, WHEN BackgroundColorUpdate effect is received, THEN color should be changed`() = runTest {
+        sut.testWith(ColorPickerEffect.BackgroundColorUpdate(Color.Gray)) {
+            dataStream.test {
+                assertEquals(InputUiState(backgroundColor = Color.Gray), expectMostRecentItem())
+            }
+        }
+    }
 }

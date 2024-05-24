@@ -1,5 +1,6 @@
 package com.yigitozgumus.transmissiontesting
 
+import app.cash.turbine.turbineScope
 import com.trendyol.transmission.Transmission
 import com.trendyol.transmission.transformer.Transformer
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -15,7 +16,9 @@ suspend fun <D : Transmission.Data, E : Transmission.Effect> Transformer<D, E>.t
     val scopeImpl =
         TransformerTestScopeImpl(registryImpl, this).apply {
             acceptSignal(signal)
-            scope(this)
+            turbineScope {
+                scope(this@apply)
+            }
         }
     scopeImpl.clear()
 }
@@ -30,7 +33,9 @@ suspend fun <D : Transmission.Data, E : Transmission.Effect> Transformer<D, E>.t
     val scopeImpl =
         TransformerTestScopeImpl(registryImpl, this).apply {
             acceptEffect(effect)
-            scope(this)
+            turbineScope {
+                scope(this@apply)
+            }
         }
     scopeImpl.clear()
 }
