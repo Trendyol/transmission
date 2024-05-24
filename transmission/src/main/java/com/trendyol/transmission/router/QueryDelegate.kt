@@ -2,7 +2,6 @@ package com.trendyol.transmission.router
 
 import com.trendyol.transmission.Transmission
 import com.trendyol.transmission.TransmissionRouter
-import com.trendyol.transmission.transformer.HolderState
 import com.trendyol.transmission.transformer.Transformer
 import com.trendyol.transmission.transformer.query.Query
 import com.trendyol.transmission.transformer.query.QueryResponse
@@ -29,7 +28,7 @@ class QueryDelegate<D : Transmission.Data, E : Transmission.Effect>(
 ) : QuerySender<D, E> {
 
     private var _routerRef: TransmissionRouter<D, E>? = null
-    private val routerRef: TransmissionRouter<D,E>
+    private val routerRef: TransmissionRouter<D, E>
         get() {
             return _routerRef ?: throw IllegalStateException("router should be registered")
         }
@@ -47,7 +46,7 @@ class QueryDelegate<D : Transmission.Data, E : Transmission.Effect>(
     private val routerQueryResponseChannel: MutableSharedFlow<QueryResponse<D>> =
         MutableSharedFlow()
 
-    val outGoingQueryChannel: Channel<Query> = Channel(capacity = Channel.BUFFERED)
+    val outGoingQuery: Channel<Query> = Channel(capacity = Channel.BUFFERED)
 
     private val queryResponseChannel: Channel<QueryResponse<D>> =
         Channel(capacity = Channel.BUFFERED)
@@ -57,7 +56,7 @@ class QueryDelegate<D : Transmission.Data, E : Transmission.Effect>(
 
     init {
         queryScope.launch {
-            launch { outGoingQueryChannel.consumeAsFlow().collect { processQuery(it) } }
+            launch { outGoingQuery.consumeAsFlow().collect { processQuery(it) } }
         }
     }
 
@@ -72,15 +71,12 @@ class QueryDelegate<D : Transmission.Data, E : Transmission.Effect>(
         query: Query.Data
     ) = queryScope.launch(dispatcher) {
         val dataHolder = routerRef.transformerSet
-            .filter { it.transmissionDataHolderState is HolderState.Initialized }
+            .filter { it.storage.isHolderStateInitialized() }
             .filter { if (query.dataOwner != null) query.dataOwner == it.transformerName else true }
-            .find {
-                (it.transmissionDataHolderState as HolderState.Initialized)
-                    .valueSet.contains(query.type)
-            }
+            .find { it.storage.isHolderDataDefined(query.type) }
         val dataToSend = QueryResponse.Data(
             owner = query.sender,
-            data = dataHolder?.holderData?.value?.get(query.type),
+            data = dataHolder?.storage?.getHolderDataByType(query.type),
             type = query.type
         )
         if (query.sender == routerRef.routerName) {
@@ -95,11 +91,11 @@ class QueryDelegate<D : Transmission.Data, E : Transmission.Effect>(
     ) = queryScope.launch(dispatcher) {
         val computationHolder = routerRef.transformerSet
             .filter { query.computationOwner == it.transformerName }
-            .find { it.computationMap.containsKey(query.type) }
+            .find { it.storage.hasComputation(query.type) }
         val computationToSend = queryScope.async {
             QueryResponse.Computation(
                 owner = query.sender,
-                data = computationHolder?.computationMap?.get(query.type)
+                data = computationHolder?.storage?.getComputationByType(query.type)
                     ?.getResult(computationHolder.communicationScope, query.invalidate),
                 type = query.type
             )
@@ -117,7 +113,7 @@ class QueryDelegate<D : Transmission.Data, E : Transmission.Effect>(
 
     @Suppress("UNCHECKED_CAST")
     override suspend fun <D : Transmission.Data> queryData(type: KClass<D>): D? {
-        outGoingQueryChannel.trySend(
+        outGoingQuery.trySend(
             Query.Data(
                 sender = routerRef.routerName,
                 type = type.simpleName.orEmpty()
@@ -134,7 +130,7 @@ class QueryDelegate<D : Transmission.Data, E : Transmission.Effect>(
         owner: KClass<out T>,
         invalidate: Boolean
     ): D? {
-        outGoingQueryChannel.trySend(
+        outGoingQuery.trySend(
             Query.Computation(
                 sender = routerRef.routerName,
                 computationOwner = owner.simpleName.orEmpty(),
@@ -152,7 +148,7 @@ class QueryDelegate<D : Transmission.Data, E : Transmission.Effect>(
         type: KClass<D>,
         owner: KClass<out T>
     ): D? {
-        outGoingQueryChannel.trySend(
+        outGoingQuery.trySend(
             Query.Data(
                 sender = routerRef.routerName,
                 dataOwner = owner.simpleName.orEmpty(),

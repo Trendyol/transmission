@@ -6,7 +6,6 @@ import com.trendyol.transmission.transformer.Transformer
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 
 
-@OptIn(ExperimentalCoroutinesApi::class)
 suspend fun <D : Transmission.Data, E : Transmission.Effect> Transformer<D, E>.testWith(
     signal: Transmission.Signal,
     registry: RegistryScope<D, E, Transformer<D, E>>.() -> Unit = {},
@@ -23,7 +22,6 @@ suspend fun <D : Transmission.Data, E : Transmission.Effect> Transformer<D, E>.t
     scopeImpl.clear()
 }
 
-@OptIn(ExperimentalCoroutinesApi::class)
 suspend fun <D : Transmission.Data, E : Transmission.Effect> Transformer<D, E>.testWith(
     effect: E,
     registry: RegistryScope<D, E, Transformer<D, E>>.() -> Unit = {},

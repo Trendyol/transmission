@@ -43,28 +43,18 @@ open class Transformer<D : Transmission.Data, E : Transmission.Effect>(
 
     protected val transformerScope = CoroutineScope(SupervisorJob() + dispatcher)
 
+    val storage = TransformerStorage<D,E>()
+
     private val dataChannel: Channel<D> = Channel(capacity = Channel.UNLIMITED)
     private val effectChannel: Channel<EffectWrapper<E, D, Transformer<D, E>>> =
         Channel(capacity = Channel.UNLIMITED)
 
-    private val outGoingQueryChannel: Channel<Query> = Channel(capacity = Channel.BUFFERED)
-    private val queryResponseChannel: Channel<QueryResponse<D>> =
+    private val outGoingQuery: Channel<Query> = Channel(capacity = Channel.BUFFERED)
+    private val incomingQueryResponse: Channel<QueryResponse<D>> =
         Channel(capacity = Channel.BUFFERED)
 
-    private val queryResponseSharedFlow = queryResponseChannel.receiveAsFlow()
+    private val queryResponseSharedFlow = incomingQueryResponse.receiveAsFlow()
         .shareIn(transformerScope, SharingStarted.WhileSubscribed())
-
-    private val holderDataReference: MutableStateFlow<MutableMap<String, D?>> =
-        MutableStateFlow(mutableMapOf())
-    val holderData = holderDataReference.asStateFlow()
-
-    protected var internalTransmissionHolderSet: HolderState = HolderState.Undefined
-    val transmissionDataHolderState: HolderState
-        get() = internalTransmissionHolderSet
-
-    protected val internalComputationMap: MutableMap<String, ComputationOwner<D, E>> =
-        mutableMapOf()
-    val computationMap: Map<String, ComputationOwner<D, E>> = internalComputationMap
 
     open val signalHandler: SignalHandler<D, E>? = null
 
@@ -86,7 +76,7 @@ open class Transformer<D : Transmission.Data, E : Transmission.Effect>(
         }
 
         override suspend fun <D : Transmission.Data> queryData(type: KClass<D>): D? {
-            outGoingQueryChannel.trySend(
+            outGoingQuery.trySend(
                 Query.Data(
                     sender = transformerName,
                     type = type.simpleName.orEmpty()
@@ -102,7 +92,7 @@ open class Transformer<D : Transmission.Data, E : Transmission.Effect>(
             type: KClass<D>,
             owner: KClass<out T>
         ): D? {
-            outGoingQueryChannel.trySend(
+            outGoingQuery.trySend(
                 Query.Data(
                     sender = transformerName,
                     dataOwner = owner.simpleName.orEmpty(),
@@ -120,7 +110,7 @@ open class Transformer<D : Transmission.Data, E : Transmission.Effect>(
             owner: KClass<out T>,
             invalidate: Boolean
         ): D? {
-            outGoingQueryChannel.trySend(
+            outGoingQuery.trySend(
                 Query.Computation(
                     sender = transformerName,
                     computationOwner = owner.simpleName.orEmpty(),
@@ -160,7 +150,8 @@ open class Transformer<D : Transmission.Data, E : Transmission.Effect>(
                 incomingEffect.filterNot { it.effect is RouterPayloadEffect }
                     .collect { incomingEffect ->
                         val effectToProcess = incomingEffect.takeIf {
-                            incomingEffect.receiver == null || incomingEffect.receiver == this@Transformer::class
+                            incomingEffect.receiver == null
+                                    || incomingEffect.receiver == this@Transformer::class
                         }?.effect ?: return@collect
                         transformerScope.launch {
                             effectHandler?.apply {
@@ -173,10 +164,10 @@ open class Transformer<D : Transmission.Data, E : Transmission.Effect>(
             }
             launch {
                 incomingQueryResponse.filter { it.owner == transformerName }.collect {
-                    queryResponseChannel.trySend(it)
+                    this@Transformer.incomingQueryResponse.trySend(it)
                 }
             }
-            launch { outGoingQueryChannel.receiveAsFlow().collect { outGoingQuery.trySend(it) } }
+            launch { this@Transformer.outGoingQuery.receiveAsFlow().collect { outGoingQuery.trySend(it) } }
             launch { dataChannel.receiveAsFlow().collect { outGoingData.trySend(it) } }
             launch {
                 effectChannel.receiveAsFlow().collect { outGoingEffect.trySend(it) }
@@ -186,7 +177,7 @@ open class Transformer<D : Transmission.Data, E : Transmission.Effect>(
 
     fun clear() {
         transformerScope.cancel()
-        internalComputationMap.clear()
+        storage.clear()
     }
 
     // region DataHolder
@@ -202,10 +193,7 @@ open class Transformer<D : Transmission.Data, E : Transmission.Effect>(
             transformerScope.launch {
                 holder.collect {
                     it?.let { holderData ->
-                        holderDataReference.update { holderDataReference ->
-                            holderDataReference[holderData::class.java.simpleName] = holderData
-                            holderDataReference
-                        }
+                        storage.updateHolderData(holderData)
                         if (publishUpdates) {
                             dataChannel.trySend(it)
                         }
@@ -226,24 +214,12 @@ open class Transformer<D : Transmission.Data, E : Transmission.Effect>(
      * Must be a type extended from [Transmission.Data]
      * @param [publishUpdates] Controls sending updates to the [TransmissionRouter]
      * */
-    protected inline fun <reified T : D?> Transformer<D, E>.buildDataHolder(
+    inline fun <reified T : D?> Transformer<D, E>.buildDataHolder(
         initialValue: T,
         publishUpdates: Boolean = true,
     ): TransmissionDataHolder<T> {
         val dataHolderToTrack = T::class.java.simpleName
-        internalTransmissionHolderSet = when (internalTransmissionHolderSet) {
-            is HolderState.Initialized -> {
-                val currentSet = (internalTransmissionHolderSet as HolderState.Initialized).valueSet
-                require(!currentSet.contains(dataHolderToTrack)) {
-                    "Multiple data holders with the same type is not allowed: $dataHolderToTrack"
-                }
-                HolderState.Initialized(currentSet + dataHolderToTrack)
-            }
-
-            HolderState.Undefined -> {
-                HolderState.Initialized(setOf(dataHolderToTrack))
-            }
-        }
+        storage.updateHolderDataReferenceToTrack(dataHolderToTrack)
         return TransmissionDataHolder(initialValue, publishUpdates)
     }
 
@@ -262,11 +238,7 @@ open class Transformer<D : Transmission.Data, E : Transmission.Effect>(
         noinline computation: suspend QuerySender<D, E>.() -> T?,
     ) {
         val typeName = T::class.java.simpleName
-        require(!internalComputationMap.containsKey(typeName)) {
-           "Multiple computations with the same type is not allowed: $typeName"
-        }
-        internalComputationMap[T::class.java.simpleName] =
-            ComputationDelegate(useCache, computation)
+        storage.registerComputation(typeName, ComputationDelegate(useCache, computation))
     }
 
     // region handler extensions
