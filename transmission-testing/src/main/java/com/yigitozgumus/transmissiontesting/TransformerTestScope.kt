@@ -5,23 +5,17 @@ import com.trendyol.transmission.effect.EffectWrapper
 import com.trendyol.transmission.transformer.Transformer
 import com.trendyol.transmission.transformer.query.Query
 import com.trendyol.transmission.transformer.query.QueryResponse
-import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.consumeAsFlow
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.shareIn
-import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 
@@ -44,10 +38,13 @@ internal class TransformerTestScopeImpl<D : Transmission.Data, E : Transmission.
         _incomingSignals.trySend(signal)
     }
 
-    private val effectChannel =
+    private val incomingEffects =
         Channel<EffectWrapper<E, D, Transformer<D, E>>>(capacity = Channel.BUFFERED)
 
-    override val effectStream: Flow<E> = effectChannel.receiveAsFlow().map { it.effect }
+    private val outGoingEffects =
+        Channel<EffectWrapper<E, D, Transformer<D, E>>>(capacity = Channel.BUFFERED)
+
+    override val effectStream: Flow<E> = outGoingEffects.consumeAsFlow().map { it.effect }
 
     private val outGoingDataChannel = Channel<D>(capacity = Channel.BUFFERED)
 
@@ -63,7 +60,7 @@ internal class TransformerTestScopeImpl<D : Transmission.Data, E : Transmission.
         .shareIn(testScope, SharingStarted.Lazily)
 
     fun acceptEffect(effect: E) {
-        effectChannel.trySend(EffectWrapper(effect))
+        incomingEffects.trySend(EffectWrapper(effect))
     }
 
     init {
@@ -83,10 +80,10 @@ internal class TransformerTestScopeImpl<D : Transmission.Data, E : Transmission.
                 transformer.initialize(
                     incomingSignal = _incomingSignals.receiveAsFlow()
                         .shareIn(testScope, SharingStarted.Lazily),
-                    incomingEffect = effectChannel.receiveAsFlow()
+                    incomingEffect = incomingEffects.receiveAsFlow()
                         .shareIn(testScope, SharingStarted.Lazily),
                     outGoingData = outGoingDataChannel,
-                    outGoingEffect = effectChannel,
+                    outGoingEffect = outGoingEffects,
                     outGoingQuery = outGoingQueryChannel,
                     incomingQueryResponse = incomingQueryResponse
                 )

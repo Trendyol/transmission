@@ -34,6 +34,9 @@ class InputTransformerTest {
         runTest {
             turbineScope {
                 sut.testWith(InputSignal.InputUpdate("test")) {
+                    effectStream.test {
+                        assertEquals(InputEffect.InputUpdate("test"), awaitItem())
+                    }
                     dataStream.test {
                         assertEquals(InputUiState("test"), expectMostRecentItem())
                     }
