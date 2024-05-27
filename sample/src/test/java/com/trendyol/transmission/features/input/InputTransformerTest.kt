@@ -3,7 +3,6 @@ package com.trendyol.transmission.features.input
 import androidx.compose.ui.graphics.Color
 import app.cash.turbine.test
 import com.trendyol.transmission.features.colorpicker.ColorPickerEffect
-import com.trendyol.transmission.features.colorpicker.ColorPickerTransformer
 import com.trendyol.transmission.transformer.util.TestCoroutineRule
 import com.trendyol.transmission.ui.InputUiState
 import com.yigitozgumus.transmissiontesting.testWith

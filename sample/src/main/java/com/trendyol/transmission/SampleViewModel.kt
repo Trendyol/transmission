@@ -21,7 +21,7 @@ import kotlin.time.Duration.Companion.seconds
 
 @HiltViewModel
 class SampleViewModel @Inject constructor(
-	private val transmissionRouter: DefaultTransmissionRouter
+	private val transmissionRouter: TransmissionRouter
 ) : ViewModel() {
 
 	private val _uiState = MutableStateFlow(SampleScreenUiState())
@@ -46,7 +46,7 @@ class SampleViewModel @Inject constructor(
 		_transmissionList.update { it.plus("Signal: $signal") }
 	}
 
-	fun onEffect(effect: Transmission.Effect) = viewModelScope.launch {
+	private fun onEffect(effect: Transmission.Effect) = viewModelScope.launch {
 		_transmissionList.update { it.plus("Effect: $effect") }
 		if (effect is RouterPayloadEffect) {
 			when (effect.payload) {

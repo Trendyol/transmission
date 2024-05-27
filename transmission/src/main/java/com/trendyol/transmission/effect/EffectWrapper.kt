@@ -4,7 +4,7 @@ import com.trendyol.transmission.Transmission
 import com.trendyol.transmission.transformer.Transformer
 import kotlin.reflect.KClass
 
-data class EffectWrapper<E : Transmission.Effect, D: Transmission.Data,T : Transformer<D, E>>(
-	val effect: E,
-	val receiver: KClass<out T>? = null
+data class EffectWrapper(
+	val effect: Transmission.Effect,
+	val receiver: KClass<out Transformer>? = null
 )

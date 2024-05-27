@@ -23,10 +23,10 @@ import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.launch
 import kotlin.reflect.KClass
 
-internal class QueryDelegate<D : Transmission.Data, E : Transmission.Effect>(
+internal class QueryDelegate(
     private val dispatcher: CoroutineDispatcher,
-    private val routerRef: TransmissionRouter<D,E>
-) : QuerySender<D, E> {
+    private val routerRef: TransmissionRouter
+) : QuerySender {
 
     private val queryScope = CoroutineScope(SupervisorJob() + dispatcher)
 
@@ -34,12 +34,12 @@ internal class QueryDelegate<D : Transmission.Data, E : Transmission.Effect>(
         queryScope.cancel()
     }
 
-    private val routerQueryResponseChannel: MutableSharedFlow<QueryResponse<D>> =
+    private val routerQueryResponseChannel: MutableSharedFlow<QueryResponse<Transmission.Data>> =
         MutableSharedFlow()
 
     val outGoingQuery: Channel<Query> = Channel(capacity = Channel.BUFFERED)
 
-    private val queryResponseChannel: Channel<QueryResponse<D>> =
+    private val queryResponseChannel: Channel<QueryResponse<Transmission.Data>> =
         Channel(capacity = Channel.BUFFERED)
 
     val incomingQueryResponse = queryResponseChannel.receiveAsFlow()
@@ -102,11 +102,15 @@ internal class QueryDelegate<D : Transmission.Data, E : Transmission.Effect>(
         }
     }
 
-    @Suppress("UNCHECKED_CAST")
-    override suspend fun <D : Transmission.Data> queryData(type: KClass<D>): D? {
+
+    override suspend fun <D : Transmission.Data> queryData(
+        type: KClass<D>,
+        owner: KClass<out Transformer>?
+    ): D? {
         outGoingQuery.trySend(
             Query.Data(
                 sender = routerRef.routerName,
+                dataOwner = owner?.simpleName,
                 type = type.simpleName.orEmpty()
             )
         )
@@ -116,7 +120,7 @@ internal class QueryDelegate<D : Transmission.Data, E : Transmission.Effect>(
             .first().data
     }
 
-    override suspend fun <D : Transmission.Data, TD : Transmission.Data, T : Transformer<TD, E>> queryComputation(
+    override suspend fun <D : Transmission.Data, T : Transformer> queryComputation(
         type: KClass<D>,
         owner: KClass<out T>,
         invalidate: Boolean
@@ -131,23 +135,6 @@ internal class QueryDelegate<D : Transmission.Data, E : Transmission.Effect>(
         )
         return routerQueryResponseChannel
             .filterIsInstance<QueryResponse.Computation<D>>()
-            .filter { it.type == type.simpleName }
-            .first().data
-    }
-
-    override suspend fun <D : Transmission.Data, TD : Transmission.Data, T : Transformer<TD, E>> queryData(
-        type: KClass<D>,
-        owner: KClass<out T>
-    ): D? {
-        outGoingQuery.trySend(
-            Query.Data(
-                sender = routerRef.routerName,
-                dataOwner = owner.simpleName.orEmpty(),
-                type = type.simpleName.orEmpty()
-            )
-        )
-        return routerQueryResponseChannel
-            .filterIsInstance<QueryResponse.Data<D>>()
             .filter { it.type == type.simpleName }
             .first().data
     }

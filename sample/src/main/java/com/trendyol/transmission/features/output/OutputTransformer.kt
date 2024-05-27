@@ -7,7 +7,7 @@ import com.trendyol.transmission.features.colorpicker.ColorPickerTransformer
 import com.trendyol.transmission.features.input.InputEffect
 import com.trendyol.transmission.features.input.InputTransformer
 import com.trendyol.transmission.features.input.WrittenInput
-import com.trendyol.transmission.transformer.DefaultTransformer
+import com.trendyol.transmission.transformer.Transformer
 import com.trendyol.transmission.transformer.handler.buildGenericEffectHandler
 import com.trendyol.transmission.ui.ColorPickerUiState
 import com.trendyol.transmission.ui.OutputUiState
@@ -19,7 +19,7 @@ import kotlin.time.Duration.Companion.seconds
 
 class OutputTransformer @Inject constructor(
     @DefaultDispatcher private val defaultDispatcher: CoroutineDispatcher
-) : DefaultTransformer(defaultDispatcher) {
+) : Transformer(defaultDispatcher) {
 
     private val holder = buildDataHolder(OutputUiState())
 
@@ -41,7 +41,7 @@ class OutputTransformer @Inject constructor(
                 holder.update { it.copy(outputText = effect.value) }
                 delay(3.seconds)
                 val selectedColor =
-                    queryData(ColorPickerUiState::class, owner = ColorPickerTransformer::class)
+                    queryData(type = ColorPickerUiState::class, owner = ColorPickerTransformer::class)
                 holder.update {
                     it.copy(outputText = it.outputText + " and Selected color index is ${selectedColor?.selectedColorIndex}")
                 }

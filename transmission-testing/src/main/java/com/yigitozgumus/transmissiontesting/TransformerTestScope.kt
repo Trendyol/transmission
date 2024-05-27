@@ -18,15 +18,15 @@ import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 
-interface TransformerTestScope<D : Transmission.Data, E : Transmission.Effect> {
-    val effectStream: Flow<EffectWrapper<E, D, Transformer<D, E>>>
-    val dataStream: SharedFlow<D>
+interface TransformerTestScope {
+    val effectStream: Flow<EffectWrapper>
+    val dataStream: SharedFlow<Transmission.Data>
 }
 
-internal class TransformerTestScopeImpl<D : Transmission.Data, E : Transmission.Effect, T : Transformer<D, E>>(
-    private val registry: RegistryScopeImpl<D, E, T>,
-    private val transformer: Transformer<D, E>
-) : TransformerTestScope<D, E> {
+internal class TransformerTestScopeImpl(
+    private val registry: RegistryScopeImpl,
+    private val transformer: Transformer
+) : TransformerTestScope {
 
     @OptIn(ExperimentalCoroutinesApi::class)
     private val testScope = CoroutineScope(UnconfinedTestDispatcher())
@@ -37,29 +37,24 @@ internal class TransformerTestScopeImpl<D : Transmission.Data, E : Transmission.
         _incomingSignals.trySend(signal)
     }
 
-    private val incomingEffects =
-        Channel<EffectWrapper<E, D, Transformer<D, E>>>(capacity = Channel.BUFFERED)
+    private val incomingEffects = Channel<EffectWrapper>(capacity = Channel.BUFFERED)
+    private val outGoingEffects = Channel<EffectWrapper>(capacity = Channel.BUFFERED)
+    override val effectStream: Flow<EffectWrapper> = outGoingEffects.consumeAsFlow()
 
-    private val outGoingEffects =
-        Channel<EffectWrapper<E, D, Transformer<D, E>>>(capacity = Channel.BUFFERED)
-
-    override val effectStream: Flow<EffectWrapper<E, D, Transformer<D, E>>> =
-        outGoingEffects.consumeAsFlow()
-
-    private val outGoingDataChannel = Channel<D>(capacity = Channel.BUFFERED)
+    private val outGoingDataChannel = Channel<Transmission.Data>(capacity = Channel.BUFFERED)
 
     override val dataStream = outGoingDataChannel.receiveAsFlow()
         .shareIn(testScope, SharingStarted.Lazily)
 
     private val outGoingQueryChannel: Channel<Query> = Channel(capacity = Channel.BUFFERED)
 
-    private val queryResponseChannel: Channel<QueryResponse<D>> =
+    private val queryResponseChannel: Channel<QueryResponse<Transmission.Data>> =
         Channel(capacity = Channel.BUFFERED)
 
     private val incomingQueryResponse = queryResponseChannel.receiveAsFlow()
         .shareIn(testScope, SharingStarted.Lazily)
 
-    fun acceptEffect(effect: E) {
+    fun acceptEffect(effect: Transmission.Effect) {
         incomingEffects.trySend(EffectWrapper(effect))
     }
 
@@ -113,7 +108,7 @@ internal class TransformerTestScopeImpl<D : Transmission.Data, E : Transmission.
     private fun processComputationQuery(
         query: Query.Computation
     ) = testScope.launch {
-        val computationKey = query.computationOwner.orEmpty() + query.type
+        val computationKey = query.computationOwner + query.type
         val computationToSend = QueryResponse.Computation(
             owner = query.sender,
             data = registry.computationMap[computationKey],

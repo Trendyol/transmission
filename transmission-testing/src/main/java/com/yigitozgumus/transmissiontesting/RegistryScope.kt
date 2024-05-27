@@ -4,33 +4,33 @@ import com.trendyol.transmission.Transmission
 import com.trendyol.transmission.transformer.Transformer
 import kotlin.reflect.KClass
 
-interface RegistryScope<D : Transmission.Data, E : Transmission.Effect, T: Transformer<D,E>> {
-    fun  addQueryData(
+interface RegistryScope {
+    fun <D : Transmission.Data> addQueryData(
         data: D,
-        owner: KClass<T>? = null,
+        owner: KClass<out Transformer>? = null,
     )
 
-    fun  addComputation(
+    fun <D : Transmission.Data> addComputation(
         data: D,
-        owner: KClass<T>? = null
+        owner: KClass<out Transformer>? = null
     )
 }
 
-internal class RegistryScopeImpl<D: Transmission.Data, E: Transmission.Effect, T: Transformer<D,E>> : RegistryScope<D,E,T> {
+internal class RegistryScopeImpl : RegistryScope {
 
-    val dataMap: MutableMap<String, D> = mutableMapOf()
-    val computationMap: MutableMap<String, D> = mutableMapOf()
+    val dataMap: MutableMap<String, Transmission.Data> = mutableMapOf()
+    val computationMap: MutableMap<String, Transmission.Data> = mutableMapOf()
 
-    override fun addQueryData(
+    override fun <D : Transmission.Data> addQueryData(
         data: D,
-        owner: KClass<T>?
+        owner: KClass<out Transformer>?
     ) {
         dataMap[owner?.java?.simpleName.orEmpty() + data::class.java.simpleName] = data
     }
 
-    override fun addComputation(
+    override fun <D : Transmission.Data> addComputation(
         data: D,
-        owner: KClass<T>?
+        owner: KClass<out Transformer>?
     ) {
         computationMap[owner?.java?.simpleName.orEmpty() + data::class.java.simpleName] = data
     }

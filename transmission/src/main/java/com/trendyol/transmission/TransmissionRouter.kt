@@ -14,13 +14,12 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 
-typealias DefaultTransmissionRouter = TransmissionRouter<Transmission.Data, Transmission.Effect>
 
 /**
  * Throws [IllegalArgumentException] when supplied [Transformer] set is empty
  */
-class TransmissionRouter<D : Transmission.Data, E : Transmission.Effect>(
-    internal val transformerSet: Set<Transformer<D, E>>,
+class TransmissionRouter(
+    internal val transformerSet: Set<Transformer>,
     dispatcher: CoroutineDispatcher = Dispatchers.Default,
 ) {
 
@@ -29,15 +28,14 @@ class TransmissionRouter<D : Transmission.Data, E : Transmission.Effect>(
     internal val routerName: String = this::class.java.simpleName
 
     private val signalCarrier = TransmissionCarrier<Transmission.Signal>(routerScope)
-    private val effectCarrier =
-        TransmissionCarrier<EffectWrapper<E, D, Transformer<D, E>>>(routerScope)
-    private val dataCarrier = TransmissionCarrier<D>(routerScope)
+    private val effectCarrier = TransmissionCarrier<EffectWrapper>(routerScope)
+    private val dataCarrier = TransmissionCarrier<Transmission.Data>(routerScope)
 
-    val effectStream: Flow<E> = effectCarrier.outGoing.map { it.effect }
+    val effectStream: Flow<Transmission.Effect> = effectCarrier.outGoing.map { it.effect }
     val dataStream = dataCarrier.outGoing
 
     private val _queryDelegate = QueryDelegate(dispatcher, this@TransmissionRouter)
-    val queryHelper: QuerySender<D, E> = _queryDelegate
+    val queryHelper: QuerySender = _queryDelegate
 
     init {
         initialize()

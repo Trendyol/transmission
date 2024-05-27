@@ -5,14 +5,14 @@ import com.trendyol.transmission.transformer.query.ComputationOwner
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.update
 
-class TransformerStorage<D : Transmission.Data, E : Transmission.Effect> {
+class TransformerStorage {
 
-    private val holderDataReference: MutableStateFlow<MutableMap<String, D?>> =
+    private val holderDataReference: MutableStateFlow<MutableMap<String, Transmission.Data?>> =
         MutableStateFlow(mutableMapOf())
 
     private var internalTransmissionHolderSet: HolderState = HolderState.Undefined
 
-    private val internalComputationMap: MutableMap<String, ComputationOwner<D, E>> =
+    private val internalComputationMap: MutableMap<String, ComputationOwner> =
         mutableMapOf()
 
     fun isHolderStateInitialized(): Boolean {
@@ -24,7 +24,7 @@ class TransformerStorage<D : Transmission.Data, E : Transmission.Effect> {
         else (internalTransmissionHolderSet as HolderState.Initialized).valueSet.contains(type)
     }
 
-    fun updateHolderData(data: D) {
+    fun updateHolderData(data: Transmission.Data) {
         holderDataReference.update { holderDataReference ->
             holderDataReference[data::class.java.simpleName] = data
             holderDataReference
@@ -48,7 +48,7 @@ class TransformerStorage<D : Transmission.Data, E : Transmission.Effect> {
         }
     }
 
-    fun registerComputation(name: String, delegate: ComputationOwner<D, E>) {
+    fun registerComputation(name: String, delegate: ComputationOwner) {
         require(!internalComputationMap.containsKey(name)) {
             "Multiple computations with the same type is not allowed: $name"
         }
@@ -59,11 +59,11 @@ class TransformerStorage<D : Transmission.Data, E : Transmission.Effect> {
         return internalComputationMap.containsKey(type)
     }
 
-    fun getComputationByType(type: String): ComputationOwner<D, E>? {
+    fun getComputationByType(type: String): ComputationOwner? {
         return internalComputationMap[type]
     }
 
-    fun getHolderDataByType(type: String): D? {
+    fun getHolderDataByType(type: String): Transmission.Data? {
         return holderDataReference.value[type]
     }
 
