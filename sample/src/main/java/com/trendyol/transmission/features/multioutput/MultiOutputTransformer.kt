@@ -1,5 +1,6 @@
 package com.trendyol.transmission.features.multioutput
 
+import com.trendyol.transmission.DefaultDispatcher
 import com.trendyol.transmission.features.colorpicker.ColorPickerEffect
 import com.trendyol.transmission.features.input.InputEffect
 import com.trendyol.transmission.features.output.OutputCalculationResult
@@ -7,9 +8,12 @@ import com.trendyol.transmission.features.output.OutputTransformer
 import com.trendyol.transmission.transformer.DefaultTransformer
 import com.trendyol.transmission.transformer.handler.buildGenericEffectHandler
 import com.trendyol.transmission.ui.MultiOutputUiState
+import kotlinx.coroutines.CoroutineDispatcher
 import javax.inject.Inject
 
-class MultiOutputTransformer @Inject constructor() : DefaultTransformer() {
+class MultiOutputTransformer @Inject constructor(
+	@DefaultDispatcher private val defaultDispatcher: CoroutineDispatcher
+) : DefaultTransformer(defaultDispatcher) {
 
 	private val holder = buildDataHolder(MultiOutputUiState())
 
