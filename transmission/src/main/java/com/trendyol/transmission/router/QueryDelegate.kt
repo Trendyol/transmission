@@ -23,19 +23,10 @@ import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.launch
 import kotlin.reflect.KClass
 
-class QueryDelegate<D : Transmission.Data, E : Transmission.Effect>(
-    private val dispatcher: CoroutineDispatcher
+internal class QueryDelegate<D : Transmission.Data, E : Transmission.Effect>(
+    private val dispatcher: CoroutineDispatcher,
+    private val routerRef: TransmissionRouter<D,E>
 ) : QuerySender<D, E> {
-
-    private var _routerRef: TransmissionRouter<D, E>? = null
-    private val routerRef: TransmissionRouter<D, E>
-        get() {
-            return _routerRef ?: throw IllegalStateException("router should be registered")
-        }
-
-    fun registerRouter(router: TransmissionRouter<D, E>) {
-        _routerRef = router
-    }
 
     private val queryScope = CoroutineScope(SupervisorJob() + dispatcher)
 

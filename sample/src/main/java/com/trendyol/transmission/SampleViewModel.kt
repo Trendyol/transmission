@@ -55,12 +55,12 @@ class SampleViewModel @Inject constructor(
 				}
 			}
 		}
-		val inputData = transmissionRouter.queryData(
+		val inputData = transmissionRouter.queryHelper.queryData(
 			type = InputUiState::class,
 			owner = InputTransformer::class
 		)
 		delay(1.seconds)
-		val colorPicker = transmissionRouter.queryData(ColorPickerUiState::class)
+		val colorPicker = transmissionRouter.queryHelper.queryData(ColorPickerUiState::class)
 		_transmissionList.update { it.plus("Current InputData: $inputData") }
 		_transmissionList.update { it.plus("Current ColorPickerData: $colorPicker") }
 	}

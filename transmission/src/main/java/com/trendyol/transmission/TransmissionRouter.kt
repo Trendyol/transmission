@@ -21,9 +21,8 @@ typealias DefaultTransmissionRouter = TransmissionRouter<Transmission.Data, Tran
  */
 class TransmissionRouter<D : Transmission.Data, E : Transmission.Effect>(
     internal val transformerSet: Set<Transformer<D, E>>,
-    private val dispatcher: CoroutineDispatcher = Dispatchers.Default,
-    private val queryDelegate: QueryDelegate<D, E> = QueryDelegate(dispatcher)
-) : QuerySender<D, E> by queryDelegate {
+    dispatcher: CoroutineDispatcher = Dispatchers.Default,
+) {
 
     private val routerScope = CoroutineScope(SupervisorJob() + dispatcher)
 
@@ -37,6 +36,9 @@ class TransmissionRouter<D : Transmission.Data, E : Transmission.Effect>(
     val effectStream: Flow<E> = effectCarrier.outGoing.map { it.effect }
     val dataStream = dataCarrier.outGoing
 
+    private val _queryDelegate = QueryDelegate(dispatcher, this@TransmissionRouter)
+    val queryHelper: QuerySender<D, E> = _queryDelegate
+
     init {
         initialize()
     }
@@ -46,7 +48,6 @@ class TransmissionRouter<D : Transmission.Data, E : Transmission.Effect>(
     }
 
     private fun initialize() {
-        queryDelegate.registerRouter(this)
         require(transformerSet.isNotEmpty()) {
             "transformerSet should not be empty"
         }
@@ -58,8 +59,8 @@ class TransmissionRouter<D : Transmission.Data, E : Transmission.Effect>(
                         incomingEffect = effectCarrier.outGoing,
                         outGoingData = dataCarrier.incoming,
                         outGoingEffect = effectCarrier.incoming,
-                        outGoingQuery = queryDelegate.outGoingQuery,
-                        incomingQueryResponse = queryDelegate.incomingQueryResponse
+                        outGoingQuery = _queryDelegate.outGoingQuery,
+                        incomingQueryResponse = _queryDelegate.incomingQueryResponse
                     )
                 }
             }
@@ -69,6 +70,6 @@ class TransmissionRouter<D : Transmission.Data, E : Transmission.Effect>(
     fun clear() {
         transformerSet.forEach { it.clear() }
         routerScope.cancel()
-        queryDelegate.clear()
+        _queryDelegate.clear()
     }
 }
