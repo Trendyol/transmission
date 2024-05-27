@@ -8,7 +8,6 @@ import com.trendyol.transmission.transformer.handler.CommunicationScope
 import com.trendyol.transmission.transformer.handler.EffectHandler
 import com.trendyol.transmission.transformer.handler.SignalHandler
 import com.trendyol.transmission.transformer.query.ComputationDelegate
-import com.trendyol.transmission.transformer.query.ComputationOwner
 import com.trendyol.transmission.transformer.query.Query
 import com.trendyol.transmission.transformer.query.QueryResponse
 import com.trendyol.transmission.transformer.query.QuerySender
@@ -22,7 +21,6 @@ import kotlinx.coroutines.channels.SendChannel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.filterNot
@@ -43,7 +41,7 @@ open class Transformer<D : Transmission.Data, E : Transmission.Effect>(
 
     protected val transformerScope = CoroutineScope(SupervisorJob() + dispatcher)
 
-    val storage = TransformerStorage<D,E>()
+    val storage = TransformerStorage<D, E>()
 
     private val dataChannel: Channel<D> = Channel(capacity = Channel.UNLIMITED)
     private val effectChannel: Channel<EffectWrapper<E, D, Transformer<D, E>>> =
@@ -167,7 +165,9 @@ open class Transformer<D : Transmission.Data, E : Transmission.Effect>(
                     this@Transformer.incomingQueryResponse.trySend(it)
                 }
             }
-            launch { this@Transformer.outGoingQuery.receiveAsFlow().collect { outGoingQuery.trySend(it) } }
+            launch {
+                this@Transformer.outGoingQuery.receiveAsFlow().collect { outGoingQuery.trySend(it) }
+            }
             launch { dataChannel.receiveAsFlow().collect { outGoingData.trySend(it) } }
             launch {
                 effectChannel.receiveAsFlow().collect { outGoingEffect.trySend(it) }
@@ -182,7 +182,11 @@ open class Transformer<D : Transmission.Data, E : Transmission.Effect>(
 
     // region DataHolder
 
-    inner class TransmissionDataHolder<T : D?>(initialValue: T, publishUpdates: Boolean) {
+    inner class TransmissionDataHolder<T : D?>(
+        initialValue: T,
+        publishUpdates: Boolean,
+        identifier: String
+    ) {
 
         private val holder = MutableStateFlow(initialValue)
 
@@ -190,6 +194,7 @@ open class Transformer<D : Transmission.Data, E : Transmission.Effect>(
             get() = holder.value
 
         init {
+            storage.updateHolderDataReferenceToTrack(identifier)
             transformerScope.launch {
                 holder.collect {
                     it?.let { holderData ->
@@ -218,9 +223,7 @@ open class Transformer<D : Transmission.Data, E : Transmission.Effect>(
         initialValue: T,
         publishUpdates: Boolean = true,
     ): TransmissionDataHolder<T> {
-        val dataHolderToTrack = T::class.java.simpleName
-        storage.updateHolderDataReferenceToTrack(dataHolderToTrack)
-        return TransmissionDataHolder(initialValue, publishUpdates)
+        return TransmissionDataHolder(initialValue, publishUpdates, T::class.java.simpleName)
     }
 
     // endregion
