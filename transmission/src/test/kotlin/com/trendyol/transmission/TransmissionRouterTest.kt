@@ -2,7 +2,7 @@ package com.trendyol.transmission
 
 import app.cash.turbine.test
 import app.cash.turbine.turbineScope
-import com.trendyol.transmission.effect.RouterPayloadEffect
+import com.trendyol.transmission.effect.RouterEffect
 import com.trendyol.transmission.transformer.FakeTransformer
 import com.trendyol.transmission.transformer.TestTransformer1
 import com.trendyol.transmission.transformer.TestTransformer2
@@ -22,7 +22,7 @@ import kotlin.test.assertEquals
 @OptIn(ExperimentalCoroutinesApi::class)
 class TransmissionRouterTest {
 
-	private lateinit var sut: DefaultTransmissionRouter
+	private lateinit var sut: TransmissionRouter
 
 	@get:Rule
 	val testCoroutineRule = TestCoroutineRule()
@@ -152,8 +152,8 @@ class TransmissionRouterTest {
 		sut.processSignal(TestSignal)
 
 		// Then
-		assertEquals(transformer1.effectList.contains(RouterPayloadEffect("")),false )
-		assertEquals(transformer2.effectList.contains(RouterPayloadEffect("")),false )
-		assertEquals(transformer3.effectList.contains(RouterPayloadEffect("")),false )
+		assertEquals(transformer1.effectList.contains(RouterEffect("")),false )
+		assertEquals(transformer2.effectList.contains(RouterEffect("")),false )
+		assertEquals(transformer3.effectList.contains(RouterEffect("")),false )
 	}
 }
