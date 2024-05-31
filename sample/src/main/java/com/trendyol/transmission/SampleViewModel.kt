@@ -2,7 +2,7 @@ package com.trendyol.transmission
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.trendyol.transmission.effect.RouterPayloadEffect
+import com.trendyol.transmission.effect.RouterEffect
 import com.trendyol.transmission.features.input.InputTransformer
 import com.trendyol.transmission.ui.ColorPickerUiState
 import com.trendyol.transmission.ui.InputUiState
@@ -13,7 +13,6 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -48,7 +47,7 @@ class SampleViewModel @Inject constructor(
 
 	private fun onEffect(effect: Transmission.Effect) = viewModelScope.launch {
 		_transmissionList.update { it.plus("Effect: $effect") }
-		if (effect is RouterPayloadEffect) {
+		if (effect is RouterEffect) {
 			when (effect.payload) {
 				is OutputUiState -> {
 					_transmissionList.update { it.plus("Generic Effect: $effect") }

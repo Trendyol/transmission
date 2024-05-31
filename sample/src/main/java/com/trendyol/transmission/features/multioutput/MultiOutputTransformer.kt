@@ -6,6 +6,7 @@ import com.trendyol.transmission.features.input.InputEffect
 import com.trendyol.transmission.features.output.OutputCalculationResult
 import com.trendyol.transmission.features.output.OutputTransformer
 import com.trendyol.transmission.transformer.Transformer
+import com.trendyol.transmission.transformer.dataholder.buildDataHolder
 import com.trendyol.transmission.transformer.handler.buildGenericEffectHandler
 import com.trendyol.transmission.ui.MultiOutputUiState
 import kotlinx.coroutines.CoroutineDispatcher

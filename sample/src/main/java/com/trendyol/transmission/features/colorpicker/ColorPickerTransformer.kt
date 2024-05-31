@@ -3,6 +3,7 @@ package com.trendyol.transmission.features.colorpicker
 import com.trendyol.transmission.DefaultDispatcher
 import com.trendyol.transmission.features.multioutput.MultiOutputTransformer
 import com.trendyol.transmission.transformer.Transformer
+import com.trendyol.transmission.transformer.dataholder.buildDataHolder
 import com.trendyol.transmission.transformer.handler.buildGenericEffectHandler
 import com.trendyol.transmission.transformer.handler.buildGenericSignalHandler
 import com.trendyol.transmission.ui.ColorPickerUiState

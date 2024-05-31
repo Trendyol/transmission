@@ -1,14 +1,16 @@
 package com.trendyol.transmission.features.output
 
 import com.trendyol.transmission.DefaultDispatcher
-import com.trendyol.transmission.effect.RouterPayloadEffect
+import com.trendyol.transmission.effect.RouterEffect
 import com.trendyol.transmission.features.colorpicker.ColorPickerEffect
 import com.trendyol.transmission.features.colorpicker.ColorPickerTransformer
 import com.trendyol.transmission.features.input.InputEffect
 import com.trendyol.transmission.features.input.InputTransformer
 import com.trendyol.transmission.features.input.WrittenInput
 import com.trendyol.transmission.transformer.Transformer
+import com.trendyol.transmission.transformer.dataholder.buildDataHolder
 import com.trendyol.transmission.transformer.handler.buildGenericEffectHandler
+import com.trendyol.transmission.transformer.query.registerComputation
 import com.trendyol.transmission.ui.ColorPickerUiState
 import com.trendyol.transmission.ui.OutputUiState
 import kotlinx.coroutines.CoroutineDispatcher
@@ -41,15 +43,18 @@ class OutputTransformer @Inject constructor(
                 holder.update { it.copy(outputText = effect.value) }
                 delay(3.seconds)
                 val selectedColor =
-                    queryData(type = ColorPickerUiState::class, owner = ColorPickerTransformer::class)
+                    queryData(
+                        type = ColorPickerUiState::class,
+                        owner = ColorPickerTransformer::class
+                    )
                 selectedColor ?: return@buildGenericEffectHandler
                 holder.update {
                     it.copy(outputText = it.outputText + " and Selected color index is ${selectedColor?.selectedColorIndex}")
                 }
-                publish(effect = RouterPayloadEffect(holder.value))
-//                delay(1.seconds)
+                publish(effect = RouterEffect(holder.getValue()))
+                delay(1.seconds)
                 send(
-                    effect = ColorPickerEffect.BackgroundColorUpdate(holder2.value.backgroundColor),
+                    effect = ColorPickerEffect.BackgroundColorUpdate(holder2.getValue().backgroundColor),
                     to = ColorPickerTransformer::class
                 )
             }

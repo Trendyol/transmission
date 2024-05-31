@@ -3,8 +3,10 @@ package com.trendyol.transmission.features.input
 import com.trendyol.transmission.DefaultDispatcher
 import com.trendyol.transmission.features.colorpicker.ColorPickerEffect
 import com.trendyol.transmission.transformer.Transformer
+import com.trendyol.transmission.transformer.dataholder.buildDataHolder
 import com.trendyol.transmission.transformer.handler.buildGenericEffectHandler
 import com.trendyol.transmission.transformer.handler.buildTypedSignalHandler
+import com.trendyol.transmission.transformer.query.registerComputation
 import com.trendyol.transmission.ui.InputUiState
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.delay
@@ -20,7 +22,7 @@ class InputTransformer @Inject constructor(
     init {
         registerComputation<WrittenInput> {
             delay(1.seconds)
-            WrittenInput(holder.value.writtenText)
+            WrittenInput(holder.getValue().writtenText)
         }
     }
 
