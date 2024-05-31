@@ -4,13 +4,10 @@ import com.trendyol.transmission.Transmission
 import com.trendyol.transmission.TransmissionRouter
 import com.trendyol.transmission.transformer.Transformer
 import com.trendyol.transmission.transformer.query.Query
-import com.trendyol.transmission.transformer.query.QueryResponse
+import com.trendyol.transmission.transformer.query.QueryResult
 import com.trendyol.transmission.transformer.query.QuerySender
-import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.async
-import kotlinx.coroutines.cancel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -24,25 +21,19 @@ import kotlinx.coroutines.launch
 import kotlin.reflect.KClass
 
 internal class QueryDelegate(
-    private val dispatcher: CoroutineDispatcher,
+    private val queryScope: CoroutineScope,
     private val routerRef: TransmissionRouter
 ) : QuerySender {
 
-    private val queryScope = CoroutineScope(SupervisorJob() + dispatcher)
-
-    fun clear() {
-        queryScope.cancel()
-    }
-
-    private val routerQueryResponseChannel: MutableSharedFlow<QueryResponse<Transmission.Data>> =
+    private val routerQueryResultChannel: MutableSharedFlow<QueryResult<Transmission.Data>> =
         MutableSharedFlow()
 
     val outGoingQuery: Channel<Query> = Channel(capacity = Channel.BUFFERED)
 
-    private val queryResponseChannel: Channel<QueryResponse<Transmission.Data>> =
+    private val queryResultChannel: Channel<QueryResult<Transmission.Data>> =
         Channel(capacity = Channel.BUFFERED)
 
-    val incomingQueryResponse = queryResponseChannel.receiveAsFlow()
+    val incomingQueryResponse = queryResultChannel.receiveAsFlow()
         .shareIn(queryScope, SharingStarted.Lazily)
 
     init {
@@ -51,7 +42,7 @@ internal class QueryDelegate(
         }
     }
 
-    private suspend fun processQuery(query: Query) = queryScope.launch(dispatcher) {
+    private suspend fun processQuery(query: Query) = queryScope.launch {
         when (query) {
             is Query.Computation -> processComputationQuery(query)
             is Query.Data -> processDataQuery(query)
@@ -60,31 +51,31 @@ internal class QueryDelegate(
 
     private suspend fun processDataQuery(
         query: Query.Data
-    ) = queryScope.launch(dispatcher) {
+    ) = queryScope.launch {
         val dataHolder = routerRef.transformerSet
             .filter { it.storage.isHolderStateInitialized() }
-            .filter { if (query.dataOwner != null) query.dataOwner == it.transformerName else true }
+            .filter { if (query.dataOwner != null) query.dataOwner == it.identifier else true }
             .find { it.storage.isHolderDataDefined(query.type) }
-        val dataToSend = QueryResponse.Data(
+        val dataToSend = QueryResult.Data(
             owner = query.sender,
             data = dataHolder?.storage?.getHolderDataByType(query.type),
             type = query.type
         )
         if (query.sender == routerRef.routerName) {
-            routerQueryResponseChannel.emit(dataToSend)
+            routerQueryResultChannel.emit(dataToSend)
         } else {
-            queryResponseChannel.trySend(dataToSend)
+            queryResultChannel.trySend(dataToSend)
         }
     }
 
     private suspend fun processComputationQuery(
         query: Query.Computation
-    ) = queryScope.launch(dispatcher) {
+    ) = queryScope.launch {
         val computationHolder = routerRef.transformerSet
-            .filter { query.computationOwner == it.transformerName }
+            .filter { query.computationOwner == it.identifier }
             .find { it.storage.hasComputation(query.type) }
         val computationToSend = queryScope.async {
-            QueryResponse.Computation(
+            QueryResult.Computation(
                 owner = query.sender,
                 data = computationHolder?.storage?.getComputationByType(query.type)
                     ?.getResult(computationHolder.communicationScope, query.invalidate),
@@ -93,11 +84,11 @@ internal class QueryDelegate(
         }
         if (query.sender == routerRef.routerName) {
             queryScope.launch {
-                routerQueryResponseChannel.emit(computationToSend.await())
+                routerQueryResultChannel.emit(computationToSend.await())
             }
         } else {
             queryScope.launch {
-                queryResponseChannel.trySend(computationToSend.await())
+                queryResultChannel.trySend(computationToSend.await())
             }
         }
     }
@@ -114,8 +105,8 @@ internal class QueryDelegate(
                 type = type.simpleName.orEmpty()
             )
         )
-        return routerQueryResponseChannel
-            .filterIsInstance<QueryResponse.Data<D>>()
+        return routerQueryResultChannel
+            .filterIsInstance<QueryResult.Data<D>>()
             .filter { it.type == type.simpleName }
             .first().data
     }
@@ -133,8 +124,8 @@ internal class QueryDelegate(
                 invalidate = invalidate
             )
         )
-        return routerQueryResponseChannel
-            .filterIsInstance<QueryResponse.Computation<D>>()
+        return routerQueryResultChannel
+            .filterIsInstance<QueryResult.Computation<D>>()
             .filter { it.type == type.simpleName }
             .first().data
     }

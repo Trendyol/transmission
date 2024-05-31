@@ -1,11 +1,13 @@
 package com.trendyol.transmission.transformer
 
 import com.trendyol.transmission.Transmission
+import com.trendyol.transmission.identifier
+import com.trendyol.transmission.transformer.dataholder.HolderState
 import com.trendyol.transmission.transformer.query.ComputationOwner
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.update
 
-class TransformerStorage {
+internal class TransformerStorage {
 
     private val holderDataReference: MutableStateFlow<MutableMap<String, Transmission.Data?>> =
         MutableStateFlow(mutableMapOf())
@@ -26,7 +28,7 @@ class TransformerStorage {
 
     fun updateHolderData(data: Transmission.Data) {
         holderDataReference.update { holderDataReference ->
-            holderDataReference[data::class.java.simpleName] = data
+            holderDataReference[data.identifier()] = data
             holderDataReference
         }
     }
