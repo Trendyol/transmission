@@ -42,11 +42,12 @@ class OutputTransformer @Inject constructor(
                 delay(3.seconds)
                 val selectedColor =
                     queryData(type = ColorPickerUiState::class, owner = ColorPickerTransformer::class)
+                selectedColor ?: return@buildGenericEffectHandler
                 holder.update {
                     it.copy(outputText = it.outputText + " and Selected color index is ${selectedColor?.selectedColorIndex}")
                 }
                 publish(effect = RouterPayloadEffect(holder.value))
-                delay(1.seconds)
+//                delay(1.seconds)
                 send(
                     effect = ColorPickerEffect.BackgroundColorUpdate(holder2.value.backgroundColor),
                     to = ColorPickerTransformer::class

@@ -12,31 +12,31 @@ import kotlinx.coroutines.CoroutineDispatcher
 import javax.inject.Inject
 
 class MultiOutputTransformer @Inject constructor(
-	@DefaultDispatcher private val defaultDispatcher: CoroutineDispatcher
+    @DefaultDispatcher private val defaultDispatcher: CoroutineDispatcher
 ) : Transformer(defaultDispatcher) {
 
-	private val holder = buildDataHolder(MultiOutputUiState())
+    private val holder = buildDataHolder(MultiOutputUiState())
 
-	override val effectHandler = buildGenericEffectHandler { effect ->
-		when (effect) {
-			is InputEffect.InputUpdate -> {
-				holder.update { it.copy(writtenUppercaseText = effect.value.uppercase()) }
-				val result = queryComputation(
-					type = OutputCalculationResult::class,
-					owner = OutputTransformer::class
-				)
-				holder.update {
-					it.copy(writtenUppercaseText = it.writtenUppercaseText + " ${result?.result}")
-				}
-			}
+    override val effectHandler = buildGenericEffectHandler { effect ->
+        when (effect) {
+            is InputEffect.InputUpdate -> {
+                holder.update { it.copy(writtenUppercaseText = effect.value.uppercase()) }
+                val result = queryComputation(
+                    type = OutputCalculationResult::class,
+                    owner = OutputTransformer::class
+                )
+                holder.update {
+                    it.copy(writtenUppercaseText = it.writtenUppercaseText + " ${result?.result}")
+                }
+            }
 
-			is ColorPickerEffect.BackgroundColorUpdate -> {
-				holder.update { it.copy(backgroundColor = effect.color) }
-			}
+            is ColorPickerEffect.BackgroundColorUpdate -> {
+                holder.update { it.copy(backgroundColor = effect.color) }
+            }
 
-			is ColorPickerEffect.SelectedColorUpdate -> {
-				holder.update { it.copy(selectedColor = effect.color) }
-			}
-		}
-	}
+            is ColorPickerEffect.SelectedColorUpdate -> {
+                holder.update { it.copy(selectedColor = effect.color) }
+            }
+        }
+    }
 }

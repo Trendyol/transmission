@@ -16,7 +16,7 @@ interface RegistryScope {
     )
 }
 
-internal class RegistryScopeImpl : RegistryScope {
+class RegistryScopeImpl : RegistryScope {
 
     val dataMap: MutableMap<String, Transmission.Data> = mutableMapOf()
     val computationMap: MutableMap<String, Transmission.Data> = mutableMapOf()

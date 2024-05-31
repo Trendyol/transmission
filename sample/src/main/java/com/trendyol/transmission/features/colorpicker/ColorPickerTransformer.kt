@@ -30,7 +30,6 @@ class ColorPickerTransformer @Inject constructor(
 		}
 	}
 
-
 	override val effectHandler = buildGenericEffectHandler { effect ->
 		when (effect) {
 			is ColorPickerEffect.BackgroundColorUpdate -> {

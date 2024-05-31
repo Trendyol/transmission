@@ -12,32 +12,32 @@ import javax.inject.Inject
 import kotlin.time.Duration.Companion.seconds
 
 class InputTransformer @Inject constructor(
-	@DefaultDispatcher private val defaultDispatcher: CoroutineDispatcher
+    @DefaultDispatcher private val defaultDispatcher: CoroutineDispatcher
 ) : Transformer(defaultDispatcher) {
 
-	private val holder = buildDataHolder(InputUiState())
+    private val holder = buildDataHolder(InputUiState())
 
-	init {
-		registerComputation<WrittenInput> {
-			delay(1.seconds)
-			WrittenInput(holder.value.writtenText)
-		}
-	}
+    init {
+        registerComputation<WrittenInput> {
+            delay(1.seconds)
+            WrittenInput(holder.value.writtenText)
+        }
+    }
 
-	override val signalHandler = buildTypedSignalHandler<InputSignal> { signal ->
-		when (signal) {
-			is InputSignal.InputUpdate -> {
-				holder.update { it.copy(writtenText = signal.value) }
-				publish(effect = InputEffect.InputUpdate(signal.value))
-			}
-		}
-	}
+    override val signalHandler = buildTypedSignalHandler<InputSignal> { signal ->
+        when (signal) {
+            is InputSignal.InputUpdate -> {
+                holder.update { it.copy(writtenText = signal.value) }
+                publish(effect = InputEffect.InputUpdate(signal.value))
+            }
+        }
+    }
 
-	override val effectHandler = buildGenericEffectHandler { effect ->
-		when (effect) {
-			is ColorPickerEffect.BackgroundColorUpdate -> {
-				holder.update { it.copy(backgroundColor = effect.color) }
-			}
-		}
-	}
+    override val effectHandler = buildGenericEffectHandler { effect ->
+        when (effect) {
+            is ColorPickerEffect.BackgroundColorUpdate -> {
+                holder.update { it.copy(backgroundColor = effect.color) }
+            }
+        }
+    }
 }
