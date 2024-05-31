@@ -1,7 +1,6 @@
 package com.trendyol.transmission.transformer.handler
 
 import com.trendyol.transmission.Transmission
-import com.trendyol.transmission.transformer.Transformer
 
 fun interface SignalHandler {
 	suspend fun CommunicationScope.onSignal(signal: Transmission.Signal)

@@ -1,7 +1,6 @@
 package com.trendyol.transmission.transformer.query
 
 import com.trendyol.transmission.Transmission
-import com.trendyol.transmission.TransmissionRouter
 import com.trendyol.transmission.transformer.Transformer
 import kotlin.reflect.KClass
 
