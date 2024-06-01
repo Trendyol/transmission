@@ -6,25 +6,23 @@ import com.trendyol.transmission.transformer.Transformer
 import com.trendyol.transmission.transformer.query.QuerySender
 import kotlin.reflect.KClass
 
-typealias usingCommunication = CommunicationScope<Transmission.Data, Transmission.Effect>
-
-interface CommunicationScope<D : Transmission.Data, E : Transmission.Effect>: QuerySender<D,E> {
+interface CommunicationScope: QuerySender {
 	/**
 	 * Sends data to [TransmissionRouter]
 	 * @param data of type [Transmission.Data]
 	 */
-	fun send(data: D?)
+	fun<D: Transmission.Data> send(data: D?)
 
 	/**
 	 * Publishes [Transmission.Effect] to other [Transformer]s
 	 * @param effect of type [Transmission.Effect]
 	 */
-	fun publish(effect: E)
+	fun<E: Transmission.Effect> publish(effect: E)
 
 	/**
 	 * Sends [Transmission.Effect] to a specific [Transformer]
 	 * @param effect of type [Transmission.Effect]
 	 * @param to Target [Transformer]
 	 */
-	fun send(effect: E, to: KClass<out Transformer<D, E>>)
+	fun <E: Transmission.Effect, T: Transformer>send(effect: E, to: KClass<out T>)
 }

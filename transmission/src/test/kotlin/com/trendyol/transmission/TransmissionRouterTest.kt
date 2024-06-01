@@ -1,6 +1,8 @@
 package com.trendyol.transmission
 
-import com.trendyol.transmission.effect.RouterPayloadEffect
+import app.cash.turbine.test
+import app.cash.turbine.turbineScope
+import com.trendyol.transmission.effect.RouterEffect
 import com.trendyol.transmission.transformer.FakeTransformer
 import com.trendyol.transmission.transformer.TestTransformer1
 import com.trendyol.transmission.transformer.TestTransformer2
@@ -20,7 +22,7 @@ import kotlin.test.assertEquals
 @OptIn(ExperimentalCoroutinesApi::class)
 class TransmissionRouterTest {
 
-	private lateinit var sut: DefaultTransmissionRouter
+	private lateinit var sut: TransmissionRouter
 
 	@get:Rule
 	val testCoroutineRule = TestCoroutineRule()
@@ -31,10 +33,9 @@ class TransmissionRouterTest {
 	fun `GIVEN Router with no transformers, WHEN initialize is called, THEN router should throw IllegalStateException`() =
 		runTest {
 			// Given
-			sut = TransmissionRouter(setOf())
-			// When
 			try {
-				sut.initialize(onData = {}, onEffect = {})
+				// When
+				sut = TransmissionRouter(setOf())
 			} catch (e: IllegalArgumentException) {
 				// Then
 				assertEquals(e.message, "transformerSet should not be empty")
@@ -45,10 +46,9 @@ class TransmissionRouterTest {
 	fun `GIVEN Router with one transformer, WHEN initialize is called, THEN router should not throw IllegalStateException`() =
 		runTest {
 			// Given
-			sut = TransmissionRouter(setOf(FakeTransformer(testDispatcher)))
-			// When
 			val exception = try {
-				sut.initialize(onData = {}, onEffect = {})
+				// When
+				sut = TransmissionRouter(setOf(FakeTransformer(testDispatcher)))
 				null
 			} catch (e: IllegalStateException) {
 				e
@@ -62,7 +62,6 @@ class TransmissionRouterTest {
 		// Given
 		val transformer = FakeTransformer(testDispatcher)
 		sut = TransmissionRouter(setOf(transformer), testDispatcher)
-		sut.initialize(onEffect = {}, onData = {})
 		// When
 		sut.processSignal(TestSignal)
 
@@ -77,7 +76,6 @@ class TransmissionRouterTest {
 		val transformer2 = TestTransformer2(testDispatcher)
 		val transformer3 = TestTransformer3(testDispatcher)
 		sut = TransmissionRouter(setOf(transformer1, transformer2, transformer3), testDispatcher)
-		sut.initialize(onEffect = {}, onData = {})
 		// When
 		sut.processSignal(TestSignal)
 
@@ -98,7 +96,6 @@ class TransmissionRouterTest {
 		val transformer2 = TestTransformer2(testDispatcher)
 		val transformer3 = TestTransformer3(testDispatcher)
 		sut = TransmissionRouter(setOf(transformer1, transformer2, transformer3), testDispatcher)
-		sut.initialize(onEffect = {}, onData = {})
 		// When
 		sut.processSignal(TestSignal)
 
@@ -109,38 +106,39 @@ class TransmissionRouterTest {
 	}
 
 	@Test
-	fun `GIVEN initialized Router with multiple Transformers, WHEN processSignal is called, THEN all effects should be sent through onEffect`() {
-		// Given
-		val transformer1 = TestTransformer1(testDispatcher)
-		val transformer2 = TestTransformer2(testDispatcher)
-		val transformer3 = TestTransformer3(testDispatcher)
-		sut = TransmissionRouter(setOf(transformer1, transformer2, transformer3), testDispatcher)
-		val effectList = mutableListOf<Transmission.Effect>()
-		sut.initialize(onEffect = { effectList.add(it) }, onData = {})
-		// When
-		sut.processSignal(TestSignal)
-
-		// Then
-		assertEquals(effectList.size, 6)
+	fun `GIVEN initialized Router with multiple Transformers, WHEN processSignal is called, THEN all effects should be sent through onEffect`() = runTest {
+		turbineScope {
+			// Given
+			val transformer1 = TestTransformer1(testDispatcher)
+			val transformer2 = TestTransformer2(testDispatcher)
+			val transformer3 = TestTransformer3(testDispatcher)
+			sut = TransmissionRouter(setOf(transformer1, transformer2, transformer3), testDispatcher)
+			// When
+			val effects  = sut.effectStream.testIn(backgroundScope)
+			sut.processSignal(TestSignal)
+			assertEquals(6, effects.cancelAndConsumeRemainingEvents().size)
+			// Then
+		}
 	}
 
 	@Test
-	fun `GIVEN initialized Router with multiple Transformers, WHEN processSignal is called, THEN all transformers should send the correct TestData`() {
-		// Given
-		val transformer1 = TestTransformer1(testDispatcher)
-		val transformer2 = TestTransformer2(testDispatcher)
-		val transformer3 = TestTransformer3(testDispatcher)
-		val dataList = mutableListOf<Transmission.Data>()
-		sut = TransmissionRouter(setOf(transformer1, transformer2, transformer3), testDispatcher)
-		sut.initialize(onEffect = {}, onData = { dataList.add(it) })
-		// When
-		sut.processSignal(TestSignal)
+	fun `GIVEN initialized Router with multiple Transformers, WHEN processSignal is called, THEN all transformers should send the correct TestData`() = runTest {
+		turbineScope {
+			// Given
+			val transformer1 = TestTransformer1(testDispatcher)
+			val transformer2 = TestTransformer2(testDispatcher)
+			val transformer3 = TestTransformer3(testDispatcher)
+			sut = TransmissionRouter(setOf(transformer1, transformer2, transformer3), testDispatcher)
+			// When
+			sut.processSignal(TestSignal)
+			sut.dataStream.test {
+				assertEquals(TestData("update with TestTransformer1"), awaitItem())
+				assertEquals(TestData("update with TestTransformer2"), awaitItem())
+				assertEquals(TestData("update with TestTransformer3"), awaitItem())
+			}
 
-		// Then
-		assertEquals(dataList.size, 3)
-		assertEquals(TestData("update with TestTransformer1"), dataList[0])
-		assertEquals(TestData("update with TestTransformer2"), dataList[1])
-		assertEquals(TestData("update with TestTransformer3"), dataList[2])
+			// Then
+		}
 	}
 
 	@Test
@@ -150,13 +148,12 @@ class TransmissionRouterTest {
 		val transformer2 = TestTransformer2(testDispatcher)
 		val transformer3 = TestTransformer3(testDispatcher)
 		sut = TransmissionRouter(setOf(transformer1, transformer2, transformer3), testDispatcher)
-		sut.initialize(onEffect = {}, onData = {})
 		// When
 		sut.processSignal(TestSignal)
 
 		// Then
-		assertEquals(transformer1.effectList.contains(RouterPayloadEffect("")),false )
-		assertEquals(transformer2.effectList.contains(RouterPayloadEffect("")),false )
-		assertEquals(transformer3.effectList.contains(RouterPayloadEffect("")),false )
+		assertEquals(transformer1.effectList.contains(RouterEffect("")),false )
+		assertEquals(transformer2.effectList.contains(RouterEffect("")),false )
+		assertEquals(transformer3.effectList.contains(RouterEffect("")),false )
 	}
 }

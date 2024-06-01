@@ -8,4 +8,4 @@ import com.trendyol.transmission.transformer.Transformer
  * This effect does not get published to other [Transformer]s.
  * Use it to send payload directly to [TransmissionRouter].
  */
-data class RouterPayloadEffect(val payload: Any): Transmission.Effect
+data class RouterEffect(val payload: Any): Transmission.Effect

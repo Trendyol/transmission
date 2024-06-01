@@ -2,7 +2,7 @@ package com.trendyol.transmission
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.trendyol.transmission.effect.RouterPayloadEffect
+import com.trendyol.transmission.effect.RouterEffect
 import com.trendyol.transmission.features.input.InputTransformer
 import com.trendyol.transmission.ui.ColorPickerUiState
 import com.trendyol.transmission.ui.InputUiState
@@ -20,7 +20,7 @@ import kotlin.time.Duration.Companion.seconds
 
 @HiltViewModel
 class SampleViewModel @Inject constructor(
-	private val transmissionRouter: DefaultTransmissionRouter
+	private val transmissionRouter: TransmissionRouter
 ) : ViewModel() {
 
 	private val _uiState = MutableStateFlow(SampleScreenUiState())
@@ -31,7 +31,12 @@ class SampleViewModel @Inject constructor(
 
 	init {
 		viewModelScope.launch {
-			transmissionRouter.initialize(onData = ::onData, onEffect = ::onEffect)
+			launch {
+				transmissionRouter.dataStream.collect(::onData)
+			}
+			launch {
+				transmissionRouter.effectStream.collect(::onEffect)
+			}
 		}
 	}
 
@@ -40,21 +45,21 @@ class SampleViewModel @Inject constructor(
 		_transmissionList.update { it.plus("Signal: $signal") }
 	}
 
-	fun onEffect(effect: Transmission.Effect) = viewModelScope.launch {
+	private fun onEffect(effect: Transmission.Effect) = viewModelScope.launch {
 		_transmissionList.update { it.plus("Effect: $effect") }
-		if (effect is RouterPayloadEffect) {
+		if (effect is RouterEffect) {
 			when (effect.payload) {
 				is OutputUiState -> {
 					_transmissionList.update { it.plus("Generic Effect: $effect") }
 				}
 			}
 		}
-		val inputData = transmissionRouter.queryData(
+		val inputData = transmissionRouter.queryHelper.queryData(
 			type = InputUiState::class,
 			owner = InputTransformer::class
 		)
 		delay(1.seconds)
-		val colorPicker = transmissionRouter.queryData(ColorPickerUiState::class)
+		val colorPicker = transmissionRouter.queryHelper.queryData(ColorPickerUiState::class)
 		_transmissionList.update { it.plus("Current InputData: $inputData") }
 		_transmissionList.update { it.plus("Current ColorPickerData: $colorPicker") }
 	}

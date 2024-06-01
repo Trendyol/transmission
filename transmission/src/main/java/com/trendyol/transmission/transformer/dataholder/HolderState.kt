@@ -1,6 +1,6 @@
-package com.trendyol.transmission.transformer
+package com.trendyol.transmission.transformer.dataholder
 
-sealed interface HolderState {
+internal sealed interface HolderState {
 	data object Undefined: HolderState
 	data class Initialized(val valueSet: Set<String>): HolderState
 }

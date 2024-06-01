@@ -10,11 +10,12 @@ java {
 }
 
 dependencies {
+    api(project(":transmission"))
     implementation(libs.kotlinx.coroutines.core)
-    testImplementation(libs.kotlinx.coroutines.test)
-    testImplementation(libs.junit)
-    testImplementation(kotlin("test"))
-    testImplementation(libs.turbine)
+    implementation(libs.kotlinx.coroutines.test)
+    implementation(libs.junit)
+    implementation(kotlin("test"))
+    implementation(libs.turbine)
 }
 
 tasks.test {
@@ -25,8 +26,8 @@ publishing {
 
     publications {
         create<MavenPublication>("release") {
-            groupId = "com.trendyol"
-            artifactId = "transmission"
+            groupId = "com.trendyol.transmission"
+            artifactId = "test"
             version = "1.0.0"
             afterEvaluate {
                 from(components["java"])

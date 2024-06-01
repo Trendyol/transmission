@@ -1,14 +1,21 @@
 package com.trendyol.transmission.transformer.handler
 
 import com.trendyol.transmission.Transmission
-import com.trendyol.transmission.transformer.Transformer
 
-fun interface SignalHandler<D : Transmission.Data, E : Transmission.Effect> {
-	suspend fun CommunicationScope<D, E>.onSignal(signal: Transmission.Signal)
+fun interface SignalHandler {
+	suspend fun CommunicationScope.onSignal(signal: Transmission.Signal)
 }
 
-fun <D : Transmission.Data, E : Transmission.Effect> Transformer<D, E>.buildGenericSignalHandler(
-	onSignal: suspend CommunicationScope<D, E>.(signal: Transmission.Signal) -> Unit
-): SignalHandler<D, E> {
+fun buildGenericSignalHandler(
+	onSignal: suspend CommunicationScope.(signal: Transmission.Signal) -> Unit
+): SignalHandler {
 	return SignalHandler { signal -> onSignal(signal) }
+}
+
+inline fun <reified S : Transmission.Signal> buildTypedSignalHandler(
+	crossinline onSignal: suspend CommunicationScope.(signal: S) -> Unit
+): SignalHandler {
+	return SignalHandler { incomingSignal ->
+		incomingSignal.takeIf { it is S }?.let { signal -> onSignal(signal as S) }
+	}
 }

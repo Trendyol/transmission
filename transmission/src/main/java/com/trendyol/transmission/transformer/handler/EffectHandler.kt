@@ -1,14 +1,26 @@
 package com.trendyol.transmission.transformer.handler
 
 import com.trendyol.transmission.Transmission
-import com.trendyol.transmission.transformer.Transformer
 
-fun interface EffectHandler<D : Transmission.Data, E : Transmission.Effect> {
-	suspend fun CommunicationScope<D, E>.onEffect(effect: Transmission.Effect)
+fun interface EffectHandler {
+    suspend fun CommunicationScope.onEffect(effect: Transmission.Effect)
 }
 
-fun <D : Transmission.Data, E : Transmission.Effect> Transformer<D, E>.buildGenericEffectHandler(
-	onEffect: suspend CommunicationScope<D, E>.(effect: Transmission.Effect) -> Unit
-): EffectHandler<D, E> {
-	return EffectHandler { effect -> onEffect(effect) }
+fun buildGenericEffectHandler(
+    onEffect: suspend CommunicationScope.(effect: Transmission.Effect) -> Unit
+): EffectHandler {
+    return EffectHandler { effect ->
+        onEffect(effect)
+    }
+}
+
+
+inline fun <reified E : Transmission.Effect> buildTypedEffectHandler(
+    crossinline onEffect: suspend CommunicationScope.(effect: E) -> Unit
+): EffectHandler {
+    return EffectHandler { incomingEffect ->
+        incomingEffect.takeIf { it is E }?.let { effect ->
+            onEffect(effect as E)
+        }
+    }
 }

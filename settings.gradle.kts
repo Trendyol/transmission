@@ -22,3 +22,4 @@ dependencyResolutionManagement {
 rootProject.name = "transmission"
 include(":sample")
 include(":transmission")
+include(":transmission-test")
