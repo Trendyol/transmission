@@ -3,8 +3,8 @@ package com.trendyol.transmission.features.colorpicker
 import androidx.compose.ui.graphics.Color
 import com.trendyol.transmission.transformer.util.TestCoroutineRule
 import com.trendyol.transmission.ui.ColorPickerUiState
-import com.yigitozgumus.transmissiontesting.testTransformer
-import com.yigitozgumus.transmissiontesting.testWith
+import com.yigitozgumus.transmissiontesting.testWithEffect
+import com.yigitozgumus.transmissiontesting.testWithSignal
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -25,8 +25,7 @@ class ColorPickerTransformerTest {
 
     @Test
     fun `GIVEN transformer, WHEN BackgroundColorUpdate effect is received, THEN color should be changed 1`() {
-        testTransformer(transformerProvider = { ColorPickerTransformer(this) }) {
-            sendEffect(ColorPickerEffect.BackgroundColorUpdate(Color.Gray))
+        sut.testWithEffect(effect = ColorPickerEffect.BackgroundColorUpdate(Color.Gray)) {
             assertEquals(
                 ColorPickerUiState(backgroundColor = Color.Gray),
                 dataStream.last()
@@ -36,8 +35,7 @@ class ColorPickerTransformerTest {
 
     @Test
     fun `GIVEN transformer, WHEN BackgroundColorUpdate effect is received, THEN color should be changed`() =
-        sut.testWith {
-            sendEffect(ColorPickerEffect.BackgroundColorUpdate(Color.Gray))
+        sut.testWithEffect(effect = ColorPickerEffect.BackgroundColorUpdate(Color.Gray)) {
             assertEquals(
                 ColorPickerUiState(backgroundColor = Color.Gray),
                 dataStream.last()
@@ -46,8 +44,7 @@ class ColorPickerTransformerTest {
 
     @Test
     fun `GIVEN inputTransformer, WHEN SelectColor signal is sent, THEN selectedColorIndex should be updated`() =
-        sut.testWith {
-            sendSignal(ColorPickerSignal.SelectColor(3, Color.Blue))
+        sut.testWithSignal(signal = ColorPickerSignal.SelectColor(3, Color.Blue)) {
             assertEquals(
                 3,
                 (dataStream.last() as ColorPickerUiState).selectedColorIndex
@@ -56,8 +53,7 @@ class ColorPickerTransformerTest {
 
     @Test
     fun `GIVEN inputTransformer, WHEN SelectColor signal is sent, THEN BackgroundColorUpdate effect should be published`() {
-        sut.testWith {
-            sendSignal(ColorPickerSignal.SelectColor(3, Color.Blue))
+        sut.testWithSignal(signal = ColorPickerSignal.SelectColor(3, Color.Blue)) {
             assertEquals(
                 Color.Blue.copy(alpha = 0.1f),
                 (effectStream.first().effect as ColorPickerEffect.BackgroundColorUpdate).color
@@ -67,11 +63,7 @@ class ColorPickerTransformerTest {
 
     @Test
     fun `GIVEN inputTransformer, WHEN SelectColor signal is sent, THEN SelectedColorUpdate is sent to MultiOutputTransformer`() {
-        // Given
-        sut.testWith {
-            // When
-            sendSignal(ColorPickerSignal.SelectColor(3, Color.Blue))
-            // Then
+        sut.testWithSignal(signal = ColorPickerSignal.SelectColor(3, Color.Blue)) {
             assertTrue { effectStream.last().effect is ColorPickerEffect.SelectedColorUpdate }
         }
     }

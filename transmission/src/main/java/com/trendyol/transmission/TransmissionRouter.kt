@@ -41,36 +41,39 @@ class TransmissionRouter(
     val queryHelper: QuerySender = _queryDelegate
 
     init {
-        initialize()
+        routerScope.launch {
+            initialize()
+        }
     }
 
     fun processSignal(signal: Transmission.Signal) {
         signalBroadcast.producer.trySend(signal)
     }
 
-    private fun initialize() {
+    private suspend fun initialize() {
         require(transformerSet.isNotEmpty()) {
             "transformerSet should not be empty"
         }
-        routerScope.launch {
+        coroutineScope {
             transformerSet.map { transformer ->
-                coroutineScope {
-                    transformer.run {
-                        launch {
-                            startSignalCollection(incoming = signalBroadcast.output)
-                        }
-                        launch {
-                            startDataPublishing(data = dataBroadcast.producer)
-                        }
-                        launch {
-                            startEffectProcessing(
-                                producer = effectBroadcast.producer,
-                                incoming = effectBroadcast.output
-                            )
-                        }
-                        launch {
-                            startQueryProcessing(queryDelegate = _queryDelegate)
-                        }
+                transformer.run {
+                    launch {
+                        startSignalCollection(incoming = signalBroadcast.output)
+                    }
+                    launch {
+                        startDataPublishing(data = dataBroadcast.producer)
+                    }
+                    launch {
+                        startEffectProcessing(
+                            producer = effectBroadcast.producer,
+                            incoming = effectBroadcast.output
+                        )
+                    }
+                    launch {
+                        startQueryProcessing(
+                            incomingQuery = _queryDelegate.incomingQueryResponse,
+                            outGoingQuery = _queryDelegate.outGoingQuery
+                        )
                     }
                 }
             }

@@ -4,15 +4,13 @@ import androidx.compose.ui.graphics.Color
 import com.trendyol.transmission.features.colorpicker.ColorPickerEffect
 import com.trendyol.transmission.transformer.util.TestCoroutineRule
 import com.trendyol.transmission.ui.InputUiState
-import com.yigitozgumus.transmissiontesting.testWith
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.test.UnconfinedTestDispatcher
+import com.yigitozgumus.transmissiontesting.testWithEffect
+import com.yigitozgumus.transmissiontesting.testWithSignal
 import org.junit.Before
 import org.junit.Rule
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
-@OptIn(ExperimentalCoroutinesApi::class)
 class InputTransformerTest {
 
     @get:Rule
@@ -22,13 +20,12 @@ class InputTransformerTest {
 
     @Before
     fun setUp() {
-        sut = InputTransformer(UnconfinedTestDispatcher())
+        sut = InputTransformer(testCoroutineRule.testDispatcher)
     }
 
     @Test
     fun `GIVEN inputTransformer, WHEN inputUpdate signal is sent, THEN inputUpdate effect is published`() {
-        sut.testWith {
-            sendSignal(InputSignal.InputUpdate("test"))
+        sut.testWithSignal(signal = InputSignal.InputUpdate("test")) {
             assertEquals(InputEffect.InputUpdate("test"), effectStream.first().effect)
             assertEquals(InputUiState("test"), dataStream.last())
         }
@@ -36,8 +33,7 @@ class InputTransformerTest {
 
     @Test
     fun `GIVEN inputTransformer, WHEN BackgroundColorUpdate effect is received, THEN color should be changed`() {
-        sut.testWith {
-            sendEffect(ColorPickerEffect.BackgroundColorUpdate(Color.Gray))
+        sut.testWithEffect(effect = ColorPickerEffect.BackgroundColorUpdate(Color.Gray)) {
             assertEquals(InputUiState(backgroundColor = Color.Gray), dataStream.last())
         }
     }

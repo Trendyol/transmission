@@ -70,27 +70,15 @@ internal class TestRouter(
                     producer = effectBroadcast.producer,
                     incoming = effectBroadcast.output
                 )
-                startQueryProcessing()
-            }
-        }
-
-    }
-
-    private suspend fun startQueryProcessing() {
-        coroutineScope {
-            launch {
-                this@TestRouter.outGoingQueryChannel.receiveAsFlow().collect {
-                    outGoingQueryChannel.send(it)
-
+                launch {
+                    startQueryProcessing(
+                        incomingQuery = incomingQueryResponse,
+                        outGoingQuery = outGoingQueryChannel
+                    )
                 }
             }
-            launch {
-                incomingQueryResponse.filter { it.owner == transformer.identifier }
-                    .collect {
-                        this@TestRouter.queryResultChannel.send(it)
-                    }
-            }
         }
+
     }
 
     private fun processQuery(query: Query) = testScope.launch {
