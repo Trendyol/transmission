@@ -3,13 +3,16 @@ package com.trendyol.transmission.transformer.handler
 import com.trendyol.transmission.Transmission
 
 fun interface EffectHandler {
-    suspend fun CommunicationScope.onEffect(effect: Transmission.Effect)
+    suspend fun CommunicationScope.onEffect(effect: Transmission.Effect): Boolean
 }
 
 fun buildGenericEffectHandler(
     onEffect: suspend CommunicationScope.(effect: Transmission.Effect) -> Unit
 ): EffectHandler {
-    return EffectHandler { effect -> onEffect(effect) }
+    return EffectHandler { effect ->
+        onEffect(effect)
+        true
+    }
 }
 
 
@@ -17,6 +20,9 @@ inline fun <reified E : Transmission.Effect> buildTypedEffectHandler(
     crossinline onEffect: suspend CommunicationScope.(effect: E) -> Unit
 ): EffectHandler {
     return EffectHandler { incomingEffect ->
-        incomingEffect.takeIf { it is E }?.let { effect -> onEffect(effect as E) }
+        incomingEffect.takeIf { it is E }?.let {
+            effect -> onEffect(effect as E)
+            true
+        } ?: false
     }
 }

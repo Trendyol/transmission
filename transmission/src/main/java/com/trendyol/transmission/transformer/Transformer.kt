@@ -10,8 +10,12 @@ import com.trendyol.transmission.transformer.handler.EffectHandler
 import com.trendyol.transmission.transformer.handler.SignalHandler
 import com.trendyol.transmission.transformer.query.TransformerQueryDelegate
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.async
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.SendChannel
@@ -24,7 +28,7 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import kotlin.reflect.KClass
 
-open class Transformer(private val dispatcher: CoroutineDispatcher = Dispatchers.Default) {
+open class Transformer(dispatcher: CoroutineDispatcher = Dispatchers.Default) {
 
     val transformerScope = CoroutineScope(dispatcher)
 
@@ -34,6 +38,9 @@ open class Transformer(private val dispatcher: CoroutineDispatcher = Dispatchers
     private val queryDelegate = TransformerQueryDelegate(transformerScope, identifier)
     internal val dataChannel: Channel<Transmission.Data> = Channel(capacity = Channel.BUFFERED)
     internal val storage = TransformerStorage()
+
+    var currentEffectProcessing: Deferred<Boolean>? = null
+    var currentSignalProcessing: Job? = null
 
     open val signalHandler: SignalHandler? = null
     open val effectHandler: EffectHandler? = null
@@ -68,11 +75,11 @@ open class Transformer(private val dispatcher: CoroutineDispatcher = Dispatchers
         }
     }
 
-    suspend fun startSignalCollection(incoming: SharedFlow<Transmission.Signal>) {
-        coroutineScope {
+    fun startSignalCollection(incoming: SharedFlow<Transmission.Signal>) {
+        transformerScope.launch {
             incoming.collect {
                 signalHandler?.apply {
-                    launch {
+                    currentSignalProcessing = launch {
                         communicationScope.onSignal(it)
                     }
                 }
@@ -80,17 +87,15 @@ open class Transformer(private val dispatcher: CoroutineDispatcher = Dispatchers
         }
     }
 
-    suspend fun startDataPublishing(data: SendChannel<Transmission.Data>) {
-        coroutineScope {
-            launch { dataChannel.receiveAsFlow().collect { data.send(it) } }
-        }
+    fun startDataPublishing(data: SendChannel<Transmission.Data>) {
+        transformerScope.launch { dataChannel.receiveAsFlow().collect { data.send(it) } }
     }
 
-    suspend fun startEffectProcessing(
+    fun startEffectProcessing(
         producer: SendChannel<EffectWrapper>,
         incoming: SharedFlow<EffectWrapper>
     ) {
-        coroutineScope {
+        transformerScope.launch {
             launch {
                 incoming
                     .filterNot { it.effect is RouterEffect }
@@ -98,7 +103,9 @@ open class Transformer(private val dispatcher: CoroutineDispatcher = Dispatchers
                     .map { it.effect }
                     .collect {
                         effectHandler?.apply {
-                            launch { communicationScope.onEffect(it) }
+                            currentEffectProcessing = async(CoroutineName("current effect")) {
+                                communicationScope.onEffect(it)
+                            }
                         }
                     }
             }
@@ -108,8 +115,8 @@ open class Transformer(private val dispatcher: CoroutineDispatcher = Dispatchers
         }
     }
 
-    internal suspend fun startQueryProcessing(queryDelegate: QueryDelegate) {
-        coroutineScope {
+    internal fun startQueryProcessing(queryDelegate: QueryDelegate) {
+        transformerScope.launch {
             launch {
                 queryDelegate.incomingQueryResponse
                     .filter { it.owner == identifier }

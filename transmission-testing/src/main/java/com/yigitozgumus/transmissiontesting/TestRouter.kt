@@ -64,21 +64,13 @@ internal class TestRouter(
                 outGoingQueryChannel.receiveAsFlow().collect { processQuery(it) }
             }
             transformer.run {
-                launch {
-                    startSignalCollection(signalBroadcast.output)
-                }
-                launch {
-                    startDataPublishing(dataBroadcast.producer)
-                }
-                launch {
-                    startEffectProcessing(
-                        producer = effectBroadcast.producer,
-                        incoming = effectBroadcast.output
-                    )
-                }
-                launch {
-                    startQueryProcessing()
-                }
+                startSignalCollection(signalBroadcast.output)
+                startDataPublishing(dataBroadcast.producer)
+                startEffectProcessing(
+                    producer = effectBroadcast.producer,
+                    incoming = effectBroadcast.output
+                )
+                startQueryProcessing()
             }
         }
 

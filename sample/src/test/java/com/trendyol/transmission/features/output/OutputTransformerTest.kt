@@ -9,6 +9,8 @@ import com.trendyol.transmission.ui.ColorPickerUiState
 import com.trendyol.transmission.ui.OutputUiState
 import com.yigitozgumus.transmissiontesting.testTransformer
 import com.yigitozgumus.transmissiontesting.testWith
+import com.yigitozgumus.transmissiontesting.testWith3
+import com.yigitozgumus.transmissiontesting.testWith4
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import org.junit.Before
@@ -62,6 +64,28 @@ class OutputTransformerTest {
             addQueryData(ColorPickerUiState(), ColorPickerTransformer::class)
         }) {
             sendEffect(InputEffect.InputUpdate("test"))
+//            assertEquals(OutputUiState(outputText = "test"), dataStream[1])
+            assertTrue(effectStream.last().effect is RouterEffect)
+        }
+    }
+
+    @Test
+    fun `GIVEN sut, WHEN inputUpdate effect comes and ColorPickerUIState exists, THEN RouterPayloadEffect should be published 2`() {
+        sut.testWith3(effect =InputEffect.InputUpdate("test"), registry = {
+            addQueryData(ColorPickerUiState(), ColorPickerTransformer::class)
+        }) {
+//            sendEffect(InputEffect.InputUpdate("test"))
+//            assertEquals(OutputUiState(outputText = "test"), dataStream[1])
+            assertTrue(effectStream.last().effect is RouterEffect)
+        }
+    }
+
+    @Test
+    fun `GIVEN sut, WHEN inputUpdate effect comes and ColorPickerUIState exists, THEN RouterPayloadEffect should be published 3`() {
+        testWith4(effect =InputEffect.InputUpdate("test"), transformerProvider = {OutputTransformer(this) }, registry = {
+            addQueryData(ColorPickerUiState(), ColorPickerTransformer::class)
+        }) {
+//            sendEffect(InputEffect.InputUpdate("test"))
 //            assertEquals(OutputUiState(outputText = "test"), dataStream[1])
             assertTrue(effectStream.last().effect is RouterEffect)
         }
