@@ -56,7 +56,7 @@ android {
 
 dependencies {
 	implementation(project(":transmission"))
-	testImplementation(project(":transmission-testing"))
+	testImplementation(project(":transmission-test"))
 
 	implementation(libs.androidx.core.ktx)
 	implementation(libs.androidx.lifecycle.runtime.ktx)

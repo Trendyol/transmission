@@ -2,7 +2,7 @@ package com.trendyol.transmission.transformer.query
 
 import com.trendyol.transmission.Transmission
 
-class ComputationDelegate(
+internal class ComputationDelegate(
     private val useCache: Boolean = false,
     private val computation: suspend QuerySender.() -> Transmission.Data?
 ) : ComputationOwner {

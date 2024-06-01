@@ -10,7 +10,6 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.map
@@ -41,40 +40,30 @@ class TransmissionRouter(
     val queryHelper: QuerySender = _queryDelegate
 
     init {
-        routerScope.launch {
-            initialize()
-        }
+        initialize()
     }
 
     fun processSignal(signal: Transmission.Signal) {
         signalBroadcast.producer.trySend(signal)
     }
 
-    private suspend fun initialize() {
+    private fun initialize() {
         require(transformerSet.isNotEmpty()) {
             "transformerSet should not be empty"
         }
-        coroutineScope {
+        routerScope.launch {
             transformerSet.map { transformer ->
                 transformer.run {
-                    launch {
-                        startSignalCollection(incoming = signalBroadcast.output)
-                    }
-                    launch {
-                        startDataPublishing(data = dataBroadcast.producer)
-                    }
-                    launch {
-                        startEffectProcessing(
-                            producer = effectBroadcast.producer,
-                            incoming = effectBroadcast.output
-                        )
-                    }
-                    launch {
-                        startQueryProcessing(
-                            incomingQuery = _queryDelegate.incomingQueryResponse,
-                            outGoingQuery = _queryDelegate.outGoingQuery
-                        )
-                    }
+                    startSignalCollection(incoming = signalBroadcast.output)
+                    startDataPublishing(data = dataBroadcast.producer)
+                    startEffectProcessing(
+                        producer = effectBroadcast.producer,
+                        incoming = effectBroadcast.output
+                    )
+                    startQueryProcessing(
+                        incomingQuery = _queryDelegate.incomingQueryResponse,
+                        outGoingQuery = _queryDelegate.outGoingQuery
+                    )
                 }
             }
         }

@@ -11,7 +11,6 @@ import com.trendyol.transmission.transformer.query.Query
 import com.trendyol.transmission.transformer.query.QueryResult
 import com.trendyol.transmission.transformer.query.TransformerQueryDelegate
 import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -106,7 +105,7 @@ open class Transformer(dispatcher: CoroutineDispatcher = Dispatchers.Default) {
                     .map { it.effect }
                     .collect {
                         effectHandler?.apply {
-                            currentEffectProcessing = launch(CoroutineName("current effect")) {
+                            currentEffectProcessing = launch {
                                 communicationScope.onEffect(it)
                             }
                         }
