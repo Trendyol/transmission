@@ -23,7 +23,6 @@ import kotlinx.coroutines.flow.filterNot
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
-import kotlin.reflect.KClass
 
 open class Transformer(dispatcher: CoroutineDispatcher = Dispatchers.Default) {
 
@@ -47,35 +46,11 @@ open class Transformer(dispatcher: CoroutineDispatcher = Dispatchers.Default) {
         currentEffectProcessing?.join()
     }
 
-    val communicationScope: CommunicationScope = object : CommunicationScope {
-
-        override fun <D : Transmission.Data> send(data: D?) {
-            data?.let { dataChannel.trySend(it) }
-        }
-
-        override fun <E : Transmission.Effect, T : Transformer> send(effect: E, to: KClass<out T>) {
-            effectChannel.trySend(EffectWrapper(effect, to))
-        }
-
-        override fun <E : Transmission.Effect> publish(effect: E) {
-            effectChannel.trySend(EffectWrapper(effect))
-        }
-
-        override suspend fun <D : Transmission.Data> queryData(
-            type: KClass<D>,
-            owner: KClass<out Transformer>?
-        ): D? {
-            return queryDelegate.interactor.queryData(type, owner)
-        }
-
-        override suspend fun <D : Transmission.Data, T : Transformer> queryComputation(
-            type: KClass<D>,
-            owner: KClass<out T>,
-            invalidate: Boolean
-        ): D? {
-            return queryDelegate.interactor.queryComputation(type, owner, invalidate)
-        }
-    }
+    val communicationScope: CommunicationScope = CommunicationScopeBuilder(
+        effectChannel = effectChannel,
+        dataChannel = dataChannel,
+        queryDelegate = queryDelegate
+    )
 
     fun startSignalCollection(incoming: SharedFlow<Transmission.Signal>) {
         transformerScope.launch {
