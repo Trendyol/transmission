@@ -46,12 +46,12 @@ class OutputTransformer @Inject constructor(
                 holder.update {
                     it.copy(outputText = it.outputText + " and Selected color index is ${selectedColor.selectedColorIndex}")
                 }
-                publish(effect = RouterEffect(holder.getValue()))
                 delay(1.seconds)
                 send(
                     effect = ColorPickerEffect.BackgroundColorUpdate(holder2.getValue().backgroundColor),
                     to = ColorPickerTransformer::class
                 )
+                publish(effect = RouterEffect(holder.getValue()))
             }
 
             is ColorPickerEffect.BackgroundColorUpdate -> {
