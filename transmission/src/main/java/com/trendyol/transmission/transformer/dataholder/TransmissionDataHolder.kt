@@ -15,7 +15,7 @@ internal class TransmissionDataHolderImpl<T : Transmission.Data?>(
     initialValue: T,
     publishUpdates: Boolean,
     transformer: Transformer,
-    typeName: String,
+    holderKey: String?,
 ) : TransmissionDataHolder<T> {
 
     private val holder = MutableStateFlow(initialValue)
@@ -26,11 +26,15 @@ internal class TransmissionDataHolderImpl<T : Transmission.Data?>(
 
     init {
         transformer.run {
-            storage.updateHolderDataReferenceToTrack(typeName)
+            holderKey?.let {
+                storage.updateHolderDataReferenceToTrack(it)
+            }
             transformerScope.launch {
                 holder.collect {
                     it?.let { holderData ->
-                        storage.updateHolderData(holderData)
+                        if (holderKey != null) {
+                            storage.updateHolderData(holderData)
+                        }
                         if (publishUpdates) {
                             transformer.dataChannel.trySend(it)
                         }

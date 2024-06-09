@@ -21,9 +21,9 @@ internal class TransformerStorage {
         return internalTransmissionHolderSet is HolderState.Initialized
     }
 
-    fun isHolderDataDefined(type: String): Boolean {
+    fun isHolderDataDefined(key: String): Boolean {
         return if (internalTransmissionHolderSet is HolderState.Undefined) false
-        else (internalTransmissionHolderSet as HolderState.Initialized).valueSet.contains(type)
+        else (internalTransmissionHolderSet as HolderState.Initialized).valueSet.contains(key)
     }
 
     fun updateHolderData(data: Transmission.Data) {
@@ -39,7 +39,7 @@ internal class TransformerStorage {
             is HolderState.Initialized -> {
                 val currentSet = (internalTransmissionHolderSet as HolderState.Initialized).valueSet
                 require(!currentSet.contains(dataHolderToTrack)) {
-                    "Multiple data holders with the same type is not allowed: $dataHolderToTrack"
+                    "Multiple data holders with the same key is not allowed: $dataHolderToTrack"
                 }
                 HolderState.Initialized(currentSet + dataHolderToTrack)
             }
@@ -50,23 +50,23 @@ internal class TransformerStorage {
         }
     }
 
-    fun registerComputation(name: String, delegate: ComputationOwner) {
-        require(!internalComputationMap.containsKey(name)) {
-            "Multiple computations with the same type is not allowed: $name"
+    fun registerComputation(key: String, delegate: ComputationOwner) {
+        require(!internalComputationMap.containsKey(key)) {
+            "Multiple computations with the same key is not allowed: $key"
         }
-        internalComputationMap[name] = delegate
+        internalComputationMap[key] = delegate
     }
 
     fun hasComputation(type: String): Boolean {
         return internalComputationMap.containsKey(type)
     }
 
-    fun getComputationByType(type: String): ComputationOwner? {
+    fun getComputationByKey(type: String): ComputationOwner? {
         return internalComputationMap[type]
     }
 
-    fun getHolderDataByType(type: String): Transmission.Data? {
-        return holderDataReference.value[type]
+    fun getHolderDataByKey(key: String): Transmission.Data? {
+        return holderDataReference.value[key]
     }
 
     fun clear() {

@@ -5,7 +5,6 @@ import com.trendyol.transmission.effect.RouterEffect
 import com.trendyol.transmission.features.colorpicker.ColorPickerEffect
 import com.trendyol.transmission.features.colorpicker.ColorPickerTransformer
 import com.trendyol.transmission.features.input.InputEffect
-import com.trendyol.transmission.features.input.InputTransformer
 import com.trendyol.transmission.features.input.WrittenInput
 import com.trendyol.transmission.transformer.Transformer
 import com.trendyol.transmission.transformer.dataholder.buildDataHolder
@@ -28,10 +27,10 @@ class OutputTransformer @Inject constructor(
     private val holder2 = buildDataHolder(ColorPickerUiState(), publishUpdates = false)
 
     init {
-        registerComputation<OutputCalculationResult> {
+        registerComputation<OutputCalculationResult>(key = "OutputCalculation") {
             delay(2.seconds)
-            val data = queryData(ColorPickerUiState::class)?.selectedColorIndex
-            val writtenOutput = queryComputation(WrittenInput::class, InputTransformer::class)
+            val data = queryData<ColorPickerUiState>("ColorPickerUiState")?.selectedColorIndex
+            val writtenOutput = queryComputation<WrittenInput>(key = "WrittenInput")
             val result = Random.nextInt(5, 15) * Random.nextInt(5, 15)
             OutputCalculationResult("result is $result with ($writtenOutput) and $data")
         }
@@ -42,14 +41,10 @@ class OutputTransformer @Inject constructor(
             is InputEffect.InputUpdate -> {
                 holder.update { it.copy(outputText = effect.value) }
                 delay(3.seconds)
-                val selectedColor =
-                    queryData(
-                        type = ColorPickerUiState::class,
-                        owner = ColorPickerTransformer::class
-                    )
+                val selectedColor = queryData<ColorPickerUiState>("ColorPickerUiState")
                 selectedColor ?: return@buildGenericEffectHandler
                 holder.update {
-                    it.copy(outputText = it.outputText + " and Selected color index is ${selectedColor?.selectedColorIndex}")
+                    it.copy(outputText = it.outputText + " and Selected color index is ${selectedColor.selectedColorIndex}")
                 }
                 publish(effect = RouterEffect(holder.getValue()))
                 delay(1.seconds)

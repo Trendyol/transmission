@@ -12,9 +12,9 @@ import com.trendyol.transmission.transformer.Transformer
  * @param computation Computation to get the result [Transmission.Data]
  */
 inline fun <reified T : Transmission.Data> Transformer.registerComputation(
+    key: String,
     useCache: Boolean = false,
     noinline computation: suspend QuerySender.() -> T?,
 ) {
-    val typeName = T::class.java.simpleName
-    ComputationBuilder<T>().buildWith(typeName, useCache, this, computation)
+    ComputationBuilder<T>().buildWith(key, useCache, this, computation)
 }

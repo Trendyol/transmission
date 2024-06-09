@@ -3,6 +3,7 @@ package com.trendyol.transmission.transformer.dataholder
 import com.trendyol.transmission.Transmission
 import com.trendyol.transmission.TransmissionRouter
 import com.trendyol.transmission.transformer.Transformer
+import com.trendyol.transmission.transformer.query.QuerySender
 
 /**
  * Throws [IllegalArgumentException] when multiple data holders with same type
@@ -10,15 +11,18 @@ import com.trendyol.transmission.transformer.Transformer
  * @param initialValue Initial value of the Data Holder.
  * Must be a type extended from [Transmission.Data]
  * @param [publishUpdates] Controls sending updates to the [TransmissionRouter]
+ * @param [key] When defined, data inside the holder can be accessed by other Transformers in the
+ * network using [QuerySender.queryData]
  * */
 inline fun <reified T : Transmission.Data?> Transformer.buildDataHolder(
     initialValue: T,
     publishUpdates: Boolean = true,
+    key: String? = null,
 ): TransmissionDataHolder<T> {
     return TransmissionDataHolderBuilder<T>().buildWith(
         initialValue = initialValue,
         publishUpdates = publishUpdates,
         transformer = this,
-        typeName = T::class.java.simpleName,
+        holderKey = key,
     )
 }

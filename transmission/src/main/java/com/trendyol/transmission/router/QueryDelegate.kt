@@ -2,7 +2,6 @@ package com.trendyol.transmission.router
 
 import com.trendyol.transmission.Transmission
 import com.trendyol.transmission.TransmissionRouter
-import com.trendyol.transmission.transformer.Transformer
 import com.trendyol.transmission.transformer.query.Query
 import com.trendyol.transmission.transformer.query.QueryResult
 import com.trendyol.transmission.transformer.query.QuerySender
@@ -18,7 +17,6 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.launch
-import kotlin.reflect.KClass
 
 internal class QueryDelegate(
     private val queryScope: CoroutineScope,
@@ -54,12 +52,11 @@ internal class QueryDelegate(
     ) = queryScope.launch {
         val dataHolder = routerRef.transformerSet
             .filter { it.storage.isHolderStateInitialized() }
-            .filter { if (query.dataOwner != null) query.dataOwner == it.identifier else true }
-            .find { it.storage.isHolderDataDefined(query.type) }
+            .find { it.storage.isHolderDataDefined(query.key) }
         val dataToSend = QueryResult.Data(
             owner = query.sender,
-            data = dataHolder?.storage?.getHolderDataByType(query.type),
-            type = query.type
+            key = query.key,
+            data = dataHolder?.storage?.getHolderDataByKey(query.key),
         )
         if (query.sender == routerRef.routerName) {
             routerQueryResultChannel.emit(dataToSend)
@@ -72,14 +69,13 @@ internal class QueryDelegate(
         query: Query.Computation
     ) = queryScope.launch {
         val computationHolder = routerRef.transformerSet
-            .filter { query.computationOwner == it.identifier }
-            .find { it.storage.hasComputation(query.type) }
+            .find { it.storage.hasComputation(query.key) }
         val computationToSend = queryScope.async {
             QueryResult.Computation(
                 owner = query.sender,
-                data = computationHolder?.storage?.getComputationByType(query.type)
+                key = query.key,
+                data = computationHolder?.storage?.getComputationByKey(query.key)
                     ?.getResult(computationHolder.communicationScope, query.invalidate),
-                type = query.type
             )
         }
         if (query.sender == routerRef.routerName) {
@@ -93,40 +89,30 @@ internal class QueryDelegate(
         }
     }
 
-
-    override suspend fun <D : Transmission.Data> queryData(
-        type: KClass<D>,
-        owner: KClass<out Transformer>?
-    ): D? {
+    override suspend fun <D : Transmission.Data> queryData(key: String): D? {
         outGoingQuery.trySend(
-            Query.Data(
-                sender = routerRef.routerName,
-                dataOwner = owner?.simpleName,
-                type = type.simpleName.orEmpty()
-            )
+            Query.Data(sender = routerRef.routerName, key = key)
         )
         return routerQueryResultChannel
             .filterIsInstance<QueryResult.Data<D>>()
-            .filter { it.type == type.simpleName }
+            .filter { it.key == key && it.owner == routerRef.routerName }
             .first().data
     }
 
-    override suspend fun <D : Transmission.Data, T : Transformer> queryComputation(
-        type: KClass<D>,
-        owner: KClass<out T>,
+    override suspend fun <D : Transmission.Data> queryComputation(
+        key: String,
         invalidate: Boolean
     ): D? {
         outGoingQuery.trySend(
             Query.Computation(
                 sender = routerRef.routerName,
-                computationOwner = owner.simpleName.orEmpty(),
-                type = type.simpleName.orEmpty(),
+                key = key,
                 invalidate = invalidate
             )
         )
         return routerQueryResultChannel
             .filterIsInstance<QueryResult.Computation<D>>()
-            .filter { it.type == type.simpleName }
+            .filter { it.key == key && it.owner == routerRef.routerName }
             .first().data
     }
 }

@@ -28,7 +28,7 @@ open class Transformer(dispatcher: CoroutineDispatcher = Dispatchers.Default) {
 
     val transformerScope = CoroutineScope(dispatcher)
 
-    val identifier: String = this.identifier()
+    private val identifier: String = this.identifier()
 
     private val effectChannel: Channel<EffectWrapper> = Channel(capacity = Channel.BUFFERED)
     private val queryDelegate = TransformerQueryDelegate(transformerScope, identifier)
