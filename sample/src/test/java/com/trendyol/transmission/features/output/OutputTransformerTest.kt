@@ -1,7 +1,6 @@
 package com.trendyol.transmission.features.output
 
 import com.trendyol.transmission.features.colorpicker.ColorPickerEffect
-import com.trendyol.transmission.features.colorpicker.ColorPickerTransformer
 import com.trendyol.transmission.features.input.InputEffect
 import com.trendyol.transmission.transformer.util.TestCoroutineRule
 import com.trendyol.transmission.ui.ColorPickerUiState
@@ -42,7 +41,7 @@ class OutputTransformerTest {
     @Test
     fun `GIVEN sut, WHEN inputUpdate effect comes and ColorPickerUIState exists, THEN RouterPayloadEffect should be published`() {
         sut.testWithEffect(effect = InputEffect.InputUpdate("test"), registry = {
-            addQueryData(ColorPickerUiState(), ColorPickerTransformer::class)
+            addQueryData(ColorPickerUiState(), key = "ColorPickerUiState")
         }) {
             assertEquals(OutputUiState(outputText = "test"), dataStream[1])
             assertTrue(effectStream.last().effect is ColorPickerEffect.BackgroundColorUpdate)

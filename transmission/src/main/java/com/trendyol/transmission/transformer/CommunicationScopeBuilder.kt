@@ -25,18 +25,14 @@ internal class CommunicationScopeBuilder(
         effectChannel.trySend(EffectWrapper(effect))
     }
 
-    override suspend fun <D : Transmission.Data> queryData(
-        type: KClass<D>,
-        owner: KClass<out Transformer>?
-    ): D? {
-        return queryDelegate.interactor.queryData(type, owner)
+    override suspend fun <D : Transmission.Data> queryData(key: String): D? {
+        return queryDelegate.interactor.queryData(key)
     }
 
-    override suspend fun <D : Transmission.Data, T : Transformer> queryComputation(
-        type: KClass<D>,
-        owner: KClass<out T>,
+    override suspend fun <D : Transmission.Data> queryComputation(
+        key: String,
         invalidate: Boolean
     ): D? {
-        return queryDelegate.interactor.queryComputation(type, owner, invalidate)
+        return queryDelegate.interactor.queryComputation(key, invalidate)
     }
 }

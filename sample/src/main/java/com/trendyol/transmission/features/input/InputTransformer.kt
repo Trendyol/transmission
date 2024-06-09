@@ -17,10 +17,10 @@ class InputTransformer @Inject constructor(
     @DefaultDispatcher private val defaultDispatcher: CoroutineDispatcher
 ) : Transformer(defaultDispatcher) {
 
-    private val holder = buildDataHolder(InputUiState())
+    private val holder = buildDataHolder(InputUiState(), key = "InputUiState")
 
     init {
-        registerComputation<WrittenInput> {
+        registerComputation<WrittenInput>(key = "WrittenInput") {
             delay(1.seconds)
             WrittenInput(holder.getValue().writtenText)
         }

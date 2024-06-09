@@ -11,33 +11,33 @@ import kotlinx.coroutines.CoroutineDispatcher
 import javax.inject.Inject
 
 class ColorPickerTransformer @Inject constructor(
-	@DefaultDispatcher private val defaultDispatcher: CoroutineDispatcher
+    @DefaultDispatcher private val defaultDispatcher: CoroutineDispatcher
 ) : Transformer(defaultDispatcher) {
 
-	private val holder = buildDataHolder(ColorPickerUiState())
+    private val holder = buildDataHolder(ColorPickerUiState(), key = "ColorPickerUiState")
 
-	override val signalHandler = buildGenericSignalHandler { signal ->
-		when (signal) {
-			is ColorPickerSignal.SelectColor -> {
-				holder.update { it.copy(selectedColorIndex = signal.index) }
-				publish(
-					ColorPickerEffect.BackgroundColorUpdate(signal.selectedColor.copy(alpha = 0.1f))
-				)
-				send(
-					effect = ColorPickerEffect.SelectedColorUpdate(signal.selectedColor),
-					to = MultiOutputTransformer::class
-				)
-			}
-		}
-	}
+    override val signalHandler = buildGenericSignalHandler { signal ->
+        when (signal) {
+            is ColorPickerSignal.SelectColor -> {
+                holder.update { it.copy(selectedColorIndex = signal.index) }
+                publish(
+                    ColorPickerEffect.BackgroundColorUpdate(signal.selectedColor.copy(alpha = 0.1f))
+                )
+                send(
+                    effect = ColorPickerEffect.SelectedColorUpdate(signal.selectedColor),
+                    to = MultiOutputTransformer::class
+                )
+            }
+        }
+    }
 
-	override val effectHandler = buildGenericEffectHandler { effect ->
-		when (effect) {
-			is ColorPickerEffect.BackgroundColorUpdate -> {
-				holder.update {
-					it.copy(backgroundColor = effect.color)
-				}
-			}
-		}
-	}
+    override val effectHandler = buildGenericEffectHandler { effect ->
+        when (effect) {
+            is ColorPickerEffect.BackgroundColorUpdate -> {
+                holder.update {
+                    it.copy(backgroundColor = effect.color)
+                }
+            }
+        }
+    }
 }

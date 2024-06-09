@@ -88,11 +88,10 @@ internal class TestRouter(
     private fun processDataQuery(
         query: Query.Data
     ) = testScope.launch {
-        val dataKey = query.dataOwner.orEmpty() + query.type
         val dataToSend = QueryResult.Data(
             owner = query.sender,
-            data = registry.dataMap[dataKey],
-            type = query.type
+            data = registry.dataMap[query.key],
+            key = query.key
         )
         testScope.launch {
             queryResultChannel.trySend(dataToSend)
@@ -102,11 +101,10 @@ internal class TestRouter(
     private fun processComputationQuery(
         query: Query.Computation
     ) = testScope.launch {
-        val computationKey = query.computationOwner + query.type
         val computationToSend = QueryResult.Computation(
             owner = query.sender,
-            data = registry.computationMap[computationKey],
-            type = query.type
+            data = registry.computationMap[query.key],
+            key = query.key
         )
         queryResultChannel.trySend(computationToSend)
     }
