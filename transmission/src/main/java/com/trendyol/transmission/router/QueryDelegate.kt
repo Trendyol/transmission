@@ -44,6 +44,7 @@ internal class QueryDelegate(
         when (query) {
             is Query.Computation -> processComputationQuery(query)
             is Query.Data -> processDataQuery(query)
+            is Query.ComputationWithArgs<*> -> processComputationQueryWithArgs(query)
         }
     }
 
@@ -89,6 +90,30 @@ internal class QueryDelegate(
         }
     }
 
+    private suspend fun <A : Any> processComputationQueryWithArgs(
+        query: Query.ComputationWithArgs<A>
+    ) = queryScope.launch {
+        val computationHolder = routerRef.transformerSet
+            .find { it.storage.hasComputation(query.key) }
+        val computationToSend = queryScope.async {
+            QueryResult.Computation(
+                owner = query.sender,
+                key = query.key,
+                data = computationHolder?.storage?.getComputationWithArgsByKey<A>(query.key)
+                    ?.getResult(computationHolder.communicationScope, query.invalidate, query.args),
+            )
+        }
+        if (query.sender == routerRef.routerName) {
+            queryScope.launch {
+                routerQueryResultChannel.emit(computationToSend.await())
+            }
+        } else {
+            queryScope.launch {
+                queryResultChannel.trySend(computationToSend.await())
+            }
+        }
+    }
+
     override suspend fun <D : Transmission.Data> queryData(key: String): D? {
         outGoingQuery.trySend(
             Query.Data(sender = routerRef.routerName, key = key)
@@ -107,6 +132,25 @@ internal class QueryDelegate(
             Query.Computation(
                 sender = routerRef.routerName,
                 key = key,
+                invalidate = invalidate
+            )
+        )
+        return routerQueryResultChannel
+            .filterIsInstance<QueryResult.Computation<D>>()
+            .filter { it.key == key && it.owner == routerRef.routerName }
+            .first().data
+    }
+
+    override suspend fun <A : Any, D : Transmission.Data> queryComputationWithArgs(
+        args: A,
+        key: String,
+        invalidate: Boolean
+    ): D? {
+        outGoingQuery.trySend(
+            Query.ComputationWithArgs(
+                sender = routerRef.routerName,
+                key = key,
+                args = args,
                 invalidate = invalidate
             )
         )

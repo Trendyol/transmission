@@ -10,4 +10,10 @@ interface QuerySender {
         key: String,
         invalidate: Boolean = false,
     ): D?
+
+    suspend fun <A : Any, D : Transmission.Data> queryComputationWithArgs(
+        args: A,
+        key: String,
+        invalidate: Boolean = false,
+    ): D?
 }

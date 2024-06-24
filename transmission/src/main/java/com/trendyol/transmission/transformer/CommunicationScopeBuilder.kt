@@ -35,4 +35,12 @@ internal class CommunicationScopeBuilder(
     ): D? {
         return queryDelegate.interactor.queryComputation(key, invalidate)
     }
+
+    override suspend fun <A : Any, D : Transmission.Data> queryComputationWithArgs(
+        args: A,
+        key: String,
+        invalidate: Boolean
+    ): D? {
+        return queryDelegate.interactor.queryComputationWithArgs(args, key, invalidate)
+    }
 }

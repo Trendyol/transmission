@@ -2,6 +2,7 @@ package com.trendyol.transmission.transformer.query
 
 import com.trendyol.transmission.Transmission
 import com.trendyol.transmission.transformer.Transformer
+import com.trendyol.transmission.transformer.query.withargs.ComputationBuilderWithArgs
 
 /**
  * Throws [IllegalArgumentException] when multiple computations with the same return type
@@ -17,4 +18,12 @@ inline fun <reified T : Transmission.Data> Transformer.registerComputation(
     noinline computation: suspend QuerySender.() -> T?,
 ) {
     ComputationBuilder<T>().buildWith(key, useCache, this, computation)
+}
+
+inline fun <A : Any, reified T : Transmission.Data> Transformer.registerComputation(
+    key: String,
+    useCache: Boolean = false,
+    noinline computation: suspend QuerySender.(args: A) -> T?,
+) {
+    ComputationBuilderWithArgs<A, T>().buildWith(key, useCache, this, computation)
 }

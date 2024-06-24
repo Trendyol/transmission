@@ -24,6 +24,9 @@ class InputTransformer @Inject constructor(
             delay(1.seconds)
             WrittenInput(holder.getValue().writtenText)
         }
+        registerComputation<String, WrittenInput>(key = "WrittenInputWithArgs") {
+            WrittenInput(it)
+        }
     }
 
     override val signalHandler = buildTypedSignalHandler<InputSignal> { signal ->

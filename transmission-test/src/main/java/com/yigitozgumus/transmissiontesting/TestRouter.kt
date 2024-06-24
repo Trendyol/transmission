@@ -82,6 +82,7 @@ internal class TestRouter(
         when (query) {
             is Query.Computation -> processComputationQuery(query)
             is Query.Data -> processDataQuery(query)
+            is Query.ComputationWithArgs<*> -> processComputationQueryWithArgs(query)
         }
     }
 
@@ -100,6 +101,17 @@ internal class TestRouter(
 
     private fun processComputationQuery(
         query: Query.Computation
+    ) = testScope.launch {
+        val computationToSend = QueryResult.Computation(
+            owner = query.sender,
+            data = registry.computationMap[query.key],
+            key = query.key
+        )
+        queryResultChannel.trySend(computationToSend)
+    }
+
+    private fun <A : Any> processComputationQueryWithArgs(
+        query: Query.ComputationWithArgs<A>
     ) = testScope.launch {
         val computationToSend = QueryResult.Computation(
             owner = query.sender,

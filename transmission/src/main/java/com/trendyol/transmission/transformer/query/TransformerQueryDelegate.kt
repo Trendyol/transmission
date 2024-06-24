@@ -38,5 +38,24 @@ internal class TransformerQueryDelegate(scope: CoroutineScope, identifier: Strin
                 .filter { it.key == key && it.owner == identifier }
                 .first().data
         }
+
+        override suspend fun <A : Any, D : Transmission.Data> queryComputationWithArgs(
+            args: A,
+            key: String,
+            invalidate: Boolean
+        ): D? {
+            outGoingQuery.trySend(
+                Query.ComputationWithArgs(
+                    sender = identifier,
+                    key = key,
+                    args = args,
+                    invalidate = invalidate
+                )
+            )
+            return resultBroadcast.output
+                .filterIsInstance<QueryResult.Computation<D>>()
+                .filter { it.key == key && it.owner == identifier }
+                .first().data
+        }
     }
 }
