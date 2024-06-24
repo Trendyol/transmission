@@ -17,12 +17,12 @@ interface RequestHandler {
         invalidate: Boolean = false,
     ): D?
 
-    suspend fun <C : Contract.Execution> compute(
+    suspend fun <C : Contract.Execution> execute(
         contract: C,
         invalidate: Boolean = false,
     )
 
-    suspend fun <C : Contract.ExecutionWithArgs<A>, A : Any> compute(
+    suspend fun <C : Contract.ExecutionWithArgs<A>, A : Any> execute(
         contract: C,
         args: A,
         invalidate: Boolean = false,
