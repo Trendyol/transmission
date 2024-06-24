@@ -19,4 +19,15 @@ sealed interface Query {
         val args: A,
         val invalidate: Boolean = false,
     ) : Query
+
+    data class Execution(
+        val sender: String,
+        val key: String,
+    ) : Query
+
+    data class ExecutionWithArgs<A : Any>(
+        val sender: String,
+        val key: String,
+        val args: A,
+    ) : Query
 }
