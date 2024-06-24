@@ -6,6 +6,7 @@ import com.trendyol.transmission.transformer.Transformer
 import com.trendyol.transmission.transformer.dataholder.buildDataHolder
 import com.trendyol.transmission.transformer.handler.buildGenericEffectHandler
 import com.trendyol.transmission.transformer.handler.buildGenericSignalHandler
+import com.trendyol.transmission.transformer.query.Contract
 import com.trendyol.transmission.ui.ColorPickerUiState
 import kotlinx.coroutines.CoroutineDispatcher
 import javax.inject.Inject
@@ -14,7 +15,7 @@ class ColorPickerTransformer @Inject constructor(
     @DefaultDispatcher private val defaultDispatcher: CoroutineDispatcher
 ) : Transformer(defaultDispatcher) {
 
-    private val holder = buildDataHolder(ColorPickerUiState(), key = "ColorPickerUiState")
+    private val holder = buildDataHolder(ColorPickerUiState(), holderContract)
 
     override val signalHandler = buildGenericSignalHandler { signal ->
         when (signal) {
@@ -38,6 +39,12 @@ class ColorPickerTransformer @Inject constructor(
                     it.copy(backgroundColor = effect.color)
                 }
             }
+        }
+    }
+
+    companion object {
+        val holderContract = object : Contract.Data<ColorPickerUiState>() {
+            override val key: String = "ColorPickerUiState"
         }
     }
 }

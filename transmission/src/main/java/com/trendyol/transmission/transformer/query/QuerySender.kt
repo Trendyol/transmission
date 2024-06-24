@@ -4,16 +4,16 @@ import com.trendyol.transmission.Transmission
 
 interface QuerySender {
 
-    suspend fun <D : Transmission.Data> queryData(key: String): D?
+    suspend fun <C : Contract.Data<D>, D : Transmission.Data> queryData(contract: C): D?
 
-    suspend fun <D : Transmission.Data> queryComputation(
-        key: String,
+    suspend fun <C : Contract.Computation<D>, D : Transmission.Data> queryComputation(
+        contract: C,
         invalidate: Boolean = false,
     ): D?
 
-    suspend fun <A : Any, D : Transmission.Data> queryComputationWithArgs(
+    suspend fun <C : Contract.ComputationWithArgs<A, D>, A : Any, D : Transmission.Data> queryComputationWithArgs(
+        contract: C,
         args: A,
-        key: String,
         invalidate: Boolean = false,
     ): D?
 }

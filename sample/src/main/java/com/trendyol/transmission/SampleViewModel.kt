@@ -3,6 +3,8 @@ package com.trendyol.transmission
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.trendyol.transmission.effect.RouterEffect
+import com.trendyol.transmission.features.colorpicker.ColorPickerTransformer
+import com.trendyol.transmission.features.input.InputTransformer
 import com.trendyol.transmission.ui.ColorPickerUiState
 import com.trendyol.transmission.ui.InputUiState
 import com.trendyol.transmission.ui.MultiOutputUiState
@@ -53,10 +55,10 @@ class SampleViewModel @Inject constructor(
                 }
             }
         }
-        val inputData = transmissionRouter.queryHelper.queryData<InputUiState>("InputUiState")
+        val inputData = transmissionRouter.queryHelper.queryData(InputTransformer.holderContract)
         delay(1.seconds)
         val colorPicker =
-            transmissionRouter.queryHelper.queryData<ColorPickerUiState>("ColorPickerUiState")
+            transmissionRouter.queryHelper.queryData(ColorPickerTransformer.holderContract)
         _transmissionList.update { it.plus("Current InputData: $inputData") }
         _transmissionList.update { it.plus("Current ColorPickerData: $colorPicker") }
     }

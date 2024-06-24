@@ -2,6 +2,7 @@ package com.trendyol.transmission.router
 
 import com.trendyol.transmission.Transmission
 import com.trendyol.transmission.TransmissionRouter
+import com.trendyol.transmission.transformer.query.Contract
 import com.trendyol.transmission.transformer.query.Query
 import com.trendyol.transmission.transformer.query.QueryResult
 import com.trendyol.transmission.transformer.query.QuerySender
@@ -114,49 +115,49 @@ internal class QueryDelegate(
         }
     }
 
-    override suspend fun <D : Transmission.Data> queryData(key: String): D? {
+    override suspend fun <C : Contract.Data<D>, D : Transmission.Data> queryData(contract: C): D? {
         outGoingQuery.trySend(
-            Query.Data(sender = routerRef.routerName, key = key)
+            Query.Data(sender = routerRef.routerName, key = contract.key)
         )
         return routerQueryResultChannel
             .filterIsInstance<QueryResult.Data<D>>()
-            .filter { it.key == key && it.owner == routerRef.routerName }
+            .filter { it.key == contract.key && it.owner == routerRef.routerName }
             .first().data
     }
 
-    override suspend fun <D : Transmission.Data> queryComputation(
-        key: String,
+    override suspend fun <C : Contract.Computation<D>, D : Transmission.Data> queryComputation(
+        contract: C,
         invalidate: Boolean
     ): D? {
         outGoingQuery.trySend(
             Query.Computation(
                 sender = routerRef.routerName,
-                key = key,
+                key = contract.key,
                 invalidate = invalidate
             )
         )
         return routerQueryResultChannel
             .filterIsInstance<QueryResult.Computation<D>>()
-            .filter { it.key == key && it.owner == routerRef.routerName }
+            .filter { it.key == contract.key && it.owner == routerRef.routerName }
             .first().data
     }
 
-    override suspend fun <A : Any, D : Transmission.Data> queryComputationWithArgs(
+    override suspend fun <C : Contract.ComputationWithArgs<A, D>, A : Any, D : Transmission.Data> queryComputationWithArgs(
+        contract: C,
         args: A,
-        key: String,
         invalidate: Boolean
     ): D? {
         outGoingQuery.trySend(
             Query.ComputationWithArgs(
                 sender = routerRef.routerName,
-                key = key,
+                key = contract.key,
                 args = args,
                 invalidate = invalidate
             )
         )
         return routerQueryResultChannel
             .filterIsInstance<QueryResult.Computation<D>>()
-            .filter { it.key == key && it.owner == routerRef.routerName }
+            .filter { it.key == contract.key && it.owner == routerRef.routerName }
             .first().data
     }
 }

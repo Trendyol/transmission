@@ -14,47 +14,48 @@ internal class TransformerQueryDelegate(scope: CoroutineScope, identifier: Strin
     val resultBroadcast = scope.createBroadcast<QueryResult<Transmission.Data>>()
 
     val interactor: QuerySender = object : QuerySender {
-        override suspend fun <D : Transmission.Data> queryData(key: String): D? {
-            outGoingQuery.trySend(Query.Data(sender = identifier, key = key))
+
+        override suspend fun <C : Contract.Data<D>, D : Transmission.Data> queryData(contract: C): D? {
+            outGoingQuery.trySend(Query.Data(sender = identifier, key = contract.key))
             return resultBroadcast.output
                 .filterIsInstance<QueryResult.Data<D>>()
-                .filter { it.key == key && it.owner == identifier }
+                .filter { it.key == contract.key && it.owner == identifier }
                 .first().data
         }
 
-        override suspend fun <D : Transmission.Data> queryComputation(
-            key: String,
+        override suspend fun <C : Contract.Computation<D>, D : Transmission.Data> queryComputation(
+            contract: C,
             invalidate: Boolean
         ): D? {
             outGoingQuery.trySend(
                 Query.Computation(
                     sender = identifier,
-                    key = key,
+                    key = contract.key,
                     invalidate = invalidate
                 )
             )
             return resultBroadcast.output
                 .filterIsInstance<QueryResult.Computation<D>>()
-                .filter { it.key == key && it.owner == identifier }
+                .filter { it.key == contract.key && it.owner == identifier }
                 .first().data
         }
 
-        override suspend fun <A : Any, D : Transmission.Data> queryComputationWithArgs(
+        override suspend fun <C : Contract.ComputationWithArgs<A, D>, A : Any, D : Transmission.Data> queryComputationWithArgs(
+            contract: C,
             args: A,
-            key: String,
             invalidate: Boolean
         ): D? {
             outGoingQuery.trySend(
                 Query.ComputationWithArgs(
                     sender = identifier,
-                    key = key,
+                    key = contract.key,
                     args = args,
                     invalidate = invalidate
                 )
             )
             return resultBroadcast.output
                 .filterIsInstance<QueryResult.Computation<D>>()
-                .filter { it.key == key && it.owner == identifier }
+                .filter { it.key == contract.key && it.owner == identifier }
                 .first().data
         }
     }
