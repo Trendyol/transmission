@@ -3,8 +3,8 @@ package com.trendyol.transmission.transformer
 import com.trendyol.transmission.Transmission
 import com.trendyol.transmission.effect.EffectWrapper
 import com.trendyol.transmission.transformer.handler.CommunicationScope
-import com.trendyol.transmission.transformer.query.Contract
-import com.trendyol.transmission.transformer.query.TransformerQueryDelegate
+import com.trendyol.transmission.transformer.request.Contract
+import com.trendyol.transmission.transformer.request.TransformerQueryDelegate
 import kotlinx.coroutines.channels.Channel
 import kotlin.reflect.KClass
 

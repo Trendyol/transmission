@@ -3,8 +3,7 @@ package com.trendyol.transmission.transformer
 import com.trendyol.transmission.Transmission
 import com.trendyol.transmission.identifier
 import com.trendyol.transmission.transformer.dataholder.HolderState
-import com.trendyol.transmission.transformer.query.ComputationOwner
-import com.trendyol.transmission.transformer.query.withargs.ComputationOwnerWithArgs
+import com.trendyol.transmission.transformer.request.computation.ComputationOwner
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.update
 
@@ -16,9 +15,6 @@ internal class TransformerStorage {
     private var internalTransmissionHolderSet: HolderState = HolderState.Undefined
 
     private val internalComputationMap: MutableMap<String, ComputationOwner> =
-        mutableMapOf()
-
-    private val internalComputationMapWithArgs: MutableMap<String, ComputationOwnerWithArgs<*>> =
         mutableMapOf()
 
     fun isHolderStateInitialized(): Boolean {
@@ -61,23 +57,16 @@ internal class TransformerStorage {
         internalComputationMap[key] = delegate
     }
 
-    fun <A : Any> registerComputationWithArgs(key: String, delegate: ComputationOwnerWithArgs<A>) {
-        require(!internalComputationMapWithArgs.containsKey(key)) {
-            "Multiple computations with the same key is not allowed: $key"
-        }
-        internalComputationMapWithArgs[key] = delegate
-    }
-
     fun hasComputation(type: String): Boolean {
         return internalComputationMap.containsKey(type)
     }
 
-    fun getComputationByKey(type: String): ComputationOwner? {
-        return internalComputationMap[type]
+    fun getComputationByKey(type: String): ComputationOwner.Default? {
+        return internalComputationMap[type] as? ComputationOwner.Default
     }
 
-    fun <A : Any> getComputationWithArgsByKey(type: String): ComputationOwnerWithArgs<A>? {
-        return internalComputationMapWithArgs[type] as? ComputationOwnerWithArgs<A>
+    fun<A: Any> getComputationByKey(type: String): ComputationOwner.WithArgs<A>? {
+        return internalComputationMap[type] as? ComputationOwner.WithArgs<A>
     }
 
     fun getHolderDataByKey(key: String): Transmission.Data? {

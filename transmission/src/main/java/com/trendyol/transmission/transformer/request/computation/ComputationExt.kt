@@ -1,8 +1,9 @@
-package com.trendyol.transmission.transformer.query
+package com.trendyol.transmission.transformer.request.computation
 
 import com.trendyol.transmission.Transmission
 import com.trendyol.transmission.transformer.Transformer
-import com.trendyol.transmission.transformer.query.withargs.ComputationBuilderWithArgs
+import com.trendyol.transmission.transformer.request.Contract
+import com.trendyol.transmission.transformer.request.RequestHandler
 
 /**
  * Throws [IllegalArgumentException] when multiple computations with the same key
@@ -17,7 +18,7 @@ fun <C : Contract.Computation<T>, T : Transmission.Data> Transformer.registerCom
     contract: C,
     computation: suspend RequestHandler.() -> T?,
 ) {
-    ComputationBuilder<T>().buildWith(contract.key, contract.useCache, this, computation)
+    ComputationBuilder().buildWith(contract.key, contract.useCache, this, computation)
 }
 
 /**
@@ -33,5 +34,5 @@ fun <C : Contract.ComputationWithArgs<A, T>, A : Any, T : Any> Transformer.regis
     contract: C,
     computation: suspend RequestHandler.(args: A) -> T?,
 ) {
-    ComputationBuilderWithArgs<A, T>().buildWith(contract.key, contract.useCache, this, computation)
+    ComputationBuilder().buildWith(contract.key, contract.useCache, this, computation)
 }

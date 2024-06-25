@@ -7,9 +7,9 @@ import com.trendyol.transmission.identifier
 import com.trendyol.transmission.transformer.handler.CommunicationScope
 import com.trendyol.transmission.transformer.handler.EffectHandler
 import com.trendyol.transmission.transformer.handler.SignalHandler
-import com.trendyol.transmission.transformer.query.Query
-import com.trendyol.transmission.transformer.query.QueryResult
-import com.trendyol.transmission.transformer.query.TransformerQueryDelegate
+import com.trendyol.transmission.transformer.request.Query
+import com.trendyol.transmission.transformer.request.QueryResult
+import com.trendyol.transmission.transformer.request.TransformerQueryDelegate
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers

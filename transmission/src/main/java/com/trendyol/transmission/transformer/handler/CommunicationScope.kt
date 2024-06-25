@@ -3,7 +3,7 @@ package com.trendyol.transmission.transformer.handler
 import com.trendyol.transmission.Transmission
 import com.trendyol.transmission.TransmissionRouter
 import com.trendyol.transmission.transformer.Transformer
-import com.trendyol.transmission.transformer.query.RequestHandler
+import com.trendyol.transmission.transformer.request.RequestHandler
 import kotlin.reflect.KClass
 
 interface CommunicationScope: RequestHandler {

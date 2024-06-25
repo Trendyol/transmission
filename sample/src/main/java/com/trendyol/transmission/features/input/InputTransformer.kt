@@ -6,8 +6,8 @@ import com.trendyol.transmission.transformer.Transformer
 import com.trendyol.transmission.transformer.dataholder.buildDataHolder
 import com.trendyol.transmission.transformer.handler.buildGenericEffectHandler
 import com.trendyol.transmission.transformer.handler.buildTypedSignalHandler
-import com.trendyol.transmission.transformer.query.Contract
-import com.trendyol.transmission.transformer.query.registerComputation
+import com.trendyol.transmission.transformer.request.Contract
+import com.trendyol.transmission.transformer.request.computation.registerComputation
 import com.trendyol.transmission.ui.InputUiState
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.delay

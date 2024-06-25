@@ -3,8 +3,8 @@ package com.trendyol.transmission.transformer.dataholder
 import com.trendyol.transmission.Transmission
 import com.trendyol.transmission.TransmissionRouter
 import com.trendyol.transmission.transformer.Transformer
-import com.trendyol.transmission.transformer.query.Contract
-import com.trendyol.transmission.transformer.query.RequestHandler
+import com.trendyol.transmission.transformer.request.Contract
+import com.trendyol.transmission.transformer.request.RequestHandler
 
 /**
  * Throws [IllegalArgumentException] when multiple data holders with same type

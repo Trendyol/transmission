@@ -4,7 +4,7 @@ import com.trendyol.transmission.effect.EffectWrapper
 import com.trendyol.transmission.router.RequestDelegate
 import com.trendyol.transmission.router.createBroadcast
 import com.trendyol.transmission.transformer.Transformer
-import com.trendyol.transmission.transformer.query.RequestHandler
+import com.trendyol.transmission.transformer.request.RequestHandler
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers

@@ -2,10 +2,11 @@ package com.trendyol.transmission.router
 
 import com.trendyol.transmission.Transmission
 import com.trendyol.transmission.TransmissionRouter
-import com.trendyol.transmission.transformer.query.Contract
-import com.trendyol.transmission.transformer.query.Query
-import com.trendyol.transmission.transformer.query.QueryResult
-import com.trendyol.transmission.transformer.query.RequestHandler
+import com.trendyol.transmission.transformer.request.Contract
+import com.trendyol.transmission.transformer.request.Query
+import com.trendyol.transmission.transformer.request.QueryResult
+import com.trendyol.transmission.transformer.request.RequestHandler
+import com.trendyol.transmission.transformer.request.computation.ComputationOwner
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.async
 import kotlinx.coroutines.channels.Channel
@@ -100,7 +101,7 @@ internal class RequestDelegate(
             QueryResult.Computation(
                 owner = query.sender,
                 key = query.key,
-                data = computationHolder?.storage?.getComputationWithArgsByKey<A>(query.key)
+                data = computationHolder?.storage?.getComputationByKey<A>(query.key)
                     ?.getResult(computationHolder.communicationScope, query.invalidate, query.args),
             )
         }

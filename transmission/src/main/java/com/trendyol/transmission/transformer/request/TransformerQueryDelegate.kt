@@ -1,4 +1,4 @@
-package com.trendyol.transmission.transformer.query
+package com.trendyol.transmission.transformer.request
 
 import com.trendyol.transmission.Transmission
 import com.trendyol.transmission.router.createBroadcast
