@@ -9,7 +9,7 @@ import com.trendyol.transmission.features.input.InputTransformer
 import com.trendyol.transmission.transformer.Transformer
 import com.trendyol.transmission.transformer.dataholder.buildDataHolder
 import com.trendyol.transmission.transformer.handler.buildGenericEffectHandler
-import com.trendyol.transmission.transformer.request.Contract
+import com.trendyol.transmission.transformer.request.buildComputationContract
 import com.trendyol.transmission.transformer.request.computation.registerComputation
 import com.trendyol.transmission.ui.ColorPickerUiState
 import com.trendyol.transmission.ui.OutputUiState
@@ -62,8 +62,7 @@ class OutputTransformer @Inject constructor(
     }
 
     companion object {
-        val outputCalculationContract = object : Contract.Computation<OutputCalculationResult>() {
-            override val key: String = "OutputCalculation"
-        }
+        val outputCalculationContract =
+            buildComputationContract<OutputCalculationResult>("OutputCalculationResult")
     }
 }

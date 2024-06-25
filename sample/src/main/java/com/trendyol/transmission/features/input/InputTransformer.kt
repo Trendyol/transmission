@@ -6,7 +6,9 @@ import com.trendyol.transmission.transformer.Transformer
 import com.trendyol.transmission.transformer.dataholder.buildDataHolder
 import com.trendyol.transmission.transformer.handler.buildGenericEffectHandler
 import com.trendyol.transmission.transformer.handler.buildTypedSignalHandler
-import com.trendyol.transmission.transformer.request.Contract
+import com.trendyol.transmission.transformer.request.buildComputationContract
+import com.trendyol.transmission.transformer.request.buildComputationContractWithArgs
+import com.trendyol.transmission.transformer.request.buildDataContract
 import com.trendyol.transmission.transformer.request.computation.registerComputation
 import com.trendyol.transmission.ui.InputUiState
 import kotlinx.coroutines.CoroutineDispatcher
@@ -49,14 +51,8 @@ class InputTransformer @Inject constructor(
 
     companion object {
         val writtenInputWithArgs =
-            object : Contract.ComputationWithArgs<String, WrittenInput>() {
-                override val key: String = "WrittenInputWithArgs"
-            }
-        val writtenInputContract = object : Contract.Computation<WrittenInput>() {
-            override val key: String = "WrittenInput"
-        }
-        val holderContract = object : Contract.Data<InputUiState>() {
-            override val key: String = "InputUiState"
-        }
+            buildComputationContractWithArgs<String, WrittenInput>("WrittenInputWithArgs")
+        val writtenInputContract = buildComputationContract<WrittenInput>("WrittenInput")
+        val holderContract = buildDataContract<InputUiState>("InputUiState")
     }
 }

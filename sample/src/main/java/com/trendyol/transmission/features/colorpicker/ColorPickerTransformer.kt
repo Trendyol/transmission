@@ -6,7 +6,7 @@ import com.trendyol.transmission.transformer.Transformer
 import com.trendyol.transmission.transformer.dataholder.buildDataHolder
 import com.trendyol.transmission.transformer.handler.buildGenericEffectHandler
 import com.trendyol.transmission.transformer.handler.buildGenericSignalHandler
-import com.trendyol.transmission.transformer.request.Contract
+import com.trendyol.transmission.transformer.request.buildDataContract
 import com.trendyol.transmission.ui.ColorPickerUiState
 import kotlinx.coroutines.CoroutineDispatcher
 import javax.inject.Inject
@@ -43,8 +43,6 @@ class ColorPickerTransformer @Inject constructor(
     }
 
     companion object {
-        val holderContract = object : Contract.Data<ColorPickerUiState>() {
-            override val key: String = "ColorPickerUiState"
-        }
+        val holderContract = buildDataContract<ColorPickerUiState>("ColorPickerUiState")
     }
 }
