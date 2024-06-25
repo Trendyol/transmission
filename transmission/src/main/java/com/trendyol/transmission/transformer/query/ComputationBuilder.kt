@@ -8,7 +8,7 @@ class ComputationBuilder<T : Transmission.Data> {
         key: String,
         useCache: Boolean = false,
         transformer: Transformer,
-        computation: suspend QuerySender.() -> T?
+        computation: suspend RequestHandler.() -> T?
     ) {
         transformer.storage.registerComputation(
             key = key,

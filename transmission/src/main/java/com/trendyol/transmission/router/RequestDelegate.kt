@@ -5,7 +5,7 @@ import com.trendyol.transmission.TransmissionRouter
 import com.trendyol.transmission.transformer.query.Contract
 import com.trendyol.transmission.transformer.query.Query
 import com.trendyol.transmission.transformer.query.QueryResult
-import com.trendyol.transmission.transformer.query.QuerySender
+import com.trendyol.transmission.transformer.query.RequestHandler
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.async
 import kotlinx.coroutines.channels.Channel
@@ -19,10 +19,10 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.launch
 
-internal class QueryDelegate(
+internal class RequestDelegate(
     private val queryScope: CoroutineScope,
     private val routerRef: TransmissionRouter
-) : QuerySender {
+) : RequestHandler {
 
     private val routerQueryResultChannel: MutableSharedFlow<QueryResult<Transmission.Data>> =
         MutableSharedFlow()
@@ -46,6 +46,8 @@ internal class QueryDelegate(
             is Query.Computation -> processComputationQuery(query)
             is Query.Data -> processDataQuery(query)
             is Query.ComputationWithArgs<*> -> processComputationQueryWithArgs(query)
+            is Query.Execution -> TODO()
+            is Query.ExecutionWithArgs<*> -> TODO()
         }
     }
 
@@ -115,7 +117,7 @@ internal class QueryDelegate(
         }
     }
 
-    override suspend fun <C : Contract.Data<D>, D : Transmission.Data> queryData(contract: C): D? {
+    override suspend fun <C : Contract.Data<D>, D : Transmission.Data> getData(contract: C): D? {
         outGoingQuery.trySend(
             Query.Data(sender = routerRef.routerName, key = contract.key)
         )
@@ -125,7 +127,7 @@ internal class QueryDelegate(
             .first().data
     }
 
-    override suspend fun <C : Contract.Computation<D>, D : Transmission.Data> queryComputation(
+    override suspend fun <C : Contract.Computation<D>, D : Any> compute(
         contract: C,
         invalidate: Boolean
     ): D? {
@@ -142,7 +144,7 @@ internal class QueryDelegate(
             .first().data
     }
 
-    override suspend fun <C : Contract.ComputationWithArgs<A, D>, A : Any, D : Transmission.Data> queryComputationWithArgs(
+    override suspend fun <C : Contract.ComputationWithArgs<A, D>, A : Any, D : Any> compute(
         contract: C,
         args: A,
         invalidate: Boolean
@@ -159,5 +161,17 @@ internal class QueryDelegate(
             .filterIsInstance<QueryResult.Computation<D>>()
             .filter { it.key == contract.key && it.owner == routerRef.routerName }
             .first().data
+    }
+
+    override suspend fun <C : Contract.Execution> execute(contract: C, invalidate: Boolean) {
+        TODO("Not yet implemented")
+    }
+
+    override suspend fun <C : Contract.ExecutionWithArgs<A>, A : Any> execute(
+        contract: C,
+        args: A,
+        invalidate: Boolean
+    ) {
+        TODO("Not yet implemented")
     }
 }

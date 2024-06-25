@@ -4,7 +4,7 @@ import com.trendyol.transmission.Transmission
 import com.trendyol.transmission.TransmissionRouter
 import com.trendyol.transmission.transformer.Transformer
 import com.trendyol.transmission.transformer.query.Contract
-import com.trendyol.transmission.transformer.query.QuerySender
+import com.trendyol.transmission.transformer.query.RequestHandler
 
 /**
  * Throws [IllegalArgumentException] when multiple data holders with same type
@@ -13,7 +13,7 @@ import com.trendyol.transmission.transformer.query.QuerySender
  * Must be a type extended from [Transmission.Data]
  * @param [publishUpdates] Controls sending updates to the [TransmissionRouter]
  * @param [key] When defined, data inside the holder can be accessed by other Transformers in the
- * network using [QuerySender.queryData]
+ * network using [RequestHandler.query]
  * */
 fun <T : Transmission.Data?> Transformer.buildDataHolder(
     initialValue: T,

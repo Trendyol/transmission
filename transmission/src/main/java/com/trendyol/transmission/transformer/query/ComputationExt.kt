@@ -9,13 +9,13 @@ import com.trendyol.transmission.transformer.query.withargs.ComputationBuilderWi
  * are defined inside the [Transformer].
  *
  * Adds a computation to [Transformer] to be queried.
- * Can be queried using [QuerySender.queryComputation]
+ * Can be queried using [RequestHandler.execute]
  * @param useCache Stores the result after first computation
  * @param computation Computation to get the result [Transmission.Data]
  */
 fun <C : Contract.Computation<T>, T : Transmission.Data> Transformer.registerComputation(
     contract: C,
-    computation: suspend QuerySender.() -> T?,
+    computation: suspend RequestHandler.() -> T?,
 ) {
     ComputationBuilder<T>().buildWith(contract.key, contract.useCache, this, computation)
 }
@@ -25,13 +25,13 @@ fun <C : Contract.Computation<T>, T : Transmission.Data> Transformer.registerCom
  * are defined inside the [Transformer].
  *
  * Adds a computation to [Transformer] to be queried. This computation accepts any class as Argument.
- * Can be queried using [QuerySender.queryComputationWithArgs]
+ * Can be queried using [RequestHandler.execute]
  * @param useCache Stores the result after first computation
  * @param computation Computation to get the result [Transmission.Data]
  */
 fun <C : Contract.ComputationWithArgs<A, T>, A : Any, T : Transmission.Data> Transformer.registerComputation(
     contract: C,
-    computation: suspend QuerySender.(args: A) -> T?,
+    computation: suspend RequestHandler.(args: A) -> T?,
 ) {
     ComputationBuilderWithArgs<A, T>().buildWith(contract.key, contract.useCache, this, computation)
 }

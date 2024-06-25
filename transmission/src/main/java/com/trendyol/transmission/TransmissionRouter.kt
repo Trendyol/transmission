@@ -1,10 +1,10 @@
 package com.trendyol.transmission
 
 import com.trendyol.transmission.effect.EffectWrapper
-import com.trendyol.transmission.router.QueryDelegate
+import com.trendyol.transmission.router.RequestDelegate
 import com.trendyol.transmission.router.createBroadcast
 import com.trendyol.transmission.transformer.Transformer
-import com.trendyol.transmission.transformer.query.QuerySender
+import com.trendyol.transmission.transformer.query.RequestHandler
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -36,8 +36,8 @@ class TransmissionRouter(
     val effectStream: SharedFlow<Transmission.Effect> = effectBroadcast.output.map { it.effect }
         .shareIn(routerScope, SharingStarted.Lazily)
 
-    private val _queryDelegate = QueryDelegate(routerScope, this@TransmissionRouter)
-    val queryHelper: QuerySender = _queryDelegate
+    private val _requestDelegate = RequestDelegate(routerScope, this@TransmissionRouter)
+    val requestHelper: RequestHandler = _requestDelegate
 
     init {
         initialize()
@@ -61,8 +61,8 @@ class TransmissionRouter(
                         incoming = effectBroadcast.output
                     )
                     startQueryProcessing(
-                        incomingQuery = _queryDelegate.incomingQueryResponse,
-                        outGoingQuery = _queryDelegate.outGoingQuery
+                        incomingQuery = _requestDelegate.incomingQueryResponse,
+                        outGoingQuery = _requestDelegate.outGoingQuery
                     )
                 }
             }
