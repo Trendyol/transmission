@@ -1,9 +1,8 @@
 package com.trendyol.transmission.transformer.query
 
-import com.trendyol.transmission.Transmission
 import com.trendyol.transmission.transformer.Transformer
 
-class ComputationBuilder<T : Transmission.Data> {
+class ComputationBuilder<T : Any> {
     fun buildWith(
         key: String,
         useCache: Boolean = false,

@@ -11,7 +11,7 @@ import kotlinx.coroutines.flow.first
 internal class TransformerQueryDelegate(scope: CoroutineScope, identifier: String) {
 
     val outGoingQuery: Channel<Query> = Channel(capacity = Channel.BUFFERED)
-    val resultBroadcast = scope.createBroadcast<QueryResult<Transmission.Data>>()
+    val resultBroadcast = scope.createBroadcast<QueryResult>()
 
     val interactor: RequestHandler = object : RequestHandler {
 

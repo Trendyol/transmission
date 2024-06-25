@@ -24,13 +24,11 @@ internal class RequestDelegate(
     private val routerRef: TransmissionRouter
 ) : RequestHandler {
 
-    private val routerQueryResultChannel: MutableSharedFlow<QueryResult<Transmission.Data>> =
-        MutableSharedFlow()
+    private val routerQueryResultChannel: MutableSharedFlow<QueryResult> = MutableSharedFlow()
 
     val outGoingQuery: Channel<Query> = Channel(capacity = Channel.BUFFERED)
 
-    private val queryResultChannel: Channel<QueryResult<Transmission.Data>> =
-        Channel(capacity = Channel.BUFFERED)
+    private val queryResultChannel: Channel<QueryResult> = Channel(capacity = Channel.BUFFERED)
 
     val incomingQueryResponse = queryResultChannel.receiveAsFlow()
         .shareIn(queryScope, SharingStarted.Lazily)

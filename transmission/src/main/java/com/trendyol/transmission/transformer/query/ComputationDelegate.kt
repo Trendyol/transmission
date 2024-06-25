@@ -1,15 +1,13 @@
 package com.trendyol.transmission.transformer.query
 
-import com.trendyol.transmission.Transmission
-
 internal class ComputationDelegate(
     private val useCache: Boolean = false,
-    private val computation: suspend RequestHandler.() -> Transmission.Data?
+    private val computation: suspend RequestHandler.() -> Any?
 ) : ComputationOwner {
 
-    private var result: Transmission.Data? = null
+    private var result: Any? = null
 
-    override suspend fun getResult(scope: RequestHandler, invalidate: Boolean): Transmission.Data? {
+    override suspend fun getResult(scope: RequestHandler, invalidate: Boolean): Any? {
         return if (useCache && invalidate.not()) {
             result ?: computation(scope).also { result = it }
         } else {

@@ -2,20 +2,19 @@ package com.trendyol.transmission.transformer.query
 
 import com.trendyol.transmission.Transmission
 
-sealed class QueryResult<D : Transmission.Data>(
+sealed class QueryResult(
     open val owner: String,
     open val key: String,
-    open val data: D?,
 ) {
     data class Data<D : Transmission.Data>(
         override val owner: String,
         override val key: String,
-        override val data: D?,
-    ) : QueryResult<D>(owner, key, data)
+        val data: D?,
+    ) : QueryResult(owner, key)
 
-    data class Computation<D : Transmission.Data>(
+    data class Computation<D : Any>(
         override val owner: String,
         override val key: String,
-        override val data: D?,
-    ) : QueryResult<D>(owner, key, data)
+        val data: D?,
+    ) : QueryResult(owner, key)
 }

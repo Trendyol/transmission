@@ -30,8 +30,8 @@ class OutputTransformer @Inject constructor(
     init {
         registerComputation(outputCalculationContract) {
             delay(2.seconds)
-            val data = queryData(ColorPickerTransformer.holderContract)?.selectedColorIndex
-            val writtenOutput = queryComputation(InputTransformer.writtenInput)
+            val data = getData(ColorPickerTransformer.holderContract)?.selectedColorIndex
+            val writtenOutput = compute(InputTransformer.writtenInputContract)
             val result = Random.nextInt(5, 15) * Random.nextInt(5, 15)
             OutputCalculationResult("result is $result with ($writtenOutput) and $data")
         }
@@ -42,7 +42,7 @@ class OutputTransformer @Inject constructor(
             is InputEffect.InputUpdate -> {
                 holder.update { it.copy(outputText = effect.value) }
                 delay(3.seconds)
-                val selectedColor = queryData(ColorPickerTransformer.holderContract)
+                val selectedColor = getData(ColorPickerTransformer.holderContract)
                 selectedColor ?: return@buildGenericEffectHandler
                 holder.update {
                     it.copy(outputText = it.outputText + " and Selected color index is ${selectedColor.selectedColorIndex}")

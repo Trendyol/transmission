@@ -29,7 +29,7 @@ fun <C : Contract.Computation<T>, T : Transmission.Data> Transformer.registerCom
  * @param useCache Stores the result after first computation
  * @param computation Computation to get the result [Transmission.Data]
  */
-fun <C : Contract.ComputationWithArgs<A, T>, A : Any, T : Transmission.Data> Transformer.registerComputation(
+fun <C : Contract.ComputationWithArgs<A, T>, A : Any, T : Any> Transformer.registerComputation(
     contract: C,
     computation: suspend RequestHandler.(args: A) -> T?,
 ) {

@@ -93,7 +93,7 @@ open class Transformer(dispatcher: CoroutineDispatcher = Dispatchers.Default) {
     }
 
     fun startQueryProcessing(
-        incomingQuery: SharedFlow<QueryResult<Transmission.Data>>,
+        incomingQuery: SharedFlow<QueryResult>,
         outGoingQuery: SendChannel<Query>
     ) {
         transformerScope.launch {

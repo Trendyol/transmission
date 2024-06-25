@@ -1,12 +1,12 @@
 package com.trendyol.transmission.transformer.query.withargs
 
 import com.trendyol.transmission.Transmission
-import com.trendyol.transmission.transformer.query.QuerySender
+import com.trendyol.transmission.transformer.query.RequestHandler
 
 internal interface ComputationOwnerWithArgs<A : Any> {
     suspend fun getResult(
-        scope: QuerySender,
+        scope: RequestHandler,
         invalidate: Boolean = false,
         args: A
-    ): Transmission.Data?
+    ): Any?
 }

@@ -1,15 +1,14 @@
 package com.trendyol.transmission.transformer.query.withargs
 
-import com.trendyol.transmission.Transmission
 import com.trendyol.transmission.transformer.Transformer
-import com.trendyol.transmission.transformer.query.QuerySender
+import com.trendyol.transmission.transformer.query.RequestHandler
 
-class ComputationBuilderWithArgs<A : Any, T : Transmission.Data> {
+class ComputationBuilderWithArgs<A : Any, T : Any> {
     fun buildWith(
         key: String,
         useCache: Boolean = false,
         transformer: Transformer,
-        computation: suspend QuerySender.(args: A) -> T?
+        computation: suspend RequestHandler.(args: A) -> T?
     ) {
         transformer.storage.registerComputationWithArgs(
             key = key,

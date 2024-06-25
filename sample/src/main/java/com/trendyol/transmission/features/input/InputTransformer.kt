@@ -21,7 +21,7 @@ class InputTransformer @Inject constructor(
     private val holder = buildDataHolder(InputUiState(), holderContract)
 
     init {
-        registerComputation(writtenInput) {
+        registerComputation(writtenInputContract) {
             delay(1.seconds)
             WrittenInput(holder.getValue().writtenText)
         }
@@ -48,10 +48,11 @@ class InputTransformer @Inject constructor(
     }
 
     companion object {
-        val writtenInputWithArgs = object : Contract.ComputationWithArgs<String, WrittenInput>() {
-            override val key: String = "WrittenInputWithArgs"
-        }
-        val writtenInput = object : Contract.Computation<WrittenInput>() {
+        val writtenInputWithArgs =
+            object : Contract.ComputationWithArgs<String, WrittenInput>() {
+                override val key: String = "WrittenInputWithArgs"
+            }
+        val writtenInputContract = object : Contract.Computation<WrittenInput>() {
             override val key: String = "WrittenInput"
         }
         val holderContract = object : Contract.Data<InputUiState>() {
