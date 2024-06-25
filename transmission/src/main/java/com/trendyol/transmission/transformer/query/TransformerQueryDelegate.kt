@@ -13,9 +13,9 @@ internal class TransformerQueryDelegate(scope: CoroutineScope, identifier: Strin
     val outGoingQuery: Channel<Query> = Channel(capacity = Channel.BUFFERED)
     val resultBroadcast = scope.createBroadcast<QueryResult<Transmission.Data>>()
 
-    val interactor: QuerySender = object : QuerySender {
+    val interactor: RequestHandler = object : RequestHandler {
 
-        override suspend fun <C : Contract.Data<D>, D : Transmission.Data> queryData(contract: C): D? {
+        override suspend fun <C : Contract.Data<D>, D : Transmission.Data> getData(contract: C): D? {
             outGoingQuery.trySend(Query.Data(sender = identifier, key = contract.key))
             return resultBroadcast.output
                 .filterIsInstance<QueryResult.Data<D>>()
@@ -23,7 +23,7 @@ internal class TransformerQueryDelegate(scope: CoroutineScope, identifier: Strin
                 .first().data
         }
 
-        override suspend fun <C : Contract.Computation<D>, D : Transmission.Data> queryComputation(
+        override suspend fun <C : Contract.Computation<D>, D : Any> compute(
             contract: C,
             invalidate: Boolean
         ): D? {
@@ -40,7 +40,7 @@ internal class TransformerQueryDelegate(scope: CoroutineScope, identifier: Strin
                 .first().data
         }
 
-        override suspend fun <C : Contract.ComputationWithArgs<A, D>, A : Any, D : Transmission.Data> queryComputationWithArgs(
+        override suspend fun <C : Contract.ComputationWithArgs<A, D>, A : Any, D : Any> compute(
             contract: C,
             args: A,
             invalidate: Boolean
@@ -57,6 +57,18 @@ internal class TransformerQueryDelegate(scope: CoroutineScope, identifier: Strin
                 .filterIsInstance<QueryResult.Computation<D>>()
                 .filter { it.key == contract.key && it.owner == identifier }
                 .first().data
+        }
+
+        override suspend fun <C : Contract.Execution> execute(contract: C, invalidate: Boolean) {
+            TODO("Not yet implemented")
+        }
+
+        override suspend fun <C : Contract.ExecutionWithArgs<A>, A : Any> execute(
+            contract: C,
+            args: A,
+            invalidate: Boolean
+        ) {
+            TODO("Not yet implemented")
         }
     }
 }

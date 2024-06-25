@@ -26,23 +26,34 @@ internal class CommunicationScopeBuilder(
         effectChannel.trySend(EffectWrapper(effect))
     }
 
-    override suspend fun <C : Contract.Data<D>, D : Transmission.Data> queryData(contract: C): D? {
-        return queryDelegate.interactor.queryData(contract)
+    override suspend fun <C : Contract.Data<D>, D : Transmission.Data> getData(contract: C): D? {
+        return queryDelegate.interactor.getData(contract)
     }
 
-    override suspend fun <C : Contract.Computation<D>, D : Transmission.Data> queryComputation(
+    override suspend fun <C : Contract.Computation<D>, D : Any> compute(
         contract: C,
         invalidate: Boolean
     ): D? {
-        return queryDelegate.interactor.queryComputation(contract, invalidate)
+        return queryDelegate.interactor.compute(contract, invalidate)
     }
 
-    override suspend fun <C : Contract.ComputationWithArgs<A, D>, A : Any, D : Transmission.Data> queryComputationWithArgs(
+    override suspend fun <C : Contract.ComputationWithArgs<A, D>, A : Any, D : Any> compute(
         contract: C,
         args: A,
         invalidate: Boolean
     ): D? {
-        return queryDelegate.interactor.queryComputationWithArgs(contract, args, invalidate)
+        return queryDelegate.interactor.compute(contract, args, invalidate)
     }
 
+    override suspend fun <C : Contract.Execution> execute(contract: C, invalidate: Boolean) {
+        TODO("Not yet implemented")
+    }
+
+    override suspend fun <C : Contract.ExecutionWithArgs<A>, A : Any> execute(
+        contract: C,
+        args: A,
+        invalidate: Boolean
+    ) {
+        TODO("Not yet implemented")
+    }
 }
