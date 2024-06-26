@@ -22,33 +22,33 @@ import kotlin.time.Duration.Companion.seconds
 
 @HiltViewModel
 class SampleViewModel @Inject constructor(
-    private val transmissionRouter: TransmissionRouter
+    private val router: TransmissionRouter
 ) : ViewModel() {
 
-    val inputUiState = transmissionRouter.dataStream
+    val inputUiState = router.dataStream
         .onEach<InputUiState> { _transmissionList.value = listOf() }
         .toState(viewModelScope, InputUiState())
-    val outputUiState = transmissionRouter.dataStream.toState(viewModelScope, OutputUiState())
-    val colorPickerUiState =
-        transmissionRouter.dataStream.toState(viewModelScope, ColorPickerUiState())
-    val multiOutputUiState =
-        transmissionRouter.dataStream.toState(viewModelScope, MultiOutputUiState())
+
+    val outputUiState = router.dataStream.toState(viewModelScope, OutputUiState())
+    val colorPickerUiState = router.dataStream.toState(viewModelScope, ColorPickerUiState())
+    val multiOutputUiState = router.dataStream.toState(viewModelScope, MultiOutputUiState())
+
     private val _transmissionList = MutableStateFlow<List<String>>(emptyList())
     val transmissionList = _transmissionList.asStateFlow()
 
     init {
         viewModelScope.launch {
             launch {
-                transmissionRouter.dataStream.collect(::onData)
+                router.dataStream.collect(::onData)
             }
             launch {
-                transmissionRouter.effectStream.collect(::onEffect)
+                router.effectStream.collect(::onEffect)
             }
         }
     }
 
     fun processSignal(signal: Transmission.Signal) {
-        transmissionRouter.processSignal(signal)
+        router.processSignal(signal)
         _transmissionList.update { it.plus("Signal: $signal") }
     }
 
@@ -61,10 +61,10 @@ class SampleViewModel @Inject constructor(
                 }
             }
         }
-        val inputData = transmissionRouter.requestHelper.getData(InputTransformer.holderContract)
+        val inputData = router.requestHelper.getData(InputTransformer.holderContract)
         delay(1.seconds)
         val colorPicker =
-            transmissionRouter.requestHelper.getData(ColorPickerTransformer.holderContract)
+            router.requestHelper.getData(ColorPickerTransformer.holderContract)
         _transmissionList.update { it.plus("Current InputData: $inputData") }
         _transmissionList.update { it.plus("Current ColorPickerData: $colorPicker") }
     }
@@ -74,7 +74,7 @@ class SampleViewModel @Inject constructor(
     }
 
     override fun onCleared() {
-        transmissionRouter.clear()
+        router.clear()
     }
 
 }
