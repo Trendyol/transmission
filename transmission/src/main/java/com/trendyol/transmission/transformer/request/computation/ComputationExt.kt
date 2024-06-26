@@ -14,7 +14,7 @@ import com.trendyol.transmission.transformer.request.RequestHandler
  * @param useCache Stores the result after first computation
  * @param computation Computation to get the result [Transmission.Data]
  */
-fun <C : Contract.Computation<T>, T : Transmission.Data> Transformer.registerComputation(
+fun <C : Contract.Computation<T>, T : Any> Transformer.registerComputation(
     contract: C,
     computation: suspend RequestHandler.() -> T?,
 ) {
