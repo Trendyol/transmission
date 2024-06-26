@@ -38,13 +38,8 @@ open class Transformer(dispatcher: CoroutineDispatcher = Dispatchers.Default) {
     open val signalHandler: SignalHandler? = null
     open val effectHandler: EffectHandler? = null
 
-    private var currentEffectProcessing: Job? = null
-    private var currentSignalProcessing: Job? = null
-
-    suspend fun waitProcessingToFinish() {
-        currentSignalProcessing?.join()
-        currentEffectProcessing?.join()
-    }
+    var currentEffectProcessing: Job? = null
+    var currentSignalProcessing: Job? = null
 
     val communicationScope: CommunicationScope = CommunicationScopeBuilder(
         effectChannel = effectChannel,

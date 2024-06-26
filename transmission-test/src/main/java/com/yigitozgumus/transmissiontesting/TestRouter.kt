@@ -37,7 +37,7 @@ internal class TestRouter(
 
     private val outGoingQueryChannel: Channel<Query> = Channel(capacity = Channel.BUFFERED)
 
-    private val queryResultChannel: Channel<QueryResult<Transmission.Data>> =
+    private val queryResultChannel: Channel<QueryResult> =
         Channel(capacity = Channel.BUFFERED)
 
     private val incomingQueryResponse = queryResultChannel.receiveAsFlow()
@@ -83,6 +83,8 @@ internal class TestRouter(
             is Query.Computation -> processComputationQuery(query)
             is Query.Data -> processDataQuery(query)
             is Query.ComputationWithArgs<*> -> processComputationQueryWithArgs(query)
+            is Query.Execution -> TODO()
+            is Query.ExecutionWithArgs<*> -> TODO()
         }
     }
 
