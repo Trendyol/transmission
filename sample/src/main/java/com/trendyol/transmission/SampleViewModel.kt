@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.trendyol.transmission.effect.RouterEffect
 import com.trendyol.transmission.features.colorpicker.ColorPickerTransformer
 import com.trendyol.transmission.features.input.InputTransformer
+import com.trendyol.transmission.router.onEach
 import com.trendyol.transmission.router.toState
 import com.trendyol.transmission.ui.ColorPickerUiState
 import com.trendyol.transmission.ui.InputUiState
@@ -24,7 +25,9 @@ class SampleViewModel @Inject constructor(
     private val transmissionRouter: TransmissionRouter
 ) : ViewModel() {
 
-    val inputUiState = transmissionRouter.dataStream.toState(viewModelScope, InputUiState())
+    val inputUiState = transmissionRouter.dataStream
+        .onEach<InputUiState> { _transmissionList.value = listOf() }
+        .toState(viewModelScope, InputUiState())
     val outputUiState = transmissionRouter.dataStream.toState(viewModelScope, OutputUiState())
     val colorPickerUiState =
         transmissionRouter.dataStream.toState(viewModelScope, ColorPickerUiState())
