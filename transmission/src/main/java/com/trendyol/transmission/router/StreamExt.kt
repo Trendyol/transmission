@@ -10,7 +10,7 @@ import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.stateIn
 
-inline fun <reified T : Transmission.Data> SharedFlow<Transmission.Data>.toState(
+inline fun <reified T : Transmission.Data?> SharedFlow<Transmission.Data?>.toState(
     scope: CoroutineScope,
     initialValue: T,
     sharingStarted: SharingStarted = SharingStarted.WhileSubscribed(),
@@ -18,7 +18,7 @@ inline fun <reified T : Transmission.Data> SharedFlow<Transmission.Data>.toState
     return this.filterIsInstance<T>().stateIn(scope, sharingStarted, initialValue)
 }
 
-inline fun <reified T : Transmission.Data> Flow<Transmission.Data>.toState(
+inline fun <reified T : Transmission.Data?> Flow<Transmission.Data?>.toState(
     scope: CoroutineScope,
     initialValue: T,
     sharingStarted: SharingStarted = SharingStarted.WhileSubscribed(),
@@ -26,7 +26,7 @@ inline fun <reified T : Transmission.Data> Flow<Transmission.Data>.toState(
     return this.filterIsInstance<T>().stateIn(scope, sharingStarted, initialValue)
 }
 
-inline fun <reified T : Transmission.Data> Flow<Transmission.Data>.onEach(
+inline fun <reified T : Transmission.Data?> Flow<Transmission.Data?>.onEach(
     noinline action: suspend (T) -> Unit
 ): Flow<T> {
     return this.filterIsInstance<T>().onEach(action)
