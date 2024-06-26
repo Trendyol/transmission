@@ -4,14 +4,14 @@ import com.trendyol.transmission.Transmission
 import com.trendyol.transmission.effect.EffectWrapper
 import com.trendyol.transmission.transformer.handler.CommunicationScope
 import com.trendyol.transmission.transformer.request.Contract
-import com.trendyol.transmission.transformer.request.TransformerQueryDelegate
+import com.trendyol.transmission.transformer.request.TransformerRequestDelegate
 import kotlinx.coroutines.channels.Channel
 import kotlin.reflect.KClass
 
 internal class CommunicationScopeBuilder(
     private val effectChannel: Channel<EffectWrapper>,
     private val dataChannel: Channel<Transmission.Data>,
-    private val queryDelegate: TransformerQueryDelegate
+    private val requestDelegate: TransformerRequestDelegate
 ) : CommunicationScope {
 
     override fun <D : Transmission.Data> send(data: D?) {
@@ -27,14 +27,14 @@ internal class CommunicationScopeBuilder(
     }
 
     override suspend fun <C : Contract.Data<D>, D : Transmission.Data> getData(contract: C): D? {
-        return queryDelegate.interactor.getData(contract)
+        return requestDelegate.interactor.getData(contract)
     }
 
     override suspend fun <C : Contract.Computation<D>, D : Any> compute(
         contract: C,
         invalidate: Boolean
     ): D? {
-        return queryDelegate.interactor.compute(contract, invalidate)
+        return requestDelegate.interactor.compute(contract, invalidate)
     }
 
     override suspend fun <C : Contract.ComputationWithArgs<A, D>, A : Any, D : Any> compute(
@@ -42,7 +42,7 @@ internal class CommunicationScopeBuilder(
         args: A,
         invalidate: Boolean
     ): D? {
-        return queryDelegate.interactor.compute(contract, args, invalidate)
+        return requestDelegate.interactor.compute(contract, args, invalidate)
     }
 
     override suspend fun <C : Contract.Execution> execute(contract: C, invalidate: Boolean) {

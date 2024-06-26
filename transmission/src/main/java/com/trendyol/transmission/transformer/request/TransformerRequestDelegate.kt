@@ -8,7 +8,7 @@ import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.first
 
-internal class TransformerQueryDelegate(scope: CoroutineScope, identifier: String) {
+internal class TransformerRequestDelegate(scope: CoroutineScope, identifier: String) {
 
     val outGoingQuery: Channel<Query> = Channel(capacity = Channel.BUFFERED)
     val resultBroadcast = scope.createBroadcast<QueryResult>()
