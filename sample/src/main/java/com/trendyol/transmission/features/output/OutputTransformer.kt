@@ -10,9 +10,12 @@ import com.trendyol.transmission.transformer.Transformer
 import com.trendyol.transmission.transformer.dataholder.buildDataHolder
 import com.trendyol.transmission.transformer.handler.buildGenericEffectHandler
 import com.trendyol.transmission.transformer.request.buildComputationContract
+import com.trendyol.transmission.transformer.request.buildExecutionContract
 import com.trendyol.transmission.transformer.request.computation.registerComputation
+import com.trendyol.transmission.transformer.request.execution.registerExecution
 import com.trendyol.transmission.ui.ColorPickerUiState
 import com.trendyol.transmission.ui.OutputUiState
+import com.trendyol.transmission.ui.theme.Pink80
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.delay
 import javax.inject.Inject
@@ -35,6 +38,10 @@ class OutputTransformer @Inject constructor(
             val result = Random.nextInt(5, 15) * Random.nextInt(5, 15)
             OutputCalculationResult("result is $result with ($writtenOutput) and $data")
         }
+        registerExecution(outputExecutionContract) {
+            delay(4.seconds)
+            communicationScope.publish(ColorPickerEffect.BackgroundColorUpdate(Pink80))
+        }
     }
 
     override val effectHandler = buildGenericEffectHandler { effect ->
@@ -52,6 +59,7 @@ class OutputTransformer @Inject constructor(
                     effect = ColorPickerEffect.BackgroundColorUpdate(holder2.getValue().backgroundColor),
                     to = ColorPickerTransformer::class
                 )
+                execute(outputExecutionContract)
                 publish(effect = RouterEffect(holder.getValue()))
             }
 
@@ -64,5 +72,7 @@ class OutputTransformer @Inject constructor(
     companion object {
         val outputCalculationContract =
             buildComputationContract<OutputCalculationResult>("OutputCalculationResult")
+        val outputExecutionContract =
+            buildExecutionContract("outputExecutionContract")
     }
 }

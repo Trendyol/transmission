@@ -6,7 +6,6 @@ import com.trendyol.transmission.transformer.request.Contract
 import com.trendyol.transmission.transformer.request.Query
 import com.trendyol.transmission.transformer.request.QueryResult
 import com.trendyol.transmission.transformer.request.RequestHandler
-import com.trendyol.transmission.transformer.request.computation.ComputationOwner
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.async
 import kotlinx.coroutines.channels.Channel
@@ -45,8 +44,8 @@ internal class RequestDelegate(
             is Query.Computation -> processComputationQuery(query)
             is Query.Data -> processDataQuery(query)
             is Query.ComputationWithArgs<*> -> processComputationQueryWithArgs(query)
-            is Query.Execution -> TODO()
-            is Query.ExecutionWithArgs<*> -> TODO()
+            is Query.Execution -> processExecution(query)
+            is Query.ExecutionWithArgs<*> -> processExecutionWithArgs(query)
         }
     }
 
@@ -116,6 +115,23 @@ internal class RequestDelegate(
         }
     }
 
+    private fun processExecution(
+        query: Query.Execution
+    ) = queryScope.launch {
+        val executionHolder = routerRef.transformerSet
+            .find { it.storage.hasExecution(query.key) }
+        executionHolder?.storage?.getExecutionByKey(query.key)
+            ?.execute(executionHolder.communicationScope)
+    }
+
+    private fun <A : Any> processExecutionWithArgs(query: Query.ExecutionWithArgs<A>) =
+        queryScope.launch {
+            val executionHolder = routerRef.transformerSet
+                .find { it.storage.hasExecution(query.key) }
+            executionHolder?.storage?.getExecutionByKey<A>(query.key)
+                ?.execute(executionHolder.communicationScope, query.args)
+        }
+
     override suspend fun <C : Contract.Data<D>, D : Transmission.Data> getData(contract: C): D? {
         outGoingQuery.trySend(
             Query.Data(sender = routerRef.routerName, key = contract.key)
@@ -162,15 +178,25 @@ internal class RequestDelegate(
             .first().data
     }
 
-    override suspend fun <C : Contract.Execution> execute(contract: C, invalidate: Boolean) {
-        TODO("Not yet implemented")
+    override suspend fun <C : Contract.Execution> execute(contract: C) {
+        outGoingQuery.trySend(
+            Query.Execution(
+                sender = routerRef.routerName,
+                key = contract.key,
+            )
+        )
     }
 
     override suspend fun <C : Contract.ExecutionWithArgs<A>, A : Any> execute(
         contract: C,
-        args: A,
-        invalidate: Boolean
+        args: A
     ) {
-        TODO("Not yet implemented")
+        outGoingQuery.trySend(
+            Query.ExecutionWithArgs(
+                sender = routerRef.routerName,
+                key = contract.key,
+                args = args,
+            )
+        )
     }
 }

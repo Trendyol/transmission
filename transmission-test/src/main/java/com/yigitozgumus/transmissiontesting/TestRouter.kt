@@ -19,7 +19,7 @@ import kotlinx.coroutines.launch
 internal class TestRouter(
     private val registry: RegistryScopeImpl,
     private val transformer: Transformer,
-    private val dispatcher: CoroutineDispatcher
+    dispatcher: CoroutineDispatcher
 ) {
     private val testScope = CoroutineScope(dispatcher)
 
@@ -83,8 +83,8 @@ internal class TestRouter(
             is Query.Computation -> processComputationQuery(query)
             is Query.Data -> processDataQuery(query)
             is Query.ComputationWithArgs<*> -> processComputationQueryWithArgs(query)
-            is Query.Execution -> TODO()
-            is Query.ExecutionWithArgs<*> -> TODO()
+            is Query.Execution -> {}
+            is Query.ExecutionWithArgs<*> -> {}
         }
     }
 

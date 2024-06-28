@@ -59,16 +59,26 @@ internal class TransformerRequestDelegate(scope: CoroutineScope, identifier: Str
                 .first().data
         }
 
-        override suspend fun <C : Contract.Execution> execute(contract: C, invalidate: Boolean) {
-            TODO("Not yet implemented")
+        override suspend fun <C : Contract.Execution> execute(contract: C) {
+            outGoingQuery.trySend(
+                Query.Execution(
+                    sender = identifier,
+                    key = contract.key,
+                )
+            )
         }
 
         override suspend fun <C : Contract.ExecutionWithArgs<A>, A : Any> execute(
             contract: C,
-            args: A,
-            invalidate: Boolean
+            args: A
         ) {
-            TODO("Not yet implemented")
+            outGoingQuery.trySend(
+                Query.ExecutionWithArgs(
+                    sender = identifier,
+                    key = contract.key,
+                    args = args,
+                )
+            )
         }
     }
 }

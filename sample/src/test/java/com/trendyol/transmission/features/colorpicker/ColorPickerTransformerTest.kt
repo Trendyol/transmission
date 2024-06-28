@@ -67,5 +67,4 @@ class ColorPickerTransformerTest {
             assertTrue { effectStream.last().effect is ColorPickerEffect.SelectedColorUpdate }
         }
     }
-
 }

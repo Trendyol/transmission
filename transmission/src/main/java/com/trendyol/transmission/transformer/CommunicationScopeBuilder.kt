@@ -45,15 +45,14 @@ internal class CommunicationScopeBuilder(
         return requestDelegate.interactor.compute(contract, args, invalidate)
     }
 
-    override suspend fun <C : Contract.Execution> execute(contract: C, invalidate: Boolean) {
-        TODO("Not yet implemented")
+    override suspend fun <C : Contract.Execution> execute(contract: C) {
+        requestDelegate.interactor.execute(contract)
     }
 
     override suspend fun <C : Contract.ExecutionWithArgs<A>, A : Any> execute(
         contract: C,
-        args: A,
-        invalidate: Boolean
+        args: A
     ) {
-        TODO("Not yet implemented")
+        requestDelegate.interactor.execute(contract, args)
     }
 }
