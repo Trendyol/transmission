@@ -76,6 +76,4 @@ internal class TransformerStorage {
     fun clear() {
         internalComputationMap.clear()
     }
-
-
 }
