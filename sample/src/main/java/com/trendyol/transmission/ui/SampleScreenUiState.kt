@@ -3,14 +3,6 @@ package com.trendyol.transmission.ui
 import androidx.compose.ui.graphics.Color
 import com.trendyol.transmission.Transmission
 
-
-data class SampleScreenUiState(
-	val inputState: InputUiState = InputUiState(),
-	val outputState: OutputUiState = OutputUiState(),
-	val colorPickerState: ColorPickerUiState = ColorPickerUiState(),
-	val multiOutputState: MultiOutputUiState = MultiOutputUiState()
-)
-
 data class InputUiState(
 	val writtenText: String = "",
 	val backgroundColor: Color = Color.White

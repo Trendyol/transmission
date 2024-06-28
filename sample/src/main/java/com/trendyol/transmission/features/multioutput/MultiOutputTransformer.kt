@@ -3,7 +3,7 @@ package com.trendyol.transmission.features.multioutput
 import com.trendyol.transmission.DefaultDispatcher
 import com.trendyol.transmission.features.colorpicker.ColorPickerEffect
 import com.trendyol.transmission.features.input.InputEffect
-import com.trendyol.transmission.features.output.OutputCalculationResult
+import com.trendyol.transmission.features.output.OutputTransformer
 import com.trendyol.transmission.transformer.Transformer
 import com.trendyol.transmission.transformer.dataholder.buildDataHolder
 import com.trendyol.transmission.transformer.handler.buildGenericEffectHandler
@@ -21,7 +21,7 @@ class MultiOutputTransformer @Inject constructor(
         when (effect) {
             is InputEffect.InputUpdate -> {
                 holder.update { it.copy(writtenUppercaseText = effect.value.uppercase()) }
-                val result = queryComputation<OutputCalculationResult>("OutputCalculation")
+                val result = compute(OutputTransformer.outputCalculationContract)
                 holder.update {
                     it.copy(writtenUppercaseText = it.writtenUppercaseText + " ${result?.result}")
                 }

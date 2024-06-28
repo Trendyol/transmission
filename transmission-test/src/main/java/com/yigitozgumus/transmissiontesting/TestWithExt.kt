@@ -75,3 +75,7 @@ fun Transformer.testWithSignal(
     }
 }
 
+suspend fun Transformer.waitProcessingToFinish() {
+    currentSignalProcessing?.join()
+    currentEffectProcessing?.join()
+}

@@ -6,7 +6,10 @@ import com.trendyol.transmission.transformer.Transformer
 import com.trendyol.transmission.transformer.dataholder.buildDataHolder
 import com.trendyol.transmission.transformer.handler.buildGenericEffectHandler
 import com.trendyol.transmission.transformer.handler.buildTypedSignalHandler
-import com.trendyol.transmission.transformer.query.registerComputation
+import com.trendyol.transmission.transformer.request.buildComputationContract
+import com.trendyol.transmission.transformer.request.buildComputationContractWithArgs
+import com.trendyol.transmission.transformer.request.buildDataContract
+import com.trendyol.transmission.transformer.request.computation.registerComputation
 import com.trendyol.transmission.ui.InputUiState
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.delay
@@ -17,12 +20,15 @@ class InputTransformer @Inject constructor(
     @DefaultDispatcher private val defaultDispatcher: CoroutineDispatcher
 ) : Transformer(defaultDispatcher) {
 
-    private val holder = buildDataHolder(InputUiState(), key = "InputUiState")
+    private val holder = buildDataHolder(InputUiState(), holderContract)
 
     init {
-        registerComputation<WrittenInput>(key = "WrittenInput") {
+        registerComputation(writtenInputContract) {
             delay(1.seconds)
             WrittenInput(holder.getValue().writtenText)
+        }
+        registerComputation(writtenInputWithArgs) {
+            WrittenInput(it)
         }
     }
 
@@ -41,5 +47,12 @@ class InputTransformer @Inject constructor(
                 holder.update { it.copy(backgroundColor = effect.color) }
             }
         }
+    }
+
+    companion object {
+        val writtenInputWithArgs =
+            buildComputationContractWithArgs<String, WrittenInput>("WrittenInputWithArgs")
+        val writtenInputContract = buildComputationContract<WrittenInput>("WrittenInput")
+        val holderContract = buildDataContract<InputUiState>("InputUiState")
     }
 }

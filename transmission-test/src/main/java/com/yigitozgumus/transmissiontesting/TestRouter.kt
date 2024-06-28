@@ -4,8 +4,8 @@ import com.trendyol.transmission.Transmission
 import com.trendyol.transmission.effect.EffectWrapper
 import com.trendyol.transmission.router.createBroadcast
 import com.trendyol.transmission.transformer.Transformer
-import com.trendyol.transmission.transformer.query.Query
-import com.trendyol.transmission.transformer.query.QueryResult
+import com.trendyol.transmission.transformer.request.Query
+import com.trendyol.transmission.transformer.request.QueryResult
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.cancel
@@ -19,7 +19,7 @@ import kotlinx.coroutines.launch
 internal class TestRouter(
     private val registry: RegistryScopeImpl,
     private val transformer: Transformer,
-    private val dispatcher: CoroutineDispatcher
+    dispatcher: CoroutineDispatcher
 ) {
     private val testScope = CoroutineScope(dispatcher)
 
@@ -37,7 +37,7 @@ internal class TestRouter(
 
     private val outGoingQueryChannel: Channel<Query> = Channel(capacity = Channel.BUFFERED)
 
-    private val queryResultChannel: Channel<QueryResult<Transmission.Data>> =
+    private val queryResultChannel: Channel<QueryResult> =
         Channel(capacity = Channel.BUFFERED)
 
     private val incomingQueryResponse = queryResultChannel.receiveAsFlow()
@@ -82,6 +82,9 @@ internal class TestRouter(
         when (query) {
             is Query.Computation -> processComputationQuery(query)
             is Query.Data -> processDataQuery(query)
+            is Query.ComputationWithArgs<*> -> processComputationQueryWithArgs(query)
+            is Query.Execution -> {}
+            is Query.ExecutionWithArgs<*> -> {}
         }
     }
 
@@ -100,6 +103,17 @@ internal class TestRouter(
 
     private fun processComputationQuery(
         query: Query.Computation
+    ) = testScope.launch {
+        val computationToSend = QueryResult.Computation(
+            owner = query.sender,
+            data = registry.computationMap[query.key],
+            key = query.key
+        )
+        queryResultChannel.trySend(computationToSend)
+    }
+
+    private fun <A : Any> processComputationQueryWithArgs(
+        query: Query.ComputationWithArgs<A>
     ) = testScope.launch {
         val computationToSend = QueryResult.Computation(
             owner = query.sender,

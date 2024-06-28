@@ -26,5 +26,4 @@ class RegistryScopeImpl : RegistryScope {
     override fun <D : Transmission.Data> addComputation(data: D, key: String) {
         computationMap[key] = data
     }
-
 }

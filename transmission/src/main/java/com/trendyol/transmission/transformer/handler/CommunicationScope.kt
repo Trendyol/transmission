@@ -3,10 +3,10 @@ package com.trendyol.transmission.transformer.handler
 import com.trendyol.transmission.Transmission
 import com.trendyol.transmission.TransmissionRouter
 import com.trendyol.transmission.transformer.Transformer
-import com.trendyol.transmission.transformer.query.QuerySender
+import com.trendyol.transmission.transformer.request.RequestHandler
 import kotlin.reflect.KClass
 
-interface CommunicationScope: QuerySender {
+interface CommunicationScope: RequestHandler {
 	/**
 	 * Sends data to [TransmissionRouter]
 	 * @param data of type [Transmission.Data]

@@ -7,9 +7,9 @@ import com.trendyol.transmission.identifier
 import com.trendyol.transmission.transformer.handler.CommunicationScope
 import com.trendyol.transmission.transformer.handler.EffectHandler
 import com.trendyol.transmission.transformer.handler.SignalHandler
-import com.trendyol.transmission.transformer.query.Query
-import com.trendyol.transmission.transformer.query.QueryResult
-import com.trendyol.transmission.transformer.query.TransformerQueryDelegate
+import com.trendyol.transmission.transformer.request.Query
+import com.trendyol.transmission.transformer.request.QueryResult
+import com.trendyol.transmission.transformer.request.TransformerRequestDelegate
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -31,25 +31,20 @@ open class Transformer(dispatcher: CoroutineDispatcher = Dispatchers.Default) {
     private val identifier: String = this.identifier()
 
     private val effectChannel: Channel<EffectWrapper> = Channel(capacity = Channel.BUFFERED)
-    private val queryDelegate = TransformerQueryDelegate(transformerScope, identifier)
+    private val requestDelegate = TransformerRequestDelegate(transformerScope, identifier)
     internal val dataChannel: Channel<Transmission.Data> = Channel(capacity = Channel.BUFFERED)
     internal val storage = TransformerStorage()
 
     open val signalHandler: SignalHandler? = null
     open val effectHandler: EffectHandler? = null
 
-    private var currentEffectProcessing: Job? = null
-    private var currentSignalProcessing: Job? = null
-
-    suspend fun waitProcessingToFinish() {
-        currentSignalProcessing?.join()
-        currentEffectProcessing?.join()
-    }
+    var currentEffectProcessing: Job? = null
+    var currentSignalProcessing: Job? = null
 
     val communicationScope: CommunicationScope = CommunicationScopeBuilder(
         effectChannel = effectChannel,
         dataChannel = dataChannel,
-        queryDelegate = queryDelegate
+        requestDelegate = requestDelegate
     )
 
     fun startSignalCollection(incoming: SharedFlow<Transmission.Signal>) {
@@ -93,7 +88,7 @@ open class Transformer(dispatcher: CoroutineDispatcher = Dispatchers.Default) {
     }
 
     fun startQueryProcessing(
-        incomingQuery: SharedFlow<QueryResult<Transmission.Data>>,
+        incomingQuery: SharedFlow<QueryResult>,
         outGoingQuery: SendChannel<Query>
     ) {
         transformerScope.launch {
@@ -101,11 +96,11 @@ open class Transformer(dispatcher: CoroutineDispatcher = Dispatchers.Default) {
                 incomingQuery
                     .filter { it.owner == identifier }
                     .collect {
-                        this@Transformer.queryDelegate.resultBroadcast.producer.trySend(it)
+                        this@Transformer.requestDelegate.resultBroadcast.producer.trySend(it)
                     }
             }
             launch {
-                this@Transformer.queryDelegate.outGoingQuery.receiveAsFlow().collect {
+                this@Transformer.requestDelegate.outGoingQuery.receiveAsFlow().collect {
                     outGoingQuery.trySend(it)
                 }
             }
