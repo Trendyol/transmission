@@ -17,11 +17,11 @@ import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.launch
 
 internal class TestRouter(
-    private val registry: RegistryScopeImpl,
     private val transformer: Transformer,
     dispatcher: CoroutineDispatcher
 ) {
     private val testScope = CoroutineScope(dispatcher)
+    var registry: RegistryScopeImpl = RegistryScopeImpl()
 
     private val signalBroadcast = testScope.createBroadcast<Transmission.Signal>()
     private val effectBroadcast = testScope.createBroadcast<EffectWrapper>()

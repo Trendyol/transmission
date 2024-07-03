@@ -5,7 +5,8 @@ import com.trendyol.transmission.features.input.InputEffect
 import com.trendyol.transmission.transformer.util.TestCoroutineRule
 import com.trendyol.transmission.ui.ColorPickerUiState
 import com.trendyol.transmission.ui.OutputUiState
-import com.yigitozgumus.transmissiontesting.testWithEffect
+import com.yigitozgumus.transmissiontesting.attachToRouter
+import com.yigitozgumus.transmissiontesting.test
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -26,25 +27,29 @@ class OutputTransformerTest {
 
     @Test
     fun `GIVEN sut, WHEN inputUpdate effect comes, THEN, holder should be updated with correct value`() {
-        sut.testWithEffect(effect = InputEffect.InputUpdate("test")) {
-            assertEquals(OutputUiState(outputText = "test"), dataStream.last())
-        }
+        sut.attachToRouter()
+            .test(effect = InputEffect.InputUpdate("test")) {
+                assertEquals(OutputUiState(outputText = "test"), dataStream.last())
+            }
     }
 
     @Test
     fun `GIVEN sut, WHEN inputUpdate effect comes and no ColorPickerUIState data is present, THEN data should not be updated further`() {
-        sut.testWithEffect(effect = InputEffect.InputUpdate("test")) {
-            assertEquals(OutputUiState(outputText = "test"), dataStream.last())
-        }
+        sut.attachToRouter()
+            .test(effect = InputEffect.InputUpdate("test")) {
+                assertEquals(OutputUiState(outputText = "test"), dataStream.last())
+            }
     }
 
     @Test
     fun `GIVEN sut, WHEN inputUpdate effect comes and ColorPickerUIState exists, THEN RouterPayloadEffect should be published`() {
-        sut.testWithEffect(effect = InputEffect.InputUpdate("test"), registry = {
-            addQueryData(ColorPickerUiState(), key = "ColorPickerUiState")
-        }) {
-            assertEquals(OutputUiState(outputText = "test"), dataStream[1])
-            assertTrue(effectStream.last().effect is RouterEffect)
-        }
+        sut.attachToRouter()
+            .register {
+                addQueryData(ColorPickerUiState(), key = "ColorPickerUiState")
+            }
+            .test(effect = InputEffect.InputUpdate("test")) {
+                assertEquals(OutputUiState(outputText = "test"), dataStream[1])
+                assertTrue(effectStream.last().effect is RouterEffect)
+            }
     }
 }
