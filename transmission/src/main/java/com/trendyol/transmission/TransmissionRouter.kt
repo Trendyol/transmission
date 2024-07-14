@@ -26,7 +26,7 @@ class TransmissionRouter(
 
     private val routerScope = CoroutineScope(SupervisorJob() + dispatcher)
 
-    internal val routerName: String = this.identifier()
+    internal val routerName: String = this::class.simpleName.orEmpty()
 
     private val signalBroadcast = routerScope.createBroadcast<Transmission.Signal>()
     private val dataBroadcast = routerScope.createBroadcast<Transmission.Data>()

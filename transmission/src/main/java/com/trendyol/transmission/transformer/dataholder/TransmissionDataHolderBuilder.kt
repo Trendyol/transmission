@@ -3,7 +3,7 @@ package com.trendyol.transmission.transformer.dataholder
 import com.trendyol.transmission.Transmission
 import com.trendyol.transmission.transformer.Transformer
 
-class TransmissionDataHolderBuilder<T : Transmission.Data?> {
+internal class TransmissionDataHolderBuilder<T : Transmission.Data?> {
     fun buildWith(
         initialValue: T,
         publishUpdates: Boolean = true,

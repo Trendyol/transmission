@@ -1,7 +1,6 @@
 package com.trendyol.transmission.transformer
 
 import com.trendyol.transmission.Transmission
-import com.trendyol.transmission.identifier
 import com.trendyol.transmission.transformer.dataholder.HolderState
 import com.trendyol.transmission.transformer.request.computation.ComputationOwner
 import com.trendyol.transmission.transformer.request.execution.ExecutionOwner
@@ -32,7 +31,7 @@ internal class TransformerStorage {
 
     fun updateHolderData(data: Transmission.Data) {
         holderDataReference.update { holderDataReference ->
-            holderDataReference[data.identifier()] = data
+            holderDataReference[data::class.simpleName.orEmpty()] = data
             holderDataReference
         }
     }

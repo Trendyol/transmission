@@ -14,7 +14,6 @@ fun buildGenericEffectHandler(
     }
 }
 
-
 inline fun <reified E : Transmission.Effect> buildTypedEffectHandler(
     crossinline onEffect: suspend CommunicationScope.(effect: E) -> Unit
 ): EffectHandler {

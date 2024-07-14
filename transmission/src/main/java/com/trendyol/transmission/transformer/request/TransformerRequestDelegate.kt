@@ -8,7 +8,7 @@ import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.first
 
-internal class TransformerRequestDelegate(scope: CoroutineScope, identifier: String) {
+internal class TransformerRequestDelegate(scope: CoroutineScope, identity: Contract.Identity) {
 
     val outGoingQuery: Channel<Query> = Channel(capacity = Channel.BUFFERED)
     val resultBroadcast = scope.createBroadcast<QueryResult>()
@@ -16,10 +16,10 @@ internal class TransformerRequestDelegate(scope: CoroutineScope, identifier: Str
     val interactor: RequestHandler = object : RequestHandler {
 
         override suspend fun <C : Contract.Data<D>, D : Transmission.Data> getData(contract: C): D? {
-            outGoingQuery.trySend(Query.Data(sender = identifier, key = contract.key))
+            outGoingQuery.trySend(Query.Data(sender = identity.key, key = contract.key))
             return resultBroadcast.output
                 .filterIsInstance<QueryResult.Data<D>>()
-                .filter { it.key == contract.key && it.owner == identifier }
+                .filter { it.key == contract.key && it.owner == identity.key }
                 .first().data
         }
 
@@ -29,14 +29,14 @@ internal class TransformerRequestDelegate(scope: CoroutineScope, identifier: Str
         ): D? {
             outGoingQuery.trySend(
                 Query.Computation(
-                    sender = identifier,
+                    sender = identity.key,
                     key = contract.key,
                     invalidate = invalidate
                 )
             )
             return resultBroadcast.output
                 .filterIsInstance<QueryResult.Computation<D>>()
-                .filter { it.key == contract.key && it.owner == identifier }
+                .filter { it.key == contract.key && it.owner == identity.key }
                 .first().data
         }
 
@@ -47,7 +47,7 @@ internal class TransformerRequestDelegate(scope: CoroutineScope, identifier: Str
         ): D? {
             outGoingQuery.trySend(
                 Query.ComputationWithArgs(
-                    sender = identifier,
+                    sender = identity.key,
                     key = contract.key,
                     args = args,
                     invalidate = invalidate
@@ -55,14 +55,14 @@ internal class TransformerRequestDelegate(scope: CoroutineScope, identifier: Str
             )
             return resultBroadcast.output
                 .filterIsInstance<QueryResult.Computation<D>>()
-                .filter { it.key == contract.key && it.owner == identifier }
+                .filter { it.key == contract.key && it.owner == identity.key }
                 .first().data
         }
 
         override suspend fun <C : Contract.Execution> execute(contract: C) {
             outGoingQuery.trySend(
                 Query.Execution(
-                    sender = identifier,
+                    sender = identity.key,
                     key = contract.key,
                 )
             )
@@ -74,7 +74,7 @@ internal class TransformerRequestDelegate(scope: CoroutineScope, identifier: Str
         ) {
             outGoingQuery.trySend(
                 Query.ExecutionWithArgs(
-                    sender = identifier,
+                    sender = identity.key,
                     key = contract.key,
                     args = args,
                 )

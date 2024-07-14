@@ -4,6 +4,7 @@ import com.trendyol.transmission.DefaultDispatcher
 import com.trendyol.transmission.effect.RouterEffect
 import com.trendyol.transmission.features.colorpicker.ColorPickerEffect
 import com.trendyol.transmission.features.colorpicker.ColorPickerTransformer
+import com.trendyol.transmission.features.colorpicker.colorPickerIdentity
 import com.trendyol.transmission.features.input.InputEffect
 import com.trendyol.transmission.features.input.InputTransformer
 import com.trendyol.transmission.transformer.Transformer
@@ -57,7 +58,7 @@ class OutputTransformer @Inject constructor(
                 delay(1.seconds)
                 send(
                     effect = ColorPickerEffect.BackgroundColorUpdate(holder2.getValue().backgroundColor),
-                    to = ColorPickerTransformer::class
+                    identity = colorPickerIdentity
                 )
                 execute(outputExecutionContract)
                 publish(effect = RouterEffect(holder.getValue()))

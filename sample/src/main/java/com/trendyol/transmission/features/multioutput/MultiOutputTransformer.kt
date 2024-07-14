@@ -7,13 +7,16 @@ import com.trendyol.transmission.features.output.OutputTransformer
 import com.trendyol.transmission.transformer.Transformer
 import com.trendyol.transmission.transformer.dataholder.buildDataHolder
 import com.trendyol.transmission.transformer.handler.buildGenericEffectHandler
+import com.trendyol.transmission.transformer.request.createIdentity
 import com.trendyol.transmission.ui.MultiOutputUiState
 import kotlinx.coroutines.CoroutineDispatcher
 import javax.inject.Inject
 
+val multiOutputTransformerIdentity = createIdentity("MultiOutput")
+
 class MultiOutputTransformer @Inject constructor(
     @DefaultDispatcher private val defaultDispatcher: CoroutineDispatcher
-) : Transformer(defaultDispatcher) {
+) : Transformer(defaultDispatcher, multiOutputTransformerIdentity) {
 
     private val holder = buildDataHolder(MultiOutputUiState())
 
