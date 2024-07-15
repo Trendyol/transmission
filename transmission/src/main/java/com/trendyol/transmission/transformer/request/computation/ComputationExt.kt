@@ -14,11 +14,11 @@ import com.trendyol.transmission.transformer.request.RequestHandler
  * @param useCache Stores the result after first computation
  * @param computation Computation to get the result [Transmission.Data]
  */
-fun <C : Contract.Computation<T>, T : Any> Transformer.registerComputation(
+fun <C : Contract.Computation<T>, T : Any> ComputationRegistry.registerComputation(
     contract: C,
     computation: suspend RequestHandler.() -> T?,
-) {
-    ComputationBuilder().buildWith(contract.key, contract.useCache, this, computation)
+): ComputationRegistry {
+    return this.apply { buildWith(contract.key, contract.useCache, computation) }
 }
 
 /**
@@ -30,9 +30,9 @@ fun <C : Contract.Computation<T>, T : Any> Transformer.registerComputation(
  * @param useCache Stores the result after first computation
  * @param computation Computation to get the result [Transmission.Data]
  */
-fun <C : Contract.ComputationWithArgs<A, T>, A : Any, T : Any> Transformer.registerComputation(
+fun <C : Contract.ComputationWithArgs<A, T>, A : Any, T : Any> ComputationRegistry.registerComputation(
     contract: C,
     computation: suspend RequestHandler.(args: A) -> T?,
-) {
-    ComputationBuilder().buildWith(contract.key, contract.useCache, this, computation)
+): ComputationRegistry {
+    return this.apply { buildWith(contract.key, contract.useCache, computation) }
 }

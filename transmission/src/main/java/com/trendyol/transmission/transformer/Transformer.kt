@@ -10,7 +10,9 @@ import com.trendyol.transmission.transformer.request.Contract
 import com.trendyol.transmission.transformer.request.Query
 import com.trendyol.transmission.transformer.request.QueryResult
 import com.trendyol.transmission.transformer.request.TransformerRequestDelegate
+import com.trendyol.transmission.transformer.request.computation.ComputationRegistry
 import com.trendyol.transmission.transformer.request.createIdentity
+import com.trendyol.transmission.transformer.request.execution.ExecutionRegistry
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -42,6 +44,9 @@ open class Transformer(
 
     open val signalHandler: SignalHandler? = null
     open val effectHandler: EffectHandler? = null
+
+    protected val executionRegistry: ExecutionRegistry by lazy { ExecutionRegistry(this) }
+    protected val computationRegistry: ComputationRegistry by lazy { ComputationRegistry(this) }
 
     var currentEffectProcessing: Job? = null
     var currentSignalProcessing: Job? = null

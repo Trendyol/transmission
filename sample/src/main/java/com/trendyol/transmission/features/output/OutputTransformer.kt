@@ -32,17 +32,19 @@ class OutputTransformer @Inject constructor(
     private val holder2 = buildDataHolder(ColorPickerUiState(), publishUpdates = false)
 
     init {
-        registerComputation(outputCalculationContract) {
-            delay(2.seconds)
-            val data = getData(ColorPickerTransformer.holderContract)?.selectedColorIndex
-            val writtenOutput = compute(InputTransformer.writtenInputContract)
-            val result = Random.nextInt(5, 15) * Random.nextInt(5, 15)
-            OutputCalculationResult("result is $result with ($writtenOutput) and $data")
-        }
-        registerExecution(outputExecutionContract) {
-            delay(4.seconds)
-            communicationScope.publish(ColorPickerEffect.BackgroundColorUpdate(Pink80))
-        }
+        computationRegistry
+            .registerComputation(outputCalculationContract) {
+                delay(2.seconds)
+                val data = getData(ColorPickerTransformer.holderContract)?.selectedColorIndex
+                val writtenOutput = compute(InputTransformer.writtenInputContract)
+                val result = Random.nextInt(5, 15) * Random.nextInt(5, 15)
+                OutputCalculationResult("result is $result with ($writtenOutput) and $data")
+            }
+        executionRegistry
+            .registerExecution(outputExecutionContract) {
+                delay(4.seconds)
+                communicationScope.publish(ColorPickerEffect.BackgroundColorUpdate(Pink80))
+            }
     }
 
     override val effectHandler = buildGenericEffectHandler { effect ->
