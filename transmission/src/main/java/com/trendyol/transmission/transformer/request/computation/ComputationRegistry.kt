@@ -3,12 +3,11 @@ package com.trendyol.transmission.transformer.request.computation
 import com.trendyol.transmission.transformer.Transformer
 import com.trendyol.transmission.transformer.request.RequestHandler
 
-class ComputationBuilder {
+class ComputationRegistry(private val transformer: Transformer) {
 
-    fun <T : Any> buildWith(
+    internal fun <T : Any> buildWith(
         key: String,
         useCache: Boolean = false,
-        transformer: Transformer,
         computation: suspend RequestHandler.() -> T?
     ) {
         transformer.storage.registerComputation(
@@ -17,10 +16,9 @@ class ComputationBuilder {
         )
     }
 
-    fun <A : Any, T : Any> buildWith(
+    internal fun <A : Any, T : Any> buildWith(
         key: String,
         useCache: Boolean = false,
-        transformer: Transformer,
         computation: suspend RequestHandler.(args: A) -> T?
     ) {
         transformer.storage.registerComputation(

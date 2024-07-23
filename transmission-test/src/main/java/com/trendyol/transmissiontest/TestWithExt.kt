@@ -1,4 +1,4 @@
-package com.yigitozgumus.transmissiontesting
+package com.trendyol.transmissiontest
 
 import com.trendyol.transmission.Transmission
 import com.trendyol.transmission.transformer.Transformer

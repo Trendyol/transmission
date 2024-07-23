@@ -2,6 +2,8 @@ package com.trendyol.transmission.transformer.request
 
 import com.trendyol.transmission.Transmission
 
+fun createIdentity(key: String): Contract.Identity = Contract.Identity(key)
+
 fun <T : Transmission.Data?> buildDataContract(
     key: String
 ) = object : Contract.Data<T>() {

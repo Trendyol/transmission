@@ -6,7 +6,6 @@ import com.trendyol.transmission.transformer.handler.CommunicationScope
 import com.trendyol.transmission.transformer.request.Contract
 import com.trendyol.transmission.transformer.request.TransformerRequestDelegate
 import kotlinx.coroutines.channels.Channel
-import kotlin.reflect.KClass
 
 internal class CommunicationScopeBuilder(
     private val effectChannel: Channel<EffectWrapper>,
@@ -18,8 +17,11 @@ internal class CommunicationScopeBuilder(
         data?.let { dataChannel.trySend(it) }
     }
 
-    override fun <E : Transmission.Effect, T : Transformer> send(effect: E, to: KClass<out T>) {
-        effectChannel.trySend(EffectWrapper(effect, to))
+    override fun <E : Transmission.Effect> send(
+        effect: E,
+        identity: Contract.Identity
+    ) {
+        effectChannel.trySend(EffectWrapper(effect, identity))
     }
 
     override fun <E : Transmission.Effect> publish(effect: E) {

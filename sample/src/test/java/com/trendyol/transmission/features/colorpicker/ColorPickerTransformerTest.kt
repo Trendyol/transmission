@@ -3,8 +3,8 @@ package com.trendyol.transmission.features.colorpicker
 import androidx.compose.ui.graphics.Color
 import com.trendyol.transmission.transformer.util.TestCoroutineRule
 import com.trendyol.transmission.ui.ColorPickerUiState
-import com.yigitozgumus.transmissiontesting.attachToRouter
-import com.yigitozgumus.transmissiontesting.test
+import com.trendyol.transmissiontest.attachToRouter
+import com.trendyol.transmissiontest.test
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test

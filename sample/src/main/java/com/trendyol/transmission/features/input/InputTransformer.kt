@@ -23,13 +23,13 @@ class InputTransformer @Inject constructor(
     private val holder = buildDataHolder(InputUiState(), holderContract)
 
     init {
-        registerComputation(writtenInputContract) {
-            delay(1.seconds)
-            WrittenInput(holder.getValue().writtenText)
-        }
-        registerComputation(writtenInputWithArgs) {
-            WrittenInput(it)
-        }
+        computationRegistry
+            .registerComputation(writtenInputContract) {
+                delay(1.seconds)
+                WrittenInput(holder.getValue().writtenText)
+            }.registerComputation(writtenInputWithArgs) {
+                WrittenInput(it)
+            }
     }
 
     override val signalHandler = buildTypedSignalHandler<InputSignal> { signal ->

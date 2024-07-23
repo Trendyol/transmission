@@ -13,11 +13,11 @@ import com.trendyol.transmission.transformer.request.RequestHandler
  * Can be queried using [RequestHandler.execute]
  * @param execution execution to get the result [Transmission.Data]
  */
-fun <C : Contract.Execution> Transformer.registerExecution(
+fun <C : Contract.Execution> ExecutionRegistry.registerExecution(
     contract: C,
     execution: suspend RequestHandler.() -> Unit,
-) {
-    ExecutionBuilder().buildWith(contract.key, this, execution)
+): ExecutionRegistry {
+    return this.apply { buildWith(contract.key, execution) }
 }
 
 /**
@@ -29,9 +29,9 @@ fun <C : Contract.Execution> Transformer.registerExecution(
  * Can be queried using [RequestHandler.execute]
  * @param execution execution to get the result [Transmission.Data]
  */
-fun <C : Contract.ExecutionWithArgs<A>, A : Any> Transformer.registerExecution(
+fun <C : Contract.ExecutionWithArgs<A>, A : Any> ExecutionRegistry.registerExecution(
     contract: C,
     execution: suspend RequestHandler.(args: A) -> Unit,
-) {
-    ExecutionBuilder().buildWith(contract.key, this, execution)
+): ExecutionRegistry {
+    return this.apply { buildWith(contract.key, execution) }
 }

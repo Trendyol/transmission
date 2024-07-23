@@ -4,6 +4,7 @@ import com.trendyol.transmission.DefaultDispatcher
 import com.trendyol.transmission.effect.RouterEffect
 import com.trendyol.transmission.features.colorpicker.ColorPickerEffect
 import com.trendyol.transmission.features.colorpicker.ColorPickerTransformer
+import com.trendyol.transmission.features.colorpicker.colorPickerIdentity
 import com.trendyol.transmission.features.input.InputEffect
 import com.trendyol.transmission.features.input.InputTransformer
 import com.trendyol.transmission.transformer.Transformer
@@ -31,17 +32,19 @@ class OutputTransformer @Inject constructor(
     private val holder2 = buildDataHolder(ColorPickerUiState(), publishUpdates = false)
 
     init {
-        registerComputation(outputCalculationContract) {
-            delay(2.seconds)
-            val data = getData(ColorPickerTransformer.holderContract)?.selectedColorIndex
-            val writtenOutput = compute(InputTransformer.writtenInputContract)
-            val result = Random.nextInt(5, 15) * Random.nextInt(5, 15)
-            OutputCalculationResult("result is $result with ($writtenOutput) and $data")
-        }
-        registerExecution(outputExecutionContract) {
-            delay(4.seconds)
-            communicationScope.publish(ColorPickerEffect.BackgroundColorUpdate(Pink80))
-        }
+        computationRegistry
+            .registerComputation(outputCalculationContract) {
+                delay(2.seconds)
+                val data = getData(ColorPickerTransformer.holderContract)?.selectedColorIndex
+                val writtenOutput = compute(InputTransformer.writtenInputContract)
+                val result = Random.nextInt(5, 15) * Random.nextInt(5, 15)
+                OutputCalculationResult("result is $result with ($writtenOutput) and $data")
+            }
+        executionRegistry
+            .registerExecution(outputExecutionContract) {
+                delay(4.seconds)
+                communicationScope.publish(ColorPickerEffect.BackgroundColorUpdate(Pink80))
+            }
     }
 
     override val effectHandler = buildGenericEffectHandler { effect ->
@@ -57,7 +60,7 @@ class OutputTransformer @Inject constructor(
                 delay(1.seconds)
                 send(
                     effect = ColorPickerEffect.BackgroundColorUpdate(holder2.getValue().backgroundColor),
-                    to = ColorPickerTransformer::class
+                    identity = colorPickerIdentity
                 )
                 execute(outputExecutionContract)
                 publish(effect = RouterEffect(holder.getValue()))

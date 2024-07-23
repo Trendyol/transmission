@@ -1,4 +1,4 @@
-package com.yigitozgumus.transmissiontesting
+package com.trendyol.transmissiontest
 
 import com.trendyol.transmission.Transmission
 import com.trendyol.transmission.effect.EffectWrapper
@@ -11,12 +11,12 @@ import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 
+@OptIn(ExperimentalCoroutinesApi::class)
 class TestSuite {
     private var orderedInitialProcessing: List<Transmission> = emptyList()
     private var transformer: Transformer? = null
     private lateinit var router: TestRouter
 
-    @OptIn(ExperimentalCoroutinesApi::class)
     fun initialize(transformer: Transformer): TestSuite {
         this.transformer = transformer
         router = TestRouter(transformer, UnconfinedTestDispatcher())
@@ -33,8 +33,9 @@ class TestSuite {
         return this
     }
 
+    @PublishedApi
     @OptIn(ExperimentalCoroutinesApi::class)
-    fun runTest(
+    internal fun runTest(
         transmission: Transmission,
         scope: suspend TransformerTestScope.(scope: TestScope) -> Unit
     ) {

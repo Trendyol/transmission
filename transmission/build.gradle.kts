@@ -27,7 +27,7 @@ publishing {
         create<MavenPublication>("release") {
             groupId = "com.trendyol"
             artifactId = "transmission"
-            version = "1.0.4"
+            version = "1.0.7"
             afterEvaluate {
                 from(components["java"])
             }

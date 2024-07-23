@@ -4,11 +4,13 @@ import com.trendyol.transmission.Transmission
 
 sealed interface Contract {
 
+    data class Identity(val key: String) : Contract
+
     abstract class Data<T : Transmission.Data?> : Contract {
         abstract val key: String
     }
 
-    abstract class Computation<T: Any>: Contract {
+    abstract class Computation<T : Any> : Contract {
         abstract val key: String
         open val useCache: Boolean = false
     }
@@ -25,5 +27,4 @@ sealed interface Contract {
     abstract class ExecutionWithArgs<A : Any> : Contract {
         abstract val key: String
     }
-
 }

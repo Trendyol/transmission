@@ -1,19 +1,22 @@
 package com.trendyol.transmission.features.colorpicker
 
 import com.trendyol.transmission.DefaultDispatcher
-import com.trendyol.transmission.features.multioutput.MultiOutputTransformer
+import com.trendyol.transmission.features.multioutput.multiOutputTransformerIdentity
 import com.trendyol.transmission.transformer.Transformer
 import com.trendyol.transmission.transformer.dataholder.buildDataHolder
 import com.trendyol.transmission.transformer.handler.buildGenericEffectHandler
 import com.trendyol.transmission.transformer.handler.buildGenericSignalHandler
 import com.trendyol.transmission.transformer.request.buildDataContract
+import com.trendyol.transmission.transformer.request.createIdentity
 import com.trendyol.transmission.ui.ColorPickerUiState
 import kotlinx.coroutines.CoroutineDispatcher
 import javax.inject.Inject
 
+val colorPickerIdentity = createIdentity("ColorPicker")
+
 class ColorPickerTransformer @Inject constructor(
     @DefaultDispatcher private val defaultDispatcher: CoroutineDispatcher
-) : Transformer(defaultDispatcher) {
+) : Transformer(defaultDispatcher, colorPickerIdentity) {
 
     private val holder = buildDataHolder(ColorPickerUiState(), holderContract)
 
@@ -26,7 +29,7 @@ class ColorPickerTransformer @Inject constructor(
                 )
                 send(
                     effect = ColorPickerEffect.SelectedColorUpdate(signal.selectedColor),
-                    to = MultiOutputTransformer::class
+                    identity = multiOutputTransformerIdentity
                 )
             }
         }
