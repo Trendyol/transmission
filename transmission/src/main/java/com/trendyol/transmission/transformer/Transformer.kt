@@ -17,6 +17,7 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.SendChannel
@@ -26,13 +27,14 @@ import kotlinx.coroutines.flow.filterNot
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.supervisorScope
 
 open class Transformer(
     dispatcher: CoroutineDispatcher = Dispatchers.Default,
     identity: Contract.Identity? = null
 ) {
 
-    val transformerScope = CoroutineScope(dispatcher)
+    val transformerScope = CoroutineScope(dispatcher + SupervisorJob())
 
     private val internalIdentity: Contract.Identity =
         identity ?: createIdentity(this::class.simpleName.orEmpty())
@@ -61,7 +63,7 @@ open class Transformer(
         transformerScope.launch {
             incoming.collect {
                 signalHandler?.apply {
-                    currentSignalProcessing = launch {
+                    currentSignalProcessing = transformerScope.launch {
                         communicationScope.onSignal(it)
                     }
                 }
@@ -78,21 +80,23 @@ open class Transformer(
         incoming: SharedFlow<EffectWrapper>
     ) {
         transformerScope.launch {
-            launch {
-                incoming
-                    .filterNot { it.effect is RouterEffect }
-                    .filter { it.identity == null || it.identity == internalIdentity }
-                    .map { it.effect }
-                    .collect {
-                        effectHandler?.apply {
-                            currentEffectProcessing = launch {
-                                communicationScope.onEffect(it)
+            supervisorScope {
+                launch {
+                    incoming
+                        .filterNot { it.effect is RouterEffect }
+                        .filter { it.identity == null || it.identity == internalIdentity }
+                        .map { it.effect }
+                        .collect {
+                            effectHandler?.apply {
+                                currentEffectProcessing = launch {
+                                    communicationScope.onEffect(it)
+                                }
                             }
                         }
-                    }
-            }
-            launch {
-                effectChannel.receiveAsFlow().collect { producer.send(it) }
+                }
+                launch {
+                    effectChannel.receiveAsFlow().collect { producer.send(it) }
+                }
             }
         }
     }
@@ -102,16 +106,18 @@ open class Transformer(
         outGoingQuery: SendChannel<Query>
     ) {
         transformerScope.launch {
-            launch {
-                incomingQuery
-                    .filter { it.owner == internalIdentity.key }
-                    .collect {
-                        this@Transformer.requestDelegate.resultBroadcast.producer.trySend(it)
+            supervisorScope {
+                launch {
+                    incomingQuery
+                        .filter { it.owner == internalIdentity.key }
+                        .collect {
+                            this@Transformer.requestDelegate.resultBroadcast.producer.trySend(it)
+                        }
+                }
+                launch {
+                    this@Transformer.requestDelegate.outGoingQuery.receiveAsFlow().collect {
+                        outGoingQuery.trySend(it)
                     }
-            }
-            launch {
-                this@Transformer.requestDelegate.outGoingQuery.receiveAsFlow().collect {
-                    outGoingQuery.trySend(it)
                 }
             }
         }
