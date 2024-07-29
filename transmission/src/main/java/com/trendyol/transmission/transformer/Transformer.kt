@@ -5,6 +5,7 @@ import com.trendyol.transmission.effect.EffectWrapper
 import com.trendyol.transmission.effect.RouterEffect
 import com.trendyol.transmission.transformer.handler.CommunicationScope
 import com.trendyol.transmission.transformer.handler.EffectHandler
+import com.trendyol.transmission.transformer.handler.HandlerRegistry
 import com.trendyol.transmission.transformer.handler.SignalHandler
 import com.trendyol.transmission.transformer.request.Contract
 import com.trendyol.transmission.transformer.request.Query
@@ -42,8 +43,7 @@ open class Transformer(
     internal val dataChannel: Channel<Transmission.Data> = Channel(capacity = Channel.BUFFERED)
     internal val storage = TransformerStorage()
 
-    open val signalHandler: SignalHandler? = null
-    open val effectHandler: EffectHandler? = null
+    protected open val handlerRegistry : HandlerRegistry? = null
 
     protected val executionRegistry: ExecutionRegistry by lazy { ExecutionRegistry(this) }
     protected val computationRegistry: ComputationRegistry by lazy { ComputationRegistry(this) }
@@ -60,10 +60,8 @@ open class Transformer(
     fun startSignalCollection(incoming: SharedFlow<Transmission.Signal>) {
         transformerScope.launch {
             incoming.collect {
-                signalHandler?.apply {
-                    currentSignalProcessing = launch {
-                        communicationScope.onSignal(it)
-                    }
+                currentSignalProcessing = launch {
+                    handlerRegistry?.signalHandlerRegistry?.get(it::class)?.invoke(communicationScope, it)
                 }
             }
         }
@@ -84,10 +82,9 @@ open class Transformer(
                     .filter { it.identity == null || it.identity == internalIdentity }
                     .map { it.effect }
                     .collect {
-                        effectHandler?.apply {
-                            currentEffectProcessing = launch {
-                                communicationScope.onEffect(it)
-                            }
+                        currentEffectProcessing = launch {
+                            handlerRegistry?.effectHandlerRegistry?.get(it::class)
+                                ?.invoke(communicationScope, it)
                         }
                     }
             }
