@@ -13,6 +13,7 @@ import com.trendyol.transmission.transformer.request.computation.ComputationRegi
 import com.trendyol.transmission.transformer.request.createIdentity
 import com.trendyol.transmission.transformer.request.execution.ExecutionRegistry
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -33,7 +34,10 @@ open class Transformer(
     identity: Contract.Identity? = null
 ) {
 
-    val transformerScope = CoroutineScope(dispatcher + SupervisorJob())
+    private val exceptionHandler = CoroutineExceptionHandler { _, throwable ->
+        onError(throwable)
+    }
+    val transformerScope = CoroutineScope(dispatcher + SupervisorJob() + exceptionHandler)
 
     private val internalIdentity: Contract.Identity =
         identity ?: createIdentity(this::class.simpleName.orEmpty())
@@ -122,5 +126,9 @@ open class Transformer(
     fun clear() {
         transformerScope.cancel()
         storage.clear()
+    }
+
+    open fun onError(throwable: Throwable) {
+        // no-operation
     }
 }

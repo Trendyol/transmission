@@ -1,5 +1,6 @@
 package com.trendyol.transmission.features.output
 
+import android.util.Log
 import com.trendyol.transmission.DefaultDispatcher
 import com.trendyol.transmission.effect.RouterEffect
 import com.trendyol.transmission.features.colorpicker.ColorPickerEffect
@@ -46,6 +47,10 @@ class OutputTransformer @Inject constructor(
             .registerExecution(outputExecutionContract) {
                 delay(4.seconds)
                 communicationScope.publish(ColorPickerEffect.BackgroundColorUpdate(Pink80))
+                throw RuntimeException(
+                    "This exception will be properly handled and caught " +
+                            "inside of the onError() function"
+                )
             }
     }
 
@@ -71,7 +76,13 @@ class OutputTransformer @Inject constructor(
         }
     }
 
+    override fun onError(throwable: Throwable) {
+        super.onError(throwable)
+        Log.e(TAG, "onError: ${throwable.localizedMessage}")
+    }
+
     companion object {
+        private const val TAG = "OutputTransformer"
         val outputCalculationContract =
             buildComputationContract<OutputCalculationResult>("OutputCalculationResult")
         val outputExecutionContract =

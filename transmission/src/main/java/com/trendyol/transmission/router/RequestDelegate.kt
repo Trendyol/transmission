@@ -73,11 +73,17 @@ internal class RequestDelegate(
         val computationHolder = routerRef.transformerSet
             .find { it.storage.hasComputation(query.key) }
         val computationToSend = queryScope.async {
+            val computationData = runCatching {
+                computationHolder?.storage?.getComputationByKey(query.key)
+                    ?.getResult(computationHolder.communicationScope, query.invalidate)
+            }.onFailure{
+                computationHolder?.onError(it)
+            }.getOrNull()
+
             QueryResult.Computation(
                 owner = query.sender,
                 key = query.key,
-                data = computationHolder?.storage?.getComputationByKey(query.key)
-                    ?.getResult(computationHolder.communicationScope, query.invalidate),
+                data = computationData,
             )
         }
         if (query.sender == routerRef.routerName) {
@@ -97,11 +103,21 @@ internal class RequestDelegate(
         val computationHolder = routerRef.transformerSet
             .find { it.storage.hasComputation(query.key) }
         val computationToSend = queryScope.async {
+            val computationData = runCatching {
+                computationHolder?.storage?.getComputationByKey<A>(query.key)
+                    ?.getResult(
+                        computationHolder.communicationScope,
+                        query.invalidate,
+                        query.args
+                    )
+            }.onFailure{
+                computationHolder?.onError(it)
+            }.getOrNull()
+
             QueryResult.Computation(
                 owner = query.sender,
                 key = query.key,
-                data = computationHolder?.storage?.getComputationByKey<A>(query.key)
-                    ?.getResult(computationHolder.communicationScope, query.invalidate, query.args),
+                data = computationData,
             )
         }
         if (query.sender == routerRef.routerName) {
@@ -119,17 +135,21 @@ internal class RequestDelegate(
         query: Query.Execution
     ) = queryScope.launch {
         val executionHolder = routerRef.transformerSet
-            .find { it.storage.hasExecution(query.key) }
-        executionHolder?.storage?.getExecutionByKey(query.key)
-            ?.execute(executionHolder.communicationScope)
+            .find { it.storage.hasExecution(query.key) } ?: return@launch
+        runCatching {
+            executionHolder.storage.getExecutionByKey(query.key)
+                ?.execute(executionHolder.communicationScope)
+        }.onFailure(executionHolder::onError).getOrNull()
     }
 
     private fun <A : Any> processExecutionWithArgs(query: Query.ExecutionWithArgs<A>) =
         queryScope.launch {
             val executionHolder = routerRef.transformerSet
-                .find { it.storage.hasExecution(query.key) }
-            executionHolder?.storage?.getExecutionByKey<A>(query.key)
-                ?.execute(executionHolder.communicationScope, query.args)
+                .find { it.storage.hasExecution(query.key) } ?: return@launch
+            runCatching {
+                executionHolder.storage.getExecutionByKey<A>(query.key)
+                    ?.execute(executionHolder.communicationScope, query.args)
+            }.onFailure(executionHolder::onError).getOrNull()
         }
 
     override suspend fun <C : Contract.Data<D>, D : Transmission.Data> getData(contract: C): D? {
