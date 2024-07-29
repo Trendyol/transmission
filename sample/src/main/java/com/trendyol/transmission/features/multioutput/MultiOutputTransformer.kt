@@ -6,7 +6,9 @@ import com.trendyol.transmission.features.input.InputEffect
 import com.trendyol.transmission.features.output.OutputTransformer
 import com.trendyol.transmission.transformer.Transformer
 import com.trendyol.transmission.transformer.dataholder.buildDataHolder
-import com.trendyol.transmission.transformer.handler.buildGenericEffectHandler
+import com.trendyol.transmission.transformer.handler.HandlerRegistry
+import com.trendyol.transmission.transformer.handler.handlerRegistry
+import com.trendyol.transmission.transformer.handler.registerEffect
 import com.trendyol.transmission.transformer.request.createIdentity
 import com.trendyol.transmission.ui.MultiOutputUiState
 import kotlinx.coroutines.CoroutineDispatcher
@@ -20,23 +22,20 @@ class MultiOutputTransformer @Inject constructor(
 
     private val holder = buildDataHolder(MultiOutputUiState())
 
-    override val effectHandler = buildGenericEffectHandler { effect ->
-        when (effect) {
-            is InputEffect.InputUpdate -> {
-                holder.update { it.copy(writtenUppercaseText = effect.value.uppercase()) }
-                val result = compute(OutputTransformer.outputCalculationContract)
-                holder.update {
-                    it.copy(writtenUppercaseText = it.writtenUppercaseText + " ${result?.result}")
-                }
-            }
-
-            is ColorPickerEffect.BackgroundColorUpdate -> {
-                holder.update { it.copy(backgroundColor = effect.color) }
-            }
-
-            is ColorPickerEffect.SelectedColorUpdate -> {
-                holder.update { it.copy(selectedColor = effect.color) }
+    override val handlerRegistry: HandlerRegistry = handlerRegistry {
+        registerEffect<InputEffect.InputUpdate> { effect ->
+            holder.update { it.copy(writtenUppercaseText = effect.value.uppercase()) }
+            val result = compute(OutputTransformer.outputCalculationContract)
+            holder.update {
+                it.copy(writtenUppercaseText = it.writtenUppercaseText + " ${result?.result}")
             }
         }
+        registerEffect<ColorPickerEffect.BackgroundColorUpdate> { effect ->
+            holder.update { it.copy(backgroundColor = effect.color) }
+        }
+        registerEffect<ColorPickerEffect.SelectedColorUpdate> { effect ->
+            holder.update { it.copy(selectedColor = effect.color) }
+        }
     }
+
 }

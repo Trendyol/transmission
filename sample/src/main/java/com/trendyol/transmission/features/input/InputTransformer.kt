@@ -4,8 +4,10 @@ import com.trendyol.transmission.DefaultDispatcher
 import com.trendyol.transmission.features.colorpicker.ColorPickerEffect
 import com.trendyol.transmission.transformer.Transformer
 import com.trendyol.transmission.transformer.dataholder.buildDataHolder
-import com.trendyol.transmission.transformer.handler.buildGenericEffectHandler
-import com.trendyol.transmission.transformer.handler.buildTypedSignalHandler
+import com.trendyol.transmission.transformer.handler.HandlerRegistry
+import com.trendyol.transmission.transformer.handler.handlerRegistry
+import com.trendyol.transmission.transformer.handler.registerEffect
+import com.trendyol.transmission.transformer.handler.registerSignal
 import com.trendyol.transmission.transformer.request.buildComputationContract
 import com.trendyol.transmission.transformer.request.buildComputationContractWithArgs
 import com.trendyol.transmission.transformer.request.buildDataContract
@@ -32,20 +34,13 @@ class InputTransformer @Inject constructor(
             }
     }
 
-    override val signalHandler = buildTypedSignalHandler<InputSignal> { signal ->
-        when (signal) {
-            is InputSignal.InputUpdate -> {
-                holder.update { it.copy(writtenText = signal.value) }
-                publish(effect = InputEffect.InputUpdate(signal.value))
-            }
+    override val handlerRegistry: HandlerRegistry = handlerRegistry {
+        registerSignal<InputSignal.InputUpdate> { signal ->
+            holder.update { it.copy(writtenText = signal.value) }
+            publish(effect = InputEffect.InputUpdate(signal.value))
         }
-    }
-
-    override val effectHandler = buildGenericEffectHandler { effect ->
-        when (effect) {
-            is ColorPickerEffect.BackgroundColorUpdate -> {
-                holder.update { it.copy(backgroundColor = effect.color) }
-            }
+        registerEffect<ColorPickerEffect.BackgroundColorUpdate> { effect ->
+            holder.update { it.copy(backgroundColor = effect.color) }
         }
     }
 
