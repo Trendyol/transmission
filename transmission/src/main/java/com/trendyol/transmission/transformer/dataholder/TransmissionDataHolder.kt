@@ -47,5 +47,4 @@ internal class TransmissionDataHolderImpl<T : Transmission.Data?>(
     override fun update(updater: (T) -> @UnsafeVariance T) {
         holder.update(updater)
     }
-
 }

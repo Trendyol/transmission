@@ -9,7 +9,9 @@ import com.trendyol.transmission.features.input.InputEffect
 import com.trendyol.transmission.features.input.InputTransformer
 import com.trendyol.transmission.transformer.Transformer
 import com.trendyol.transmission.transformer.dataholder.buildDataHolder
-import com.trendyol.transmission.transformer.handler.buildGenericEffectHandler
+import com.trendyol.transmission.transformer.handler.HandlerRegistry
+import com.trendyol.transmission.transformer.handler.handlerRegistry
+import com.trendyol.transmission.transformer.handler.registerEffect
 import com.trendyol.transmission.transformer.request.buildComputationContract
 import com.trendyol.transmission.transformer.request.buildExecutionContract
 import com.trendyol.transmission.transformer.request.computation.registerComputation
@@ -47,28 +49,25 @@ class OutputTransformer @Inject constructor(
             }
     }
 
-    override val effectHandler = buildGenericEffectHandler { effect ->
-        when (effect) {
-            is InputEffect.InputUpdate -> {
-                holder.update { it.copy(outputText = effect.value) }
-                delay(3.seconds)
-                val selectedColor = getData(ColorPickerTransformer.holderContract)
-                selectedColor ?: return@buildGenericEffectHandler
-                holder.update {
-                    it.copy(outputText = it.outputText + " and Selected color index is ${selectedColor.selectedColorIndex}")
-                }
-                delay(1.seconds)
-                send(
-                    effect = ColorPickerEffect.BackgroundColorUpdate(holder2.getValue().backgroundColor),
-                    identity = colorPickerIdentity
-                )
-                execute(outputExecutionContract)
-                publish(effect = RouterEffect(holder.getValue()))
+    override val handlerRegistry: HandlerRegistry = handlerRegistry {
+        registerEffect<InputEffect.InputUpdate> { effect ->
+            holder.update { it.copy(outputText = effect.value) }
+            delay(3.seconds)
+            val selectedColor = getData(ColorPickerTransformer.holderContract)
+            selectedColor ?: return@registerEffect
+            holder.update {
+                it.copy(outputText = it.outputText + " and Selected color index is ${selectedColor.selectedColorIndex}")
             }
-
-            is ColorPickerEffect.BackgroundColorUpdate -> {
-                holder.update { it.copy(backgroundColor = effect.color) }
-            }
+            delay(1.seconds)
+            send(
+                effect = ColorPickerEffect.BackgroundColorUpdate(holder2.getValue().backgroundColor),
+                identity = colorPickerIdentity
+            )
+            execute(outputExecutionContract)
+            publish(effect = RouterEffect(holder.getValue()))
+        }
+        registerEffect<ColorPickerEffect.BackgroundColorUpdate> { effect ->
+            holder.update { it.copy(backgroundColor = effect.color) }
         }
     }
 

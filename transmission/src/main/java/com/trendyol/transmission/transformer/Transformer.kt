@@ -4,8 +4,7 @@ import com.trendyol.transmission.Transmission
 import com.trendyol.transmission.effect.EffectWrapper
 import com.trendyol.transmission.effect.RouterEffect
 import com.trendyol.transmission.transformer.handler.CommunicationScope
-import com.trendyol.transmission.transformer.handler.EffectHandler
-import com.trendyol.transmission.transformer.handler.SignalHandler
+import com.trendyol.transmission.transformer.handler.HandlerRegistry
 import com.trendyol.transmission.transformer.request.Contract
 import com.trendyol.transmission.transformer.request.Query
 import com.trendyol.transmission.transformer.request.QueryResult
@@ -17,6 +16,7 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.SendChannel
@@ -26,13 +26,14 @@ import kotlinx.coroutines.flow.filterNot
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.supervisorScope
 
 open class Transformer(
     dispatcher: CoroutineDispatcher = Dispatchers.Default,
     identity: Contract.Identity? = null
 ) {
 
-    val transformerScope = CoroutineScope(dispatcher)
+    val transformerScope = CoroutineScope(dispatcher + SupervisorJob())
 
     private val internalIdentity: Contract.Identity =
         identity ?: createIdentity(this::class.simpleName.orEmpty())
@@ -42,8 +43,7 @@ open class Transformer(
     internal val dataChannel: Channel<Transmission.Data> = Channel(capacity = Channel.BUFFERED)
     internal val storage = TransformerStorage()
 
-    open val signalHandler: SignalHandler? = null
-    open val effectHandler: EffectHandler? = null
+    protected open val handlerRegistry: HandlerRegistry? = null
 
     protected val executionRegistry: ExecutionRegistry by lazy { ExecutionRegistry(this) }
     protected val computationRegistry: ComputationRegistry by lazy { ComputationRegistry(this) }
@@ -60,10 +60,9 @@ open class Transformer(
     fun startSignalCollection(incoming: SharedFlow<Transmission.Signal>) {
         transformerScope.launch {
             incoming.collect {
-                signalHandler?.apply {
-                    currentSignalProcessing = launch {
-                        communicationScope.onSignal(it)
-                    }
+                currentSignalProcessing = transformerScope.launch {
+                    handlerRegistry?.signalHandlerRegistry?.get(it::class)
+                        ?.invoke(communicationScope, it)
                 }
             }
         }
@@ -78,21 +77,22 @@ open class Transformer(
         incoming: SharedFlow<EffectWrapper>
     ) {
         transformerScope.launch {
-            launch {
-                incoming
-                    .filterNot { it.effect is RouterEffect }
-                    .filter { it.identity == null || it.identity == internalIdentity }
-                    .map { it.effect }
-                    .collect {
-                        effectHandler?.apply {
+            supervisorScope {
+                launch {
+                    incoming
+                        .filterNot { it.effect is RouterEffect }
+                        .filter { it.identity == null || it.identity == internalIdentity }
+                        .map { it.effect }
+                        .collect {
                             currentEffectProcessing = launch {
-                                communicationScope.onEffect(it)
+                                handlerRegistry?.effectHandlerRegistry?.get(it::class)
+                                    ?.invoke(communicationScope, it)
                             }
                         }
-                    }
-            }
-            launch {
-                effectChannel.receiveAsFlow().collect { producer.send(it) }
+                }
+                launch {
+                    effectChannel.receiveAsFlow().collect { producer.send(it) }
+                }
             }
         }
     }
@@ -102,16 +102,18 @@ open class Transformer(
         outGoingQuery: SendChannel<Query>
     ) {
         transformerScope.launch {
-            launch {
-                incomingQuery
-                    .filter { it.owner == internalIdentity.key }
-                    .collect {
-                        this@Transformer.requestDelegate.resultBroadcast.producer.trySend(it)
+            supervisorScope {
+                launch {
+                    incomingQuery
+                        .filter { it.owner == internalIdentity.key }
+                        .collect {
+                            this@Transformer.requestDelegate.resultBroadcast.producer.trySend(it)
+                        }
+                }
+                launch {
+                    this@Transformer.requestDelegate.outGoingQuery.receiveAsFlow().collect {
+                        outGoingQuery.trySend(it)
                     }
-            }
-            launch {
-                this@Transformer.requestDelegate.outGoingQuery.receiveAsFlow().collect {
-                    outGoingQuery.trySend(it)
                 }
             }
         }

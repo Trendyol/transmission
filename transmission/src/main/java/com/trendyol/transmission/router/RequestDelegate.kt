@@ -35,7 +35,7 @@ internal class RequestDelegate(
 
     init {
         queryScope.launch {
-            launch { outGoingQuery.consumeAsFlow().collect { processQuery(it) } }
+            outGoingQuery.consumeAsFlow().collect { processQuery(it) }
         }
     }
 

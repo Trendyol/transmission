@@ -52,7 +52,7 @@ class TransmissionRouter(
             "transformerSet should not be empty"
         }
         routerScope.launch {
-            transformerSet.map { transformer ->
+            transformerSet.forEach { transformer ->
                 transformer.run {
                     startSignalCollection(incoming = signalBroadcast.output)
                     startDataPublishing(data = dataBroadcast.producer)
