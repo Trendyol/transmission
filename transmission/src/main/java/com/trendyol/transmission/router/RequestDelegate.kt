@@ -71,12 +71,14 @@ internal class RequestDelegate(
         query: Query.Computation
     ) = queryScope.launch {
         val computationHolder = routerRef.transformerSet
-            .find { it.storage.hasComputation(query.key) } ?: return@launch
+            .find { it.storage.hasComputation(query.key) }
         val computationToSend = queryScope.async {
             val computationData = runCatching {
-                computationHolder.storage.getComputationByKey(query.key)
+                computationHolder?.storage?.getComputationByKey(query.key)
                     ?.getResult(computationHolder.communicationScope, query.invalidate)
-            }.onFailure(computationHolder::onError).getOrNull()
+            }.onFailure{
+                computationHolder?.onError(it)
+            }.getOrNull()
 
             QueryResult.Computation(
                 owner = query.sender,
@@ -99,16 +101,18 @@ internal class RequestDelegate(
         query: Query.ComputationWithArgs<A>
     ) = queryScope.launch {
         val computationHolder = routerRef.transformerSet
-            .find { it.storage.hasComputation(query.key) } ?: return@launch
+            .find { it.storage.hasComputation(query.key) }
         val computationToSend = queryScope.async {
             val computationData = runCatching {
-                computationHolder.storage.getComputationByKey<A>(query.key)
+                computationHolder?.storage?.getComputationByKey<A>(query.key)
                     ?.getResult(
                         computationHolder.communicationScope,
                         query.invalidate,
                         query.args
                     )
-            }.onFailure(computationHolder::onError).getOrNull()
+            }.onFailure{
+                computationHolder?.onError(it)
+            }.getOrNull()
 
             QueryResult.Computation(
                 owner = query.sender,
