@@ -4,9 +4,7 @@ import com.trendyol.transmission.Transmission
 import com.trendyol.transmission.effect.EffectWrapper
 import com.trendyol.transmission.effect.RouterEffect
 import com.trendyol.transmission.transformer.handler.CommunicationScope
-import com.trendyol.transmission.transformer.handler.EffectHandler
 import com.trendyol.transmission.transformer.handler.HandlerRegistry
-import com.trendyol.transmission.transformer.handler.SignalHandler
 import com.trendyol.transmission.transformer.request.Contract
 import com.trendyol.transmission.transformer.request.Query
 import com.trendyol.transmission.transformer.request.QueryResult
@@ -45,7 +43,7 @@ open class Transformer(
     internal val dataChannel: Channel<Transmission.Data> = Channel(capacity = Channel.BUFFERED)
     internal val storage = TransformerStorage()
 
-    protected open val handlerRegistry : HandlerRegistry? = null
+    protected open val handlerRegistry: HandlerRegistry? = null
 
     protected val executionRegistry: ExecutionRegistry by lazy { ExecutionRegistry(this) }
     protected val computationRegistry: ComputationRegistry by lazy { ComputationRegistry(this) }
@@ -63,7 +61,8 @@ open class Transformer(
         transformerScope.launch {
             incoming.collect {
                 currentSignalProcessing = transformerScope.launch {
-                    handlerRegistry?.signalHandlerRegistry?.get(it::class)?.invoke(communicationScope, it)
+                    handlerRegistry?.signalHandlerRegistry?.get(it::class)
+                        ?.invoke(communicationScope, it)
                 }
             }
         }
