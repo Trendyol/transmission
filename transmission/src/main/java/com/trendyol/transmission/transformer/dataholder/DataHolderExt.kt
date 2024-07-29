@@ -20,7 +20,7 @@ fun <T : Transmission.Data?> Transformer.buildDataHolder(
     contract: Contract.Data<T>? = null,
     publishUpdates: Boolean = true
 ): TransmissionDataHolder<T> {
-    return TransmissionDataHolderBuilder<T>().buildWith(
+    return TransmissionDataHolderBuilder.buildWith(
         initialValue = initialValue,
         publishUpdates = publishUpdates,
         transformer = this,
