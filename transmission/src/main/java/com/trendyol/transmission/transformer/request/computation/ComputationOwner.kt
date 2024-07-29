@@ -14,5 +14,4 @@ internal sealed interface ComputationOwner {
     interface Default: ComputationOwner {
         suspend fun getResult(scope: RequestHandler, invalidate: Boolean = false): Any?
     }
-
 }

@@ -3,7 +3,7 @@ package com.trendyol.transmission.transformer.request.execution
 import com.trendyol.transmission.transformer.Transformer
 import com.trendyol.transmission.transformer.request.RequestHandler
 
-class ExecutionRegistry(private val transformer: Transformer) {
+class ExecutionRegistry internal constructor(private val transformer: Transformer) {
 
     internal fun buildWith(
         key: String,

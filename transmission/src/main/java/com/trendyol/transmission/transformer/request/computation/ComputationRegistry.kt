@@ -3,7 +3,7 @@ package com.trendyol.transmission.transformer.request.computation
 import com.trendyol.transmission.transformer.Transformer
 import com.trendyol.transmission.transformer.request.RequestHandler
 
-class ComputationRegistry(private val transformer: Transformer) {
+class ComputationRegistry internal constructor(private val transformer: Transformer) {
 
     internal fun <T : Any> buildWith(
         key: String,

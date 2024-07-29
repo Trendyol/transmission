@@ -3,8 +3,9 @@ package com.trendyol.transmission.transformer.dataholder
 import com.trendyol.transmission.Transmission
 import com.trendyol.transmission.transformer.Transformer
 
-internal class TransmissionDataHolderBuilder<T : Transmission.Data?> {
-    fun buildWith(
+internal object TransmissionDataHolderBuilder {
+
+    fun <T : Transmission.Data?> buildWith(
         initialValue: T,
         publishUpdates: Boolean = true,
         transformer: Transformer,
