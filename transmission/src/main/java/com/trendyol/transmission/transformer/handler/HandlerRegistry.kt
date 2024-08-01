@@ -6,7 +6,7 @@ import com.trendyol.transmission.Transmission
 import com.trendyol.transmission.transformer.Transformer
 import kotlin.reflect.KClass
 
-class HandlerScope(val handlerRegistry: HandlerRegistry)
+class HandlerScope internal constructor(val handlerRegistry: HandlerRegistry)
 
 fun Transformer.handlerRegistry(scope: HandlerScope.() -> Unit): HandlerRegistry {
     val handlerRegistry = HandlerRegistry()
