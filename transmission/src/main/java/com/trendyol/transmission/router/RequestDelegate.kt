@@ -21,7 +21,8 @@ import kotlinx.coroutines.launch
 
 internal class RequestDelegate(
     private val queryScope: CoroutineScope,
-    private val routerRef: TransmissionRouter
+    private val routerRef: TransmissionRouter,
+    private val registry: RegistryScopeImpl? = null,
 ) : RequestHandler {
 
     private val routerQueryResultChannel: MutableSharedFlow<QueryResult> = MutableSharedFlow()
@@ -35,9 +36,15 @@ internal class RequestDelegate(
 
     init {
         queryScope.launch {
-            outGoingQuery.consumeAsFlow().collect { processQuery(it) }
+            if (registry != null) {
+                outGoingQuery.consumeAsFlow().collect { testQuery(it) }
+            } else {
+                outGoingQuery.consumeAsFlow().collect { processQuery(it) }
+            }
         }
     }
+
+    // region process queries
 
     private suspend fun processQuery(query: Query) = queryScope.launch {
         when (query) {
@@ -152,6 +159,57 @@ internal class RequestDelegate(
             }.onFailure(executionHolder::onError).getOrNull()
         }
 
+    // endregion
+
+    // region test queries
+
+    private fun testQuery(query: Query) = queryScope.launch {
+        when (query) {
+            is Query.Computation -> testComputationQuery(query)
+            is Query.Data -> testDataQuery(query)
+            is Query.ComputationWithArgs<*> -> testComputationQueryWithArgs(query)
+            is Query.Execution -> {}
+            is Query.ExecutionWithArgs<*> -> {}
+        }
+    }
+
+    private fun testDataQuery(
+        query: Query.Data
+    ) = queryScope.launch {
+        val dataToSend = QueryResult.Data(
+            owner = query.sender,
+            data = registry?.dataMap?.get(query.key),
+            key = query.key
+        )
+        queryScope.launch {
+            queryResultChannel.trySend(dataToSend)
+        }
+    }
+
+    private fun testComputationQuery(
+        query: Query.Computation
+    ) = queryScope.launch {
+        val computationToSend = QueryResult.Computation(
+            owner = query.sender,
+            data = registry?.computationMap?.get(query.key),
+            key = query.key
+        )
+        queryResultChannel.trySend(computationToSend)
+    }
+
+    private fun <A : Any> testComputationQueryWithArgs(
+        query: Query.ComputationWithArgs<A>
+    ) = queryScope.launch {
+        val computationToSend = QueryResult.Computation(
+            owner = query.sender,
+            data = registry?.computationMap?.get(query.key),
+            key = query.key
+        )
+        queryResultChannel.trySend(computationToSend)
+    }
+
+    // region Request Handler
+
     override suspend fun <C : Contract.Data<D>, D : Transmission.Data> getData(contract: C): D? {
         outGoingQuery.trySend(
             Query.Data(sender = routerRef.routerName, key = contract.key)
@@ -219,4 +277,6 @@ internal class RequestDelegate(
             )
         )
     }
+
+    // endregion
 }
