@@ -1,6 +1,7 @@
 package com.trendyol.transmission
 
 import com.trendyol.transmission.effect.EffectWrapper
+import com.trendyol.transmission.router.RegistryScopeImpl
 import com.trendyol.transmission.router.RequestDelegate
 import com.trendyol.transmission.router.createBroadcast
 import com.trendyol.transmission.transformer.Transformer
@@ -19,9 +20,10 @@ import kotlinx.coroutines.launch
 /**
  * Throws [IllegalArgumentException] when supplied [Transformer] set is empty
  */
-class TransmissionRouter(
+class TransmissionRouter internal constructor(
     internal val transformerSet: Set<Transformer>,
     dispatcher: CoroutineDispatcher = Dispatchers.Default,
+    registryScope: RegistryScopeImpl? = null
 ) {
 
     private val routerScope = CoroutineScope(SupervisorJob() + dispatcher)
@@ -36,7 +38,11 @@ class TransmissionRouter(
     val effectStream: SharedFlow<Transmission.Effect> = effectBroadcast.output.map { it.effect }
         .shareIn(routerScope, SharingStarted.Lazily)
 
-    private val _requestDelegate = RequestDelegate(routerScope, this@TransmissionRouter)
+    private val _requestDelegate = RequestDelegate(
+        queryScope = routerScope,
+        routerRef = this@TransmissionRouter,
+        registry = registryScope
+    )
     val requestHelper: RequestHandler = _requestDelegate
 
     init {
@@ -45,6 +51,10 @@ class TransmissionRouter(
 
     fun processSignal(signal: Transmission.Signal) {
         signalBroadcast.producer.trySend(signal)
+    }
+
+    fun processEffect(effect: Transmission.Effect) {
+        effectBroadcast.producer.trySend(EffectWrapper(effect))
     }
 
     private fun initialize() {

@@ -61,7 +61,7 @@ open class Transformer(
         requestDelegate = requestDelegate
     )
 
-    fun startSignalCollection(incoming: SharedFlow<Transmission.Signal>) {
+    internal fun startSignalCollection(incoming: SharedFlow<Transmission.Signal>) {
         transformerScope.launch {
             incoming.collect {
                 currentSignalProcessing = transformerScope.launch {
@@ -72,11 +72,11 @@ open class Transformer(
         }
     }
 
-    fun startDataPublishing(data: SendChannel<Transmission.Data>) {
+    internal fun startDataPublishing(data: SendChannel<Transmission.Data>) {
         transformerScope.launch { dataChannel.receiveAsFlow().collect { data.send(it) } }
     }
 
-    fun startEffectProcessing(
+    internal fun startEffectProcessing(
         producer: SendChannel<EffectWrapper>,
         incoming: SharedFlow<EffectWrapper>
     ) {
@@ -101,7 +101,7 @@ open class Transformer(
         }
     }
 
-    fun startQueryProcessing(
+    internal fun startQueryProcessing(
         incomingQuery: SharedFlow<QueryResult>,
         outGoingQuery: SendChannel<Query>
     ) {
