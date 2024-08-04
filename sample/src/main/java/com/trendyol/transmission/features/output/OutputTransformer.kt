@@ -18,6 +18,8 @@ import com.trendyol.transmission.transformer.request.buildExecutionContract
 import com.trendyol.transmission.transformer.request.computation.ComputationRegistry
 import com.trendyol.transmission.transformer.request.computation.computationRegistry
 import com.trendyol.transmission.transformer.request.computation.registerComputation
+import com.trendyol.transmission.transformer.request.execution.ExecutionRegistry
+import com.trendyol.transmission.transformer.request.execution.executionRegistry
 import com.trendyol.transmission.transformer.request.execution.registerExecution
 import com.trendyol.transmission.ui.ColorPickerUiState
 import com.trendyol.transmission.ui.OutputUiState
@@ -46,16 +48,15 @@ class OutputTransformer @Inject constructor(
         }
     }
 
-    init {
-        executionRegistry
-            .registerExecution(outputExecutionContract) {
-                delay(4.seconds)
-                communicationScope.publish(ColorPickerEffect.BackgroundColorUpdate(Pink80))
-                throw RuntimeException(
-                    "This exception will be properly handled and caught " +
-                            "inside of the onError() function"
-                )
-            }
+    override val executionRegistry: ExecutionRegistry = executionRegistry {
+        registerExecution(outputExecutionContract) {
+            delay(4.seconds)
+            communicationScope.publish(ColorPickerEffect.BackgroundColorUpdate(Pink80))
+            throw RuntimeException(
+                "This exception will be properly handled and caught " +
+                        "inside of the onError() function"
+            )
+        }
     }
 
     override val handlerRegistry: HandlerRegistry = handlerRegistry {

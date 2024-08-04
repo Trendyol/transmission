@@ -49,7 +49,7 @@ open class Transformer(
 
     protected open val handlerRegistry: HandlerRegistry? = null
 
-    protected val executionRegistry: ExecutionRegistry by lazy { ExecutionRegistry(this) }
+    protected open val executionRegistry: ExecutionRegistry? = null
     protected open val computationRegistry: ComputationRegistry? = null
 
     var currentEffectProcessing: Job? = null
