@@ -1,6 +1,6 @@
 package com.trendyol.transmission.transformer.request
 
-sealed interface Query {
+internal sealed interface Query {
 
     data class Data(
         val sender: String,

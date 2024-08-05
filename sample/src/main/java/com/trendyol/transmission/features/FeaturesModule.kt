@@ -5,6 +5,7 @@ import com.trendyol.transmission.features.colorpicker.ColorPickerTransformer
 import com.trendyol.transmission.features.input.InputTransformer
 import com.trendyol.transmission.features.multioutput.MultiOutputTransformer
 import com.trendyol.transmission.features.output.OutputTransformer
+import com.trendyol.transmission.router.builder.TransmissionRouterBuilder
 import com.trendyol.transmission.transformer.Transformer
 import dagger.Binds
 import dagger.Module
@@ -42,7 +43,9 @@ interface FeaturesModule {
 		fun provideRouter(
 			transformerSet: @JvmSuppressWildcards Set<Transformer>
 		): TransmissionRouter {
-			return TransmissionRouter(transformerSet)
+			return TransmissionRouterBuilder.build {
+				withTransformerSet(transformerSet)
+			}
 		}
 	}
 

@@ -27,7 +27,7 @@ class InputTransformerTest {
     fun `GIVEN inputTransformer, WHEN inputUpdate signal is sent, THEN inputUpdate effect is published`() {
         sut.attachToRouter()
             .test(signal = InputSignal.InputUpdate("test")) {
-                assertEquals(InputEffect.InputUpdate("test"), effectStream.first().effect)
+                assertEquals(InputEffect.InputUpdate("test"), effectStream.first())
                 assertEquals(InputUiState("test"), dataStream.last())
             }
     }

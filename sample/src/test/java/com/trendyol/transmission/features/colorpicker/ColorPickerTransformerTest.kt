@@ -60,7 +60,7 @@ class ColorPickerTransformerTest {
             .test(signal = ColorPickerSignal.SelectColor(3, Color.Blue)) {
                 assertEquals(
                     Color.Blue.copy(alpha = 0.1f),
-                    (effectStream.first().effect as ColorPickerEffect.BackgroundColorUpdate).color
+                    (effectStream.first() as ColorPickerEffect.BackgroundColorUpdate).color
                 )
             }
     }
@@ -68,7 +68,7 @@ class ColorPickerTransformerTest {
     @Test
     fun `GIVEN inputTransformer, WHEN SelectColor signal is sent, THEN SelectedColorUpdate is sent to MultiOutputTransformer`() {
         sut.attachToRouter().test(signal = ColorPickerSignal.SelectColor(3, Color.Blue)) {
-            assertTrue { effectStream.last().effect is ColorPickerEffect.SelectedColorUpdate }
+            assertTrue { effectStream.last() is ColorPickerEffect.SelectedColorUpdate }
         }
     }
 }

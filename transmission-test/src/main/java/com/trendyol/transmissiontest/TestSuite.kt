@@ -1,7 +1,9 @@
 package com.trendyol.transmissiontest
 
 import com.trendyol.transmission.Transmission
-import com.trendyol.transmission.effect.EffectWrapper
+import com.trendyol.transmission.TransmissionRouter
+import com.trendyol.transmission.router.RegistryScope
+import com.trendyol.transmission.router.builder.TransmissionTestingRouterBuilder
 import com.trendyol.transmission.transformer.Transformer
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.toList
@@ -15,16 +17,16 @@ import kotlinx.coroutines.test.runTest
 class TestSuite {
     private var orderedInitialProcessing: List<Transmission> = emptyList()
     private var transformer: Transformer? = null
-    private lateinit var router: TestRouter
+    private var registryScope: RegistryScope.() -> Unit = {}
+    private lateinit var router: TransmissionRouter
 
     fun initialize(transformer: Transformer): TestSuite {
         this.transformer = transformer
-        router = TestRouter(transformer, UnconfinedTestDispatcher())
         return this
     }
 
     fun register(registry: RegistryScope.() -> Unit = {}): TestSuite {
-        router.registry = RegistryScopeImpl().apply(registry)
+        this.registryScope = registry
         return this
     }
 
@@ -39,10 +41,15 @@ class TestSuite {
         transmission: Transmission,
         scope: suspend TransformerTestScope.(scope: TestScope) -> Unit
     ) {
+        router = TransmissionTestingRouterBuilder.build {
+            withDispatcher(UnconfinedTestDispatcher())
+            this@TestSuite.transformer?.let { withTransformerSet(setOf(it)) }
+            testing(this@TestSuite.registryScope)
+        }
 
         runTest {
             val dataStream: MutableList<Transmission.Data> = mutableListOf()
-            val effectStream: MutableList<EffectWrapper> = mutableListOf()
+            val effectStream: MutableList<Transmission.Effect> = mutableListOf()
             try {
                 backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) {
                     router.dataStream.toList(dataStream)
@@ -52,20 +59,20 @@ class TestSuite {
                 }
                 val testScope = object : TransformerTestScope {
                     override val dataStream: List<Transmission.Data> = dataStream
-                    override val effectStream: List<EffectWrapper> = effectStream
+                    override val effectStream: List<Transmission.Effect> = effectStream
                 }
                 orderedInitialProcessing.forEach {
                     when (it) {
                         is Transmission.Data -> throw IllegalArgumentException("Transmission.Data should not be sent for processing")
-                        is Transmission.Effect -> router.sendEffect(it)
-                        is Transmission.Signal -> router.sendSignal(it)
+                        is Transmission.Effect -> router.processEffect(it)
+                        is Transmission.Signal -> router.processSignal(it)
                     }
                     transformer?.waitProcessingToFinish()
                 }
                 if (transmission is Transmission.Signal) {
-                    router.sendSignal(transmission)
+                    router.processSignal(transmission)
                 } else if (transmission is Transmission.Effect) {
-                    router.sendEffect(transmission)
+                    router.processEffect(transmission)
                 }
                 transformer?.waitProcessingToFinish()
                 testScope.scope(this)
