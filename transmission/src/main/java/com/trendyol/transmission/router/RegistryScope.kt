@@ -1,8 +1,9 @@
-package com.trendyol.transmissiontest
+package com.trendyol.transmission.router
 
 import com.trendyol.transmission.Transmission
 
 interface RegistryScope {
+
     fun <D : Transmission.Data> addQueryData(
         data: D,
         key: String,
@@ -14,7 +15,7 @@ interface RegistryScope {
     )
 }
 
-class RegistryScopeImpl : RegistryScope {
+internal class RegistryScopeImpl : RegistryScope {
 
     val dataMap: MutableMap<String, Transmission.Data> = mutableMapOf()
     val computationMap: MutableMap<String, Transmission.Data> = mutableMapOf()

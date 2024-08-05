@@ -11,14 +11,13 @@ import com.trendyol.transmission.transformer.request.RequestHandler
  *
  * Adds a computation to [Transformer] to be queried.
  * Can be queried using [RequestHandler.execute]
- * @param useCache Stores the result after first computation
  * @param computation Computation to get the result [Transmission.Data]
  */
-fun <C : Contract.Computation<T>, T : Any> ComputationRegistry.registerComputation(
+fun <C : Contract.Computation<T>, T : Any> ComputationScope.registerComputation(
     contract: C,
     computation: suspend RequestHandler.() -> T?,
-): ComputationRegistry {
-    return this.apply { buildWith(contract.key, contract.useCache, computation) }
+) {
+    this.computationRegistry.buildWith(contract.key, contract.useCache, computation)
 }
 
 /**
@@ -27,12 +26,11 @@ fun <C : Contract.Computation<T>, T : Any> ComputationRegistry.registerComputati
  *
  * Adds a computation to [Transformer] to be queried. This computation accepts any class as Argument.
  * Can be queried using [RequestHandler.execute]
- * @param useCache Stores the result after first computation
  * @param computation Computation to get the result [Transmission.Data]
  */
-fun <C : Contract.ComputationWithArgs<A, T>, A : Any, T : Any> ComputationRegistry.registerComputation(
+fun <C : Contract.ComputationWithArgs<A, T>, A : Any, T : Any> ComputationScope.registerComputation(
     contract: C,
     computation: suspend RequestHandler.(args: A) -> T?,
-): ComputationRegistry {
-    return this.apply { buildWith(contract.key, contract.useCache, computation) }
+) {
+    this.computationRegistry.buildWith(contract.key, contract.useCache, computation)
 }

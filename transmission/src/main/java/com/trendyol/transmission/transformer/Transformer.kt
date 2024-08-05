@@ -13,6 +13,7 @@ import com.trendyol.transmission.transformer.request.computation.ComputationRegi
 import com.trendyol.transmission.transformer.request.createIdentity
 import com.trendyol.transmission.transformer.request.execution.ExecutionRegistry
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -33,7 +34,10 @@ open class Transformer(
     identity: Contract.Identity? = null
 ) {
 
-    val transformerScope = CoroutineScope(dispatcher + SupervisorJob())
+    private val exceptionHandler = CoroutineExceptionHandler { _, throwable ->
+        onError(throwable)
+    }
+    val transformerScope = CoroutineScope(dispatcher + SupervisorJob() + exceptionHandler)
 
     private val internalIdentity: Contract.Identity =
         identity ?: createIdentity(this::class.simpleName.orEmpty())
@@ -45,8 +49,8 @@ open class Transformer(
 
     protected open val handlerRegistry: HandlerRegistry? = null
 
-    protected val executionRegistry: ExecutionRegistry by lazy { ExecutionRegistry(this) }
-    protected val computationRegistry: ComputationRegistry by lazy { ComputationRegistry(this) }
+    protected open val executionRegistry: ExecutionRegistry? = null
+    protected open val computationRegistry: ComputationRegistry? = null
 
     var currentEffectProcessing: Job? = null
     var currentSignalProcessing: Job? = null
@@ -57,7 +61,7 @@ open class Transformer(
         requestDelegate = requestDelegate
     )
 
-    fun startSignalCollection(incoming: SharedFlow<Transmission.Signal>) {
+    internal fun startSignalCollection(incoming: SharedFlow<Transmission.Signal>) {
         transformerScope.launch {
             incoming.collect {
                 currentSignalProcessing = transformerScope.launch {
@@ -68,11 +72,11 @@ open class Transformer(
         }
     }
 
-    fun startDataPublishing(data: SendChannel<Transmission.Data>) {
+    internal fun startDataPublishing(data: SendChannel<Transmission.Data>) {
         transformerScope.launch { dataChannel.receiveAsFlow().collect { data.send(it) } }
     }
 
-    fun startEffectProcessing(
+    internal fun startEffectProcessing(
         producer: SendChannel<EffectWrapper>,
         incoming: SharedFlow<EffectWrapper>
     ) {
@@ -97,7 +101,7 @@ open class Transformer(
         }
     }
 
-    fun startQueryProcessing(
+    internal fun startQueryProcessing(
         incomingQuery: SharedFlow<QueryResult>,
         outGoingQuery: SendChannel<Query>
     ) {
@@ -122,5 +126,9 @@ open class Transformer(
     fun clear() {
         transformerScope.cancel()
         storage.clear()
+    }
+
+    open fun onError(throwable: Throwable) {
+        // no-operation
     }
 }
