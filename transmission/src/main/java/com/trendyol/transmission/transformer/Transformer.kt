@@ -37,7 +37,9 @@ open class Transformer(
     private val exceptionHandler = CoroutineExceptionHandler { _, throwable ->
         onError(throwable)
     }
-    val transformerScope = CoroutineScope(dispatcher + SupervisorJob() + exceptionHandler)
+
+    @PublishedApi
+    internal val transformerScope = CoroutineScope(dispatcher + SupervisorJob() + exceptionHandler)
 
     private val internalIdentity: Contract.Identity =
         identity ?: createIdentity(this::class.simpleName.orEmpty())
