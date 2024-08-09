@@ -2,6 +2,7 @@ package com.trendyol.transmission.router
 
 import com.trendyol.transmission.Transmission
 import com.trendyol.transmission.effect.EffectWrapper
+import com.trendyol.transmission.router.loader.TransformerSetLoader
 import com.trendyol.transmission.transformer.Transformer
 import com.trendyol.transmission.transformer.request.RequestHandler
 import kotlinx.coroutines.CoroutineDispatcher
@@ -19,12 +20,14 @@ import kotlinx.coroutines.launch
  * Throws [IllegalArgumentException] when supplied [Transformer] set is empty
  */
 class TransmissionRouter internal constructor(
-    internal val transformerSet: Set<Transformer>,
+    internal val transformerSetLoader: TransformerSetLoader,
     dispatcher: CoroutineDispatcher = Dispatchers.Default,
     registryScope: RegistryScopeImpl? = null
 ) {
 
     private val routerScope = CoroutineScope(SupervisorJob() + dispatcher)
+
+    internal var transformerSet: Set<Transformer> = emptySet()
 
     internal val routerName: String = this::class.simpleName.orEmpty()
 
@@ -56,10 +59,11 @@ class TransmissionRouter internal constructor(
     }
 
     private fun initialize() {
-        require(transformerSet.isNotEmpty()) {
-            "transformerSet should not be empty"
-        }
         routerScope.launch {
+            transformerSet = transformerSetLoader.load()
+            require(transformerSet.isNotEmpty()) {
+                "transformerSet should not be empty"
+            }
             transformerSet.forEach { transformer ->
                 transformer.run {
                     startSignalCollection(incoming = signalBroadcast.output)

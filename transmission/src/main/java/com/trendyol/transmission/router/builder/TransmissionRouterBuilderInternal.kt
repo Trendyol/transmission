@@ -2,6 +2,7 @@ package com.trendyol.transmission.router.builder
 
 import com.trendyol.transmission.router.RegistryScope
 import com.trendyol.transmission.router.RegistryScopeImpl
+import com.trendyol.transmission.router.loader.TransformerSetLoader
 import com.trendyol.transmission.transformer.Transformer
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
@@ -11,8 +12,8 @@ internal class TransmissionRouterBuilderInternal internal constructor(
 ) {
 
     internal var dispatcher: CoroutineDispatcher = Dispatchers.Default
-    internal var transformerSet = setOf<Transformer>()
     internal var registryScope: RegistryScopeImpl? = null
+    internal lateinit var transformerSetLoader: TransformerSetLoader
 
     private val scopeImpl = object : TransmissionTestingRouterBuilderScope {
 
@@ -26,8 +27,18 @@ internal class TransmissionRouterBuilderInternal internal constructor(
         }
 
         override fun withTransformerSet(transformerSet: Set<Transformer>) {
-            this@TransmissionRouterBuilderInternal.transformerSet = transformerSet
+            val loader = object: TransformerSetLoader {
+                override suspend fun load(): Set<Transformer> {
+                    return transformerSet
+                }
+            }
+            withLoader(loader)
         }
+
+        override fun withLoader(loader: TransformerSetLoader) {
+            this@TransmissionRouterBuilderInternal.transformerSetLoader = loader
+        }
+
     }
 
     init {
