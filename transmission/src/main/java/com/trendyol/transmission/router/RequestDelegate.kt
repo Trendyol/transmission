@@ -1,7 +1,6 @@
 package com.trendyol.transmission.router
 
 import com.trendyol.transmission.Transmission
-import com.trendyol.transmission.TransmissionRouter
 import com.trendyol.transmission.transformer.request.Contract
 import com.trendyol.transmission.transformer.request.Query
 import com.trendyol.transmission.transformer.request.QueryResult
