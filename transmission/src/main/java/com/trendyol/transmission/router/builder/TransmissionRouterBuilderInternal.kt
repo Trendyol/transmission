@@ -38,7 +38,6 @@ internal class TransmissionRouterBuilderInternal internal constructor(
         override fun withLoader(loader: TransformerSetLoader) {
             this@TransmissionRouterBuilderInternal.transformerSetLoader = loader
         }
-
     }
 
     init {

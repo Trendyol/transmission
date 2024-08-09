@@ -6,6 +6,7 @@ import com.trendyol.transmission.router.loader.TransformerSetLoader
 import com.trendyol.transmission.transformer.Transformer
 import com.trendyol.transmission.transformer.request.RequestHandler
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -25,9 +26,11 @@ class TransmissionRouter internal constructor(
     registryScope: RegistryScopeImpl? = null
 ) {
 
-    private val routerScope = CoroutineScope(SupervisorJob() + dispatcher)
+    private val exceptionHandler = CoroutineExceptionHandler { _, _ -> }
+    private val routerScope = CoroutineScope(SupervisorJob() + dispatcher + exceptionHandler)
 
-    internal var transformerSet: Set<Transformer> = emptySet()
+    private val _transformerSet : MutableSet<Transformer> = mutableSetOf()
+    internal val transformerSet: Set<Transformer> = _transformerSet
 
     internal val routerName: String = this::class.simpleName.orEmpty()
 
@@ -60,23 +63,27 @@ class TransmissionRouter internal constructor(
 
     private fun initialize() {
         routerScope.launch {
-            transformerSet = transformerSetLoader.load()
-            require(transformerSet.isNotEmpty()) {
-                "transformerSet should not be empty"
-            }
-            transformerSet.forEach { transformer ->
-                transformer.run {
-                    startSignalCollection(incoming = signalBroadcast.output)
-                    startDataPublishing(data = dataBroadcast.producer)
-                    startEffectProcessing(
-                        producer = effectBroadcast.producer,
-                        incoming = effectBroadcast.output
-                    )
-                    startQueryProcessing(
-                        incomingQuery = _requestDelegate.incomingQueryResponse,
-                        outGoingQuery = _requestDelegate.outGoingQuery
-                    )
-                }
+            _transformerSet.addAll(transformerSetLoader.load())
+            initializeTransformers(transformerSet)
+        }
+    }
+
+    private fun initializeTransformers(transformerSet: Set<Transformer>) {
+        require(transformerSet.isNotEmpty()) {
+            "transformerSet should not be empty"
+        }
+        transformerSet.forEach { transformer ->
+            transformer.run {
+                startSignalCollection(incoming = signalBroadcast.output)
+                startDataPublishing(data = dataBroadcast.producer)
+                startEffectProcessing(
+                    producer = effectBroadcast.producer,
+                    incoming = effectBroadcast.output
+                )
+                startQueryProcessing(
+                    incomingQuery = _requestDelegate.incomingQueryResponse,
+                    outGoingQuery = _requestDelegate.outGoingQuery
+                )
             }
         }
     }
