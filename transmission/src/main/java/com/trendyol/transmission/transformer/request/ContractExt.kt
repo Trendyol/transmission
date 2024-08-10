@@ -2,15 +2,17 @@ package com.trendyol.transmission.transformer.request
 
 import com.trendyol.transmission.Transmission
 
-fun createIdentity(key: String): Contract.Identity = Contract.Identity(key)
+object Contracts
 
-fun <T : Transmission.Data?> buildDataContract(
+fun Contracts.identity(key: String): Contract.Identity = Contract.Identity(key)
+
+fun <T : Transmission.Data?> Contracts.data(
     key: String
 ) = object : Contract.Data<T>() {
     override val key: String = key
 }
 
-fun <A : Any> buildComputationContract(
+fun <A : Any> Contracts.computation(
     key: String,
     useCache: Boolean = false
 ) = object : Contract.Computation<A>() {
@@ -18,7 +20,7 @@ fun <A : Any> buildComputationContract(
     override val useCache: Boolean = useCache
 }
 
-fun <A : Any, T : Any> buildComputationContractWithArgs(
+fun <A : Any, T : Any> Contracts.computationWithArgs(
     key: String,
     useCache: Boolean = false
 ) = object : Contract.ComputationWithArgs<A, T>() {
@@ -26,13 +28,13 @@ fun <A : Any, T : Any> buildComputationContractWithArgs(
     override val useCache: Boolean = useCache
 }
 
-fun buildExecutionContract(
+fun Contracts.execution(
     key: String,
 ) = object : Contract.Execution() {
     override val key: String = key
 }
 
-fun <A : Any> buildExecutionContractWithArgs(
+fun <A : Any> Contracts.executionWithArgs(
     key: String,
 ) = object : Contract.ExecutionWithArgs<A>() {
     override val key: String = key

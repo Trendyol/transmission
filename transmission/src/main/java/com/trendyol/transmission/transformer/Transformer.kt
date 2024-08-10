@@ -6,12 +6,13 @@ import com.trendyol.transmission.effect.RouterEffect
 import com.trendyol.transmission.transformer.handler.CommunicationScope
 import com.trendyol.transmission.transformer.handler.HandlerRegistry
 import com.trendyol.transmission.transformer.request.Contract
+import com.trendyol.transmission.transformer.request.Contracts
 import com.trendyol.transmission.transformer.request.Query
 import com.trendyol.transmission.transformer.request.QueryResult
 import com.trendyol.transmission.transformer.request.TransformerRequestDelegate
 import com.trendyol.transmission.transformer.request.computation.ComputationRegistry
-import com.trendyol.transmission.transformer.request.createIdentity
 import com.trendyol.transmission.transformer.request.execution.ExecutionRegistry
+import com.trendyol.transmission.transformer.request.identity
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineScope
@@ -40,17 +41,17 @@ open class Transformer(
     val transformerScope = CoroutineScope(dispatcher + SupervisorJob() + exceptionHandler)
 
     private val internalIdentity: Contract.Identity =
-        identity ?: createIdentity(this::class.simpleName.orEmpty())
+        identity ?: Contracts.identity(this::class.simpleName.orEmpty())
 
     private val effectChannel: Channel<EffectWrapper> = Channel(capacity = Channel.BUFFERED)
     private val requestDelegate = TransformerRequestDelegate(transformerScope, internalIdentity)
     internal val dataChannel: Channel<Transmission.Data> = Channel(capacity = Channel.BUFFERED)
     internal val storage = TransformerStorage()
 
-    protected open val handlerRegistry: HandlerRegistry? = null
+    protected open val handlers: HandlerRegistry? = null
 
-    protected open val executionRegistry: ExecutionRegistry? = null
-    protected open val computationRegistry: ComputationRegistry? = null
+    protected open val executions: ExecutionRegistry? = null
+    protected open val computations: ComputationRegistry? = null
 
     var currentEffectProcessing: Job? = null
     var currentSignalProcessing: Job? = null
@@ -65,7 +66,7 @@ open class Transformer(
         transformerScope.launch {
             incoming.collect {
                 currentSignalProcessing = transformerScope.launch {
-                    handlerRegistry?.signalHandlerRegistry?.get(it::class)
+                    handlers?.signalHandlerRegistry?.get(it::class)
                         ?.invoke(communicationScope, it)
                 }
             }
@@ -89,7 +90,7 @@ open class Transformer(
                         .map { it.effect }
                         .collect {
                             currentEffectProcessing = launch {
-                                handlerRegistry?.effectHandlerRegistry?.get(it::class)
+                                handlers?.effectHandlerRegistry?.get(it::class)
                                     ?.invoke(communicationScope, it)
                             }
                         }
