@@ -83,7 +83,7 @@ internal class RequestDelegate(
             val computationData = runCatching {
                 computationHolder?.storage?.getComputationByKey(query.key)
                     ?.getResult(computationHolder.communicationScope, query.invalidate)
-            }.onFailure{
+            }.onFailure {
                 computationHolder?.onError(it)
             }.getOrNull()
 
@@ -117,7 +117,7 @@ internal class RequestDelegate(
                         query.invalidate,
                         query.args
                     )
-            }.onFailure{
+            }.onFailure {
                 computationHolder?.onError(it)
             }.getOrNull()
 
@@ -210,7 +210,7 @@ internal class RequestDelegate(
 
     // region Request Handler
 
-    override suspend fun <C : Contract.Data<D>, D : Transmission.Data> getData(contract: C): D? {
+    override suspend fun <C : Contract.DataHolder<D>, D : Transmission.Data> getData(contract: C): D? {
         outGoingQuery.trySend(
             Query.Data(sender = routerRef.routerName, key = contract.key)
         )

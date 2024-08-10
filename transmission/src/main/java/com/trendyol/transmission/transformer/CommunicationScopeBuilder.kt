@@ -28,7 +28,7 @@ internal class CommunicationScopeBuilder(
         effectChannel.trySend(EffectWrapper(effect))
     }
 
-    override suspend fun <C : Contract.Data<D>, D : Transmission.Data> getData(contract: C): D? {
+    override suspend fun <C : Contract.DataHolder<D>, D : Transmission.Data> getData(contract: C): D? {
         return requestDelegate.interactor.getData(contract)
     }
 

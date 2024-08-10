@@ -6,9 +6,9 @@ object Contracts
 
 fun Contracts.identity(key: String): Contract.Identity = Contract.Identity(key)
 
-fun <T : Transmission.Data?> Contracts.data(
+fun <T : Transmission.Data?> Contracts.dataHolder(
     key: String
-) = object : Contract.Data<T>() {
+) = object : Contract.DataHolder<T>() {
     override val key: String = key
 }
 

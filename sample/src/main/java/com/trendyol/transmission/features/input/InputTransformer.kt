@@ -14,7 +14,7 @@ import com.trendyol.transmission.transformer.request.computation.ComputationRegi
 import com.trendyol.transmission.transformer.request.computation.computations
 import com.trendyol.transmission.transformer.request.computation.register
 import com.trendyol.transmission.transformer.request.computationWithArgs
-import com.trendyol.transmission.transformer.request.data
+import com.trendyol.transmission.transformer.request.dataHolder
 import com.trendyol.transmission.ui.InputUiState
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.delay
@@ -51,6 +51,6 @@ class InputTransformer @Inject constructor(
         val writtenInputWithArgs =
             Contracts.computationWithArgs<String, WrittenInput>("WrittenInputWithArgs")
         val writtenInputContract = Contracts.computation<WrittenInput>("WrittenInput")
-        val holderContract = Contracts.data<InputUiState>("InputUiState")
+        val holderContract = Contracts.dataHolder<InputUiState>("InputUiState")
     }
 }

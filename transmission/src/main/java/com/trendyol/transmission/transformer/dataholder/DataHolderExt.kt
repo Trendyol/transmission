@@ -17,7 +17,7 @@ import com.trendyol.transmission.transformer.request.RequestHandler
  * */
 fun <T : Transmission.Data?> Transformer.dataHolder(
     initialValue: T,
-    contract: Contract.Data<T>? = null,
+    contract: Contract.DataHolder<T>? = null,
     publishUpdates: Boolean = true
 ): TransmissionDataHolder<T> {
     return TransmissionDataHolderBuilder.buildWith(

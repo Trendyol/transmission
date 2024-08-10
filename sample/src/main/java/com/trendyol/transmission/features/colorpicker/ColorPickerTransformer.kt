@@ -9,7 +9,7 @@ import com.trendyol.transmission.transformer.handler.effect
 import com.trendyol.transmission.transformer.handler.handlers
 import com.trendyol.transmission.transformer.handler.signal
 import com.trendyol.transmission.transformer.request.Contracts
-import com.trendyol.transmission.transformer.request.data
+import com.trendyol.transmission.transformer.request.dataHolder
 import com.trendyol.transmission.transformer.request.identity
 import com.trendyol.transmission.ui.ColorPickerUiState
 import kotlinx.coroutines.CoroutineDispatcher
@@ -42,6 +42,6 @@ class ColorPickerTransformer @Inject constructor(
     }
 
     companion object {
-        val holderContract = Contracts.data<ColorPickerUiState>("ColorPickerUiState")
+        val holderContract = Contracts.dataHolder<ColorPickerUiState>("ColorPickerUiState")
     }
 }
