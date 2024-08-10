@@ -1,0 +1,18 @@
+site_name: Transmission
+repo_url: https://github.com/trendyol/transmission
+theme:
+  name: material
+  features:
+  - content.code.annotate
+  - content.tabs.link
+  - content.tooltips
+  - header.autohide
+  - navigation.top
+  - navigation.tracking
+  - navigation.sections
+  - navigation.indexes
+  - navigation.footer
+  - search.highlight
+  - search.share
+  - search.suggest
+  - toc.integrate
