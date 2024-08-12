@@ -5,9 +5,9 @@ import com.trendyol.transmission.features.colorpicker.ColorPickerEffect
 import com.trendyol.transmission.transformer.Transformer
 import com.trendyol.transmission.transformer.dataholder.dataHolder
 import com.trendyol.transmission.transformer.handler.HandlerRegistry
-import com.trendyol.transmission.transformer.handler.effect
+import com.trendyol.transmission.transformer.handler.onEffect
 import com.trendyol.transmission.transformer.handler.handlers
-import com.trendyol.transmission.transformer.handler.signal
+import com.trendyol.transmission.transformer.handler.onSignal
 import com.trendyol.transmission.transformer.request.Contracts
 import com.trendyol.transmission.transformer.request.computation
 import com.trendyol.transmission.transformer.request.computation.ComputationRegistry
@@ -38,11 +38,11 @@ class InputTransformer @Inject constructor(
     }
 
     override val handlers: HandlerRegistry = handlers {
-        signal<InputSignal.InputUpdate> { signal ->
+        onSignal<InputSignal.InputUpdate> { signal ->
             holder.update { it.copy(writtenText = signal.value) }
             publish(effect = InputEffect.InputUpdate(signal.value))
         }
-        effect<ColorPickerEffect.BackgroundColorUpdate> { effect ->
+        onEffect<ColorPickerEffect.BackgroundColorUpdate> { effect ->
             holder.update { it.copy(backgroundColor = effect.color) }
         }
     }
