@@ -1,7 +1,7 @@
 package com.trendyol.transmissiontest
 
 import com.trendyol.transmission.Transmission
-import com.trendyol.transmission.TransmissionRouter
+import com.trendyol.transmission.router.TransmissionRouter
 import com.trendyol.transmission.router.RegistryScope
 import com.trendyol.transmission.router.builder.TransmissionTestingRouterBuilder
 import com.trendyol.transmission.transformer.Transformer
