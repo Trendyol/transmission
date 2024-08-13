@@ -16,7 +16,7 @@ class HandlerRegistry internal constructor() {
         mutableMapOf<KClass<out Transmission.Effect>, suspend CommunicationScope.(effect: Transmission.Effect) -> Unit>()
 
     @PublishedApi
-    internal inline fun <reified T : Transmission.Signal> registerSignal(
+    internal inline fun <reified T : Transmission.Signal> signal(
         noinline lambda: suspend CommunicationScope.(signal: T) -> Unit
     ) {
         signalHandlerRegistry[T::class] =
@@ -24,7 +24,7 @@ class HandlerRegistry internal constructor() {
     }
 
     @PublishedApi
-    internal inline fun <reified T : Transmission.Effect> registerEffect(
+    internal inline fun <reified T : Transmission.Effect> effect(
         noinline lambda: suspend CommunicationScope.(effect: T) -> Unit
     ) {
         effectHandlerRegistry[T::class] =

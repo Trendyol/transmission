@@ -15,7 +15,7 @@ internal class TransformerRequestDelegate(scope: CoroutineScope, identity: Contr
 
     val interactor: RequestHandler = object : RequestHandler {
 
-        override suspend fun <C : Contract.Data<D>, D : Transmission.Data> getData(contract: C): D? {
+        override suspend fun <C : Contract.DataHolder<D>, D : Transmission.Data> getData(contract: C): D? {
             outGoingQuery.trySend(Query.Data(sender = identity.key, key = contract.key))
             return resultBroadcast.output
                 .filterIsInstance<QueryResult.Data<D>>()

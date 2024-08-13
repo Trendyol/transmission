@@ -6,7 +6,7 @@ sealed interface Contract {
 
     data class Identity(val key: String) : Contract
 
-    abstract class Data<T : Transmission.Data?> : Contract {
+    abstract class DataHolder<T : Transmission.Data?> : Contract {
         abstract val key: String
     }
 
