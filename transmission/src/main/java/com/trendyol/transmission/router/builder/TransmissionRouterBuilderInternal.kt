@@ -14,6 +14,7 @@ internal class TransmissionRouterBuilderInternal internal constructor(
     internal var dispatcher: CoroutineDispatcher = Dispatchers.Default
     internal var registryScope: RegistryScopeImpl? = null
     internal lateinit var transformerSetLoader: TransformerSetLoader
+    internal var autoInitialization: Boolean = true
 
     private val scopeImpl = object : TransmissionTestingRouterBuilderScope {
 
@@ -21,22 +22,26 @@ internal class TransmissionRouterBuilderInternal internal constructor(
             this@TransmissionRouterBuilderInternal.registryScope = RegistryScopeImpl().apply(scope)
         }
 
-        override fun withDispatcher(dispatcher: CoroutineDispatcher) {
+        override fun addDispatcher(dispatcher: CoroutineDispatcher) {
             this@TransmissionRouterBuilderInternal.dispatcher = dispatcher
 
         }
 
-        override fun withTransformerSet(transformerSet: Set<Transformer>) {
+        override fun addTransformerSet(transformerSet: Set<Transformer>) {
             val loader = object: TransformerSetLoader {
                 override suspend fun load(): Set<Transformer> {
                     return transformerSet
                 }
             }
-            withLoader(loader)
+            addLoader(loader)
         }
 
-        override fun withLoader(loader: TransformerSetLoader) {
+        override fun addLoader(loader: TransformerSetLoader) {
             this@TransmissionRouterBuilderInternal.transformerSetLoader = loader
+        }
+
+        override fun overrideInitialization() {
+            this@TransmissionRouterBuilderInternal.autoInitialization = false
         }
     }
 
