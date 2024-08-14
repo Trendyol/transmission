@@ -44,7 +44,7 @@ interface FeaturesModule {
 			transformerSet: @JvmSuppressWildcards Set<Transformer>
 		): TransmissionRouter {
 			return TransmissionRouterBuilder.build {
-				withTransformerSet(transformerSet)
+				addTransformerSet(transformerSet)
 			}
 		}
 	}

@@ -4,6 +4,7 @@ import com.trendyol.transmission.Transmission
 import com.trendyol.transmission.effect.EffectWrapper
 import com.trendyol.transmission.router.loader.TransformerSetLoader
 import com.trendyol.transmission.transformer.Transformer
+import com.trendyol.transmission.router.builder.TransmissionRouterBuilderScope
 import com.trendyol.transmission.transformer.request.RequestHandler
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineExceptionHandler
@@ -18,10 +19,11 @@ import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.launch
 
 /**
- * Throws [IllegalArgumentException] when supplied [Transformer] set is empty
+ * Throws [IllegalStateException] when supplied [Transformer] set is empty
  */
 class TransmissionRouter internal constructor(
-    internal val transformerSetLoader: TransformerSetLoader,
+    internal val transformerSetLoader: TransformerSetLoader? = null,
+    internal val autoInitialization: Boolean = true,
     dispatcher: CoroutineDispatcher = Dispatchers.Default,
     registryScope: RegistryScopeImpl? = null
 ) {
@@ -50,7 +52,22 @@ class TransmissionRouter internal constructor(
     val requestHelper: RequestHandler = _requestDelegate
 
     init {
-        initialize()
+        if (autoInitialization) {
+            initializeInternal(transformerSetLoader)
+        }
+    }
+
+    /**
+     * Initializes the [TransmissionRouter] with the corresponding [TransformerSetLoader].
+     * Default behaviour of TransmissionRouter is to be initialized automatically. To
+     * override this behaviour, you must call [TransmissionRouterBuilderScope.overrideInitialization].
+     * Otherwise this method throws [IllegalStateException]
+     */
+    fun initialize(loader: TransformerSetLoader) {
+        check(!autoInitialization) {
+           "TransmissionRouter is configured to initialize automatically."
+        }
+        initializeInternal(loader)
     }
 
     fun processSignal(signal: Transmission.Signal) {
@@ -61,15 +78,15 @@ class TransmissionRouter internal constructor(
         effectBroadcast.producer.trySend(EffectWrapper(effect))
     }
 
-    private fun initialize() {
+    private fun initializeInternal(transformerSetLoader: TransformerSetLoader?) {
         routerScope.launch {
-            _transformerSet.addAll(transformerSetLoader.load())
+            transformerSetLoader?.load()?.let { _transformerSet.addAll(it) }
             initializeTransformers(transformerSet)
         }
     }
 
     private fun initializeTransformers(transformerSet: Set<Transformer>) {
-        require(transformerSet.isNotEmpty()) {
+        check(transformerSet.isNotEmpty()) {
             "transformerSet should not be empty"
         }
         transformerSet.forEach { transformer ->

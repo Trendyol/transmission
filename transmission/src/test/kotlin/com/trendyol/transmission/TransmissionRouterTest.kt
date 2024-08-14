@@ -37,10 +37,10 @@ class TransmissionRouterTest {
             try {
                 // When
                 sut = TransmissionRouterBuilder.build {
-                    withTransformerSet(setOf())
-                    withDispatcher(testDispatcher)
+                    addTransformerSet(setOf())
+                    addDispatcher(testDispatcher)
                 }
-            } catch (e: IllegalArgumentException) {
+            } catch (e: IllegalStateException) {
                 // Then
                 assertEquals(e.message, "transformerSet should not be empty")
             }
@@ -53,8 +53,8 @@ class TransmissionRouterTest {
             val exception = try {
                 // When
                 sut = TransmissionRouterBuilder.build {
-                    withTransformerSet(setOf(FakeTransformer(testDispatcher)))
-                    withDispatcher(testDispatcher)
+                    addTransformerSet(setOf(FakeTransformer(testDispatcher)))
+                    addDispatcher(testDispatcher)
                 }
                 null
             } catch (e: IllegalStateException) {
@@ -69,8 +69,8 @@ class TransmissionRouterTest {
         // Given
         val transformer = FakeTransformer(testDispatcher)
         sut = TransmissionRouterBuilder.build {
-            withTransformerSet(setOf(transformer))
-            withDispatcher(testDispatcher)
+            addTransformerSet(setOf(transformer))
+            addDispatcher(testDispatcher)
         }
         // When
         sut.processSignal(TestSignal)
@@ -86,8 +86,8 @@ class TransmissionRouterTest {
         val transformer2 = TestTransformer2(testDispatcher)
         val transformer3 = TestTransformer3(testDispatcher)
         sut = TransmissionRouterBuilder.build {
-            withTransformerSet(setOf(transformer1, transformer2, transformer3))
-            withDispatcher(testDispatcher)
+            addTransformerSet(setOf(transformer1, transformer2, transformer3))
+            addDispatcher(testDispatcher)
         }
         // When
         sut.processSignal(TestSignal)
@@ -109,8 +109,8 @@ class TransmissionRouterTest {
         val transformer2 = TestTransformer2(testDispatcher)
         val transformer3 = TestTransformer3(testDispatcher)
         sut = TransmissionRouterBuilder.build {
-            withTransformerSet(setOf(transformer1, transformer2, transformer3))
-            withDispatcher(testDispatcher)
+            addTransformerSet(setOf(transformer1, transformer2, transformer3))
+            addDispatcher(testDispatcher)
         }
         // When
         sut.processSignal(TestSignal)
@@ -130,8 +130,8 @@ class TransmissionRouterTest {
                 val transformer2 = TestTransformer2(testDispatcher)
                 val transformer3 = TestTransformer3(testDispatcher)
                 sut = TransmissionRouterBuilder.build {
-                    withTransformerSet(setOf(transformer1, transformer2, transformer3))
-                    withDispatcher(testDispatcher)
+                    addTransformerSet(setOf(transformer1, transformer2, transformer3))
+                    addDispatcher(testDispatcher)
                 }
                 // When
                 val effects = sut.effectStream.testIn(backgroundScope)
@@ -150,8 +150,8 @@ class TransmissionRouterTest {
                 val transformer2 = TestTransformer2(testDispatcher)
                 val transformer3 = TestTransformer3(testDispatcher)
                 sut = TransmissionRouterBuilder.build {
-                    withTransformerSet(setOf(transformer1, transformer2, transformer3))
-                    withDispatcher(testDispatcher)
+                    addTransformerSet(setOf(transformer1, transformer2, transformer3))
+                    addDispatcher(testDispatcher)
                 }
                 // When
                 sut.processSignal(TestSignal)
@@ -172,8 +172,8 @@ class TransmissionRouterTest {
         val transformer2 = TestTransformer2(testDispatcher)
         val transformer3 = TestTransformer3(testDispatcher)
         sut = TransmissionRouterBuilder.build {
-            withTransformerSet(setOf(transformer1, transformer2, transformer3))
-            withDispatcher(testDispatcher)
+            addTransformerSet(setOf(transformer1, transformer2, transformer3))
+            addDispatcher(testDispatcher)
         }
         // When
         sut.processSignal(TestSignal)
