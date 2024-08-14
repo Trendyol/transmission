@@ -11,19 +11,27 @@ interface TransmissionRouterBuilderScope {
      * Sets the [CoroutineDispatcher] to the [TransmissionRouter].
      * If not provided, [Default] Dispatcher is going to be used.
      */
-    fun withDispatcher(dispatcher: CoroutineDispatcher)
+    fun addDispatcher(dispatcher: CoroutineDispatcher)
 
     /**
      * Sets the [Transformer] set to the [TransmissionRouter].
-     * Either this method or [withLoader] must be used to provide a valid
+     * In cases where [overrideInitialization] is not used,
+     * Either this method or [addLoader] must be used to provide a valid
      * set of [Transformer]s.
      */
-    fun withTransformerSet(transformerSet: Set<Transformer>)
+    fun addTransformerSet(transformerSet: Set<Transformer>)
 
     /**
      * Sets [TransformerSetLoader] to the [TransmissionRouter].
-     * Either this method or [withTransformerSet] must be used to provide a valid
+     * In cases where [overrideInitialization] is not used, Either this method or
+     * [addTransformerSet] must be used to provide a valid
      * set of [Transformer]s.
      */
-    fun withLoader(loader: TransformerSetLoader)
+    fun addLoader(loader: TransformerSetLoader)
+
+    /**
+     * Overrides auto initialization of [TransmissionRouter]. This disables any effect of using
+     * [addLoader] or [addTransformerSet].
+     */
+    fun overrideInitialization()
 }
