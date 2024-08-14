@@ -1,7 +1,7 @@
 package com.trendyol.transmissiontest
 
 import com.trendyol.transmission.Transmission
-import com.trendyol.transmission.TransmissionRouter
+import com.trendyol.transmission.router.TransmissionRouter
 import com.trendyol.transmission.router.RegistryScope
 import com.trendyol.transmission.router.builder.TransmissionTestingRouterBuilder
 import com.trendyol.transmission.transformer.Transformer
@@ -42,8 +42,8 @@ class TestSuite {
         scope: suspend TransformerTestScope.(scope: TestScope) -> Unit
     ) {
         router = TransmissionTestingRouterBuilder.build {
-            withDispatcher(UnconfinedTestDispatcher())
-            this@TestSuite.transformer?.let { withTransformerSet(setOf(it)) }
+            addDispatcher(UnconfinedTestDispatcher())
+            this@TestSuite.transformer?.let { addTransformerSet(setOf(it)) }
             testing(this@TestSuite.registryScope)
         }
 

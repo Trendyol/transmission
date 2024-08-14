@@ -1,6 +1,6 @@
 package com.trendyol.transmission.features
 
-import com.trendyol.transmission.TransmissionRouter
+import com.trendyol.transmission.router.TransmissionRouter
 import com.trendyol.transmission.features.colorpicker.ColorPickerTransformer
 import com.trendyol.transmission.features.input.InputTransformer
 import com.trendyol.transmission.features.multioutput.MultiOutputTransformer
@@ -44,7 +44,7 @@ interface FeaturesModule {
 			transformerSet: @JvmSuppressWildcards Set<Transformer>
 		): TransmissionRouter {
 			return TransmissionRouterBuilder.build {
-				withTransformerSet(transformerSet)
+				addTransformerSet(transformerSet)
 			}
 		}
 	}

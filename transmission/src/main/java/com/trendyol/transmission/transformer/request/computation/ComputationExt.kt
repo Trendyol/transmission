@@ -13,7 +13,7 @@ import com.trendyol.transmission.transformer.request.RequestHandler
  * Can be queried using [RequestHandler.execute]
  * @param computation Computation to get the result [Transmission.Data]
  */
-fun <C : Contract.Computation<T>, T : Any> ComputationScope.registerComputation(
+fun <C : Contract.Computation<T>, T : Any> ComputationScope.register(
     contract: C,
     computation: suspend RequestHandler.() -> T?,
 ) {
@@ -28,7 +28,7 @@ fun <C : Contract.Computation<T>, T : Any> ComputationScope.registerComputation(
  * Can be queried using [RequestHandler.execute]
  * @param computation Computation to get the result [Transmission.Data]
  */
-fun <C : Contract.ComputationWithArgs<A, T>, A : Any, T : Any> ComputationScope.registerComputation(
+fun <C : Contract.ComputationWithArgs<A, T>, A : Any, T : Any> ComputationScope.register(
     contract: C,
     computation: suspend RequestHandler.(args: A) -> T?,
 ) {

@@ -1,7 +1,7 @@
 package com.trendyol.transmission.transformer.dataholder
 
 import com.trendyol.transmission.Transmission
-import com.trendyol.transmission.TransmissionRouter
+import com.trendyol.transmission.router.TransmissionRouter
 import com.trendyol.transmission.transformer.Transformer
 import com.trendyol.transmission.transformer.request.Contract
 import com.trendyol.transmission.transformer.request.RequestHandler
@@ -15,9 +15,9 @@ import com.trendyol.transmission.transformer.request.RequestHandler
  * @param [key] When defined, data inside the holder can be accessed by other Transformers in the
  * network using [RequestHandler.query]
  * */
-fun <T : Transmission.Data?> Transformer.buildDataHolder(
+fun <T : Transmission.Data?> Transformer.dataHolder(
     initialValue: T,
-    contract: Contract.Data<T>? = null,
+    contract: Contract.DataHolder<T>? = null,
     publishUpdates: Boolean = true
 ): TransmissionDataHolder<T> {
     return TransmissionDataHolderBuilder.buildWith(

@@ -4,7 +4,7 @@ import com.trendyol.transmission.Transmission
 
 interface RequestHandler {
 
-    suspend fun <C : Contract.Data<D>, D : Transmission.Data> getData(contract: C): D?
+    suspend fun <C : Contract.DataHolder<D>, D : Transmission.Data> getData(contract: C): D?
 
     suspend fun <C : Contract.Computation<D>, D : Any> compute(
         contract: C,

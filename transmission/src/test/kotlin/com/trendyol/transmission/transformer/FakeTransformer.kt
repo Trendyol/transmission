@@ -5,27 +5,27 @@ import com.trendyol.transmission.effect.RouterEffect
 import com.trendyol.transmission.transformer.data.TestData
 import com.trendyol.transmission.transformer.data.TestEffect
 import com.trendyol.transmission.transformer.data.TestSignal
-import com.trendyol.transmission.transformer.dataholder.buildDataHolder
+import com.trendyol.transmission.transformer.dataholder.dataHolder
 import com.trendyol.transmission.transformer.handler.HandlerRegistry
-import com.trendyol.transmission.transformer.handler.handlerRegistry
-import com.trendyol.transmission.transformer.handler.registerEffect
-import com.trendyol.transmission.transformer.handler.registerSignal
+import com.trendyol.transmission.transformer.handler.onEffect
+import com.trendyol.transmission.transformer.handler.handlers
+import com.trendyol.transmission.transformer.handler.onSignal
 import kotlinx.coroutines.CoroutineDispatcher
 
 open class FakeTransformer(dispatcher: CoroutineDispatcher) : Transformer(dispatcher) {
     val signalList = mutableListOf<Transmission.Signal>()
     val effectList = mutableListOf<Transmission.Effect>()
 
-    private val holder = buildDataHolder<TestData?>(null)
+    private val holder = dataHolder<TestData?>(null)
 
-    override val handlerRegistry: HandlerRegistry = handlerRegistry {
-        registerSignal<TestSignal> { signal ->
+    override val handlers: HandlerRegistry = handlers {
+        onSignal<TestSignal> { signal ->
             signalList.add(signal)
             publish(TestEffect)
             publish(RouterEffect(""))
             holder.update { TestData("update with ${this@FakeTransformer.javaClass.simpleName}") }
         }
-        registerEffect<TestEffect> { effect ->
+        onEffect<TestEffect> { effect ->
             effectList.add(effect)
         }
     }
