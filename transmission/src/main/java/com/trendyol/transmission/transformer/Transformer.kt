@@ -6,13 +6,11 @@ import com.trendyol.transmission.effect.RouterEffect
 import com.trendyol.transmission.transformer.handler.CommunicationScope
 import com.trendyol.transmission.transformer.handler.HandlerRegistry
 import com.trendyol.transmission.transformer.request.Contract
-import com.trendyol.transmission.transformer.request.Contracts
 import com.trendyol.transmission.transformer.request.Query
 import com.trendyol.transmission.transformer.request.QueryResult
 import com.trendyol.transmission.transformer.request.TransformerRequestDelegate
 import com.trendyol.transmission.transformer.request.computation.ComputationRegistry
 import com.trendyol.transmission.transformer.request.execution.ExecutionRegistry
-import com.trendyol.transmission.transformer.request.identity
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineScope
@@ -31,8 +29,8 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.supervisorScope
 
 open class Transformer(
+    identity: Contract.Identity,
     dispatcher: CoroutineDispatcher = Dispatchers.Default,
-    identity: Contract.Identity? = null
 ) {
 
     private val exceptionHandler = CoroutineExceptionHandler { _, throwable ->
@@ -42,11 +40,10 @@ open class Transformer(
     @PublishedApi
     internal val transformerScope = CoroutineScope(dispatcher + SupervisorJob() + exceptionHandler)
 
-    private val internalIdentity: Contract.Identity =
-        identity ?: Contracts.identity(this::class.simpleName.orEmpty())
+    private val _identity: Contract.Identity = identity
 
     private val effectChannel: Channel<EffectWrapper> = Channel(capacity = Channel.BUFFERED)
-    private val requestDelegate = TransformerRequestDelegate(transformerScope, internalIdentity)
+    private val requestDelegate = TransformerRequestDelegate(transformerScope, _identity)
     internal val dataChannel: Channel<Transmission.Data> = Channel(capacity = Channel.BUFFERED)
     internal val storage = TransformerStorage()
 
@@ -88,7 +85,7 @@ open class Transformer(
                 launch {
                     incoming
                         .filterNot { it.effect is RouterEffect }
-                        .filter { it.identity == null || it.identity == internalIdentity }
+                        .filter { it.identity == null || it.identity == _identity }
                         .map { it.effect }
                         .collect {
                             currentEffectProcessing = launch {
@@ -112,7 +109,7 @@ open class Transformer(
             supervisorScope {
                 launch {
                     incomingQuery
-                        .filter { it.owner == internalIdentity.key }
+                        .filter { it.owner == _identity.key }
                         .collect {
                             this@Transformer.requestDelegate.resultBroadcast.producer.trySend(it)
                         }

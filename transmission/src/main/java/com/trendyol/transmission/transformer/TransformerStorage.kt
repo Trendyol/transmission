@@ -29,9 +29,9 @@ internal class TransformerStorage {
         else (internalTransmissionHolderSet as HolderState.Initialized).valueSet.contains(key)
     }
 
-    fun updateHolderData(data: Transmission.Data) {
+    fun updateHolderData(data: Transmission.Data, key: String) {
         holderDataReference.update { holderDataReference ->
-            holderDataReference[data::class.simpleName.orEmpty()] = data
+            holderDataReference[key] = data
             holderDataReference
         }
     }
