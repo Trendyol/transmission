@@ -11,11 +11,12 @@ interface TransmissionDataHolder<T : Transmission.Data?> {
     fun update(updater: (T) -> @UnsafeVariance T)
 }
 
+@PublishedApi
 internal class TransmissionDataHolderImpl<T : Transmission.Data?>(
     initialValue: T,
     publishUpdates: Boolean,
     transformer: Transformer,
-    holderKey: String?,
+    holderKey: String,
 ) : TransmissionDataHolder<T> {
 
     private val holder = MutableStateFlow(initialValue)
@@ -26,15 +27,11 @@ internal class TransmissionDataHolderImpl<T : Transmission.Data?>(
 
     init {
         transformer.run {
-            holderKey?.let {
-                storage.updateHolderDataReferenceToTrack(it)
-            }
+            storage.updateHolderDataReferenceToTrack(holderKey)
             transformerScope.launch {
                 holder.collect {
                     it?.let { holderData ->
-                        if (holderKey != null) {
-                            storage.updateHolderData(holderData)
-                        }
+                        storage.updateHolderData(holderData, holderKey)
                         if (publishUpdates) {
                             transformer.dataChannel.trySend(it)
                         }

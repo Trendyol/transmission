@@ -7,8 +7,8 @@ import com.trendyol.transmission.features.output.OutputTransformer
 import com.trendyol.transmission.transformer.Transformer
 import com.trendyol.transmission.transformer.dataholder.dataHolder
 import com.trendyol.transmission.transformer.handler.HandlerRegistry
-import com.trendyol.transmission.transformer.handler.onEffect
 import com.trendyol.transmission.transformer.handler.handlers
+import com.trendyol.transmission.transformer.handler.onEffect
 import com.trendyol.transmission.transformer.request.Contracts
 import com.trendyol.transmission.transformer.request.identity
 import com.trendyol.transmission.ui.MultiOutputUiState
@@ -19,7 +19,7 @@ val multiOutputTransformerIdentity = Contracts.identity("MultiOutput")
 
 class MultiOutputTransformer @Inject constructor(
     @DefaultDispatcher private val defaultDispatcher: CoroutineDispatcher
-) : Transformer(defaultDispatcher, multiOutputTransformerIdentity) {
+) : Transformer(multiOutputTransformerIdentity, defaultDispatcher) {
 
     private val holder = dataHolder(MultiOutputUiState())
 

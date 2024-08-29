@@ -11,8 +11,8 @@ import com.trendyol.transmission.features.input.InputTransformer
 import com.trendyol.transmission.transformer.Transformer
 import com.trendyol.transmission.transformer.dataholder.dataHolder
 import com.trendyol.transmission.transformer.handler.HandlerRegistry
-import com.trendyol.transmission.transformer.handler.onEffect
 import com.trendyol.transmission.transformer.handler.handlers
+import com.trendyol.transmission.transformer.handler.onEffect
 import com.trendyol.transmission.transformer.request.Contracts
 import com.trendyol.transmission.transformer.request.computation
 import com.trendyol.transmission.transformer.request.computation.ComputationRegistry
@@ -22,6 +22,7 @@ import com.trendyol.transmission.transformer.request.execution
 import com.trendyol.transmission.transformer.request.execution.ExecutionRegistry
 import com.trendyol.transmission.transformer.request.execution.executions
 import com.trendyol.transmission.transformer.request.execution.register
+import com.trendyol.transmission.transformer.request.identity
 import com.trendyol.transmission.ui.ColorPickerUiState
 import com.trendyol.transmission.ui.OutputUiState
 import com.trendyol.transmission.ui.theme.Pink80
@@ -33,7 +34,7 @@ import kotlin.time.Duration.Companion.seconds
 
 class OutputTransformer @Inject constructor(
     @DefaultDispatcher private val defaultDispatcher: CoroutineDispatcher
-) : Transformer(defaultDispatcher) {
+) : Transformer(Contracts.identity("OutputTransformer"), defaultDispatcher) {
 
     private val holder = dataHolder(OutputUiState())
 
