@@ -17,7 +17,7 @@ import com.trendyol.transmission.transformer.request.dataHolder
  * @param [key] When defined, data inside the holder can be accessed by other Transformers in the
  * network using [RequestHandler.query]
  * */
-inline fun <reified T : Transmission.Data?> Transformer.dataHolder(
+fun <T : Transmission.Data?> Transformer.dataHolder(
     initialValue: T,
     contract: Contract.DataHolder<T>? = null,
     publishUpdates: Boolean = true
