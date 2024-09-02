@@ -4,7 +4,9 @@ import com.trendyol.transmission.Transmission
 import com.trendyol.transmission.router.TransmissionRouter
 import com.trendyol.transmission.transformer.Transformer
 import com.trendyol.transmission.transformer.request.Contract
+import com.trendyol.transmission.transformer.request.Contracts
 import com.trendyol.transmission.transformer.request.RequestHandler
+import com.trendyol.transmission.transformer.request.dataHolder
 
 /**
  * Throws [IllegalArgumentException] when multiple data holders with same type
@@ -24,6 +26,6 @@ inline fun <reified T : Transmission.Data?> Transformer.dataHolder(
         initialValue = initialValue,
         publishUpdates = publishUpdates,
         transformer = this,
-        holderKey = contract?.key ?: T::class.simpleName.orEmpty(),
+        contract = contract ?: Contracts.dataHolder(),
     )
 }

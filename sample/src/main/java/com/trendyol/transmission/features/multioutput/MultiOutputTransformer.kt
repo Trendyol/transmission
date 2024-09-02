@@ -15,7 +15,7 @@ import com.trendyol.transmission.ui.MultiOutputUiState
 import kotlinx.coroutines.CoroutineDispatcher
 import javax.inject.Inject
 
-val multiOutputTransformerIdentity = Contracts.identity("MultiOutput")
+val multiOutputTransformerIdentity = Contracts.identity()
 
 class MultiOutputTransformer @Inject constructor(
     @DefaultDispatcher private val defaultDispatcher: CoroutineDispatcher

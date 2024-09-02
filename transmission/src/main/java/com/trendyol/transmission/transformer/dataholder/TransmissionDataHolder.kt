@@ -2,6 +2,7 @@ package com.trendyol.transmission.transformer.dataholder
 
 import com.trendyol.transmission.Transmission
 import com.trendyol.transmission.transformer.Transformer
+import com.trendyol.transmission.transformer.request.Contract
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -16,7 +17,7 @@ internal class TransmissionDataHolderImpl<T : Transmission.Data?>(
     initialValue: T,
     publishUpdates: Boolean,
     transformer: Transformer,
-    holderKey: String,
+    contract: Contract.DataHolder<T>
 ) : TransmissionDataHolder<T> {
 
     private val holder = MutableStateFlow(initialValue)
@@ -27,11 +28,11 @@ internal class TransmissionDataHolderImpl<T : Transmission.Data?>(
 
     init {
         transformer.run {
-            storage.updateHolderDataReferenceToTrack(holderKey)
+            storage.updateHolderDataReferenceToTrack(contract.key)
             transformerScope.launch {
                 holder.collect {
                     it?.let { holderData ->
-                        storage.updateHolderData(holderData, holderKey)
+                        storage.updateHolderData(holderData, contract.key)
                         if (publishUpdates) {
                             transformer.dataChannel.trySend(it)
                         }

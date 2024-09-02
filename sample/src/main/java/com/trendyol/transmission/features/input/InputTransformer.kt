@@ -15,7 +15,6 @@ import com.trendyol.transmission.transformer.request.computation.computations
 import com.trendyol.transmission.transformer.request.computation.register
 import com.trendyol.transmission.transformer.request.computationWithArgs
 import com.trendyol.transmission.transformer.request.dataHolder
-import com.trendyol.transmission.transformer.request.identity
 import com.trendyol.transmission.ui.InputUiState
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.delay
@@ -24,7 +23,7 @@ import kotlin.time.Duration.Companion.seconds
 
 class InputTransformer @Inject constructor(
     @DefaultDispatcher private val defaultDispatcher: CoroutineDispatcher
-) : Transformer(Contracts.identity("InputTransformer"), defaultDispatcher) {
+) : Transformer(dispatcher = defaultDispatcher) {
 
     private val holder = dataHolder(InputUiState(), holderContract)
 
@@ -49,9 +48,8 @@ class InputTransformer @Inject constructor(
     }
 
     companion object {
-        val writtenInputWithArgs =
-            Contracts.computationWithArgs<String, WrittenInput>("WrittenInputWithArgs")
-        val writtenInputContract = Contracts.computation<WrittenInput>("WrittenInput")
-        val holderContract = Contracts.dataHolder<InputUiState>("InputUiState")
+        val writtenInputWithArgs = Contracts.computationWithArgs<String, WrittenInput>()
+        val writtenInputContract = Contracts.computation<WrittenInput>()
+        val holderContract = Contracts.dataHolder<InputUiState>()
     }
 }

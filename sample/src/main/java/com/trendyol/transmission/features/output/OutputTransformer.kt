@@ -22,7 +22,6 @@ import com.trendyol.transmission.transformer.request.execution
 import com.trendyol.transmission.transformer.request.execution.ExecutionRegistry
 import com.trendyol.transmission.transformer.request.execution.executions
 import com.trendyol.transmission.transformer.request.execution.register
-import com.trendyol.transmission.transformer.request.identity
 import com.trendyol.transmission.ui.ColorPickerUiState
 import com.trendyol.transmission.ui.OutputUiState
 import com.trendyol.transmission.ui.theme.Pink80
@@ -34,7 +33,7 @@ import kotlin.time.Duration.Companion.seconds
 
 class OutputTransformer @Inject constructor(
     @DefaultDispatcher private val defaultDispatcher: CoroutineDispatcher
-) : Transformer(Contracts.identity("OutputTransformer"), defaultDispatcher) {
+) : Transformer(dispatcher = defaultDispatcher) {
 
     private val holder = dataHolder(OutputUiState())
 
@@ -90,9 +89,7 @@ class OutputTransformer @Inject constructor(
 
     companion object {
         private const val TAG = "OutputTransformer"
-        val outputCalculationContract =
-            Contracts.computation<OutputCalculationResult>("OutputCalculationResult")
-        val outputExecutionContract =
-            Contracts.execution("outputExecutionContract")
+        val outputCalculationContract = Contracts.computation<OutputCalculationResult>()
+        val outputExecutionContract = Contracts.execution()
     }
 }
