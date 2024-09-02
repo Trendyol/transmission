@@ -13,9 +13,9 @@ import com.trendyol.transmission.transformer.request.dataHolder
  * is defined inside a [Transformer]
  * @param initialValue Initial value of the Data Holder.
  * Must be a type extended from [Transmission.Data]
- * @param [publishUpdates] Controls sending updates to the [TransmissionRouter]
- * @param [key] When defined, data inside the holder can be accessed by other Transformers in the
+ * @param [contract] When defined, data inside the holder can be accessed by other Transformers in the
  * network using [RequestHandler.query]
+ * @param [publishUpdates] Controls sending updates to the [TransmissionRouter]
  * */
 fun <T : Transmission.Data?> Transformer.dataHolder(
     initialValue: T,
