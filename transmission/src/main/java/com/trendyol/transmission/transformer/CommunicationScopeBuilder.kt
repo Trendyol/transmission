@@ -47,7 +47,7 @@ internal class CommunicationScopeBuilder(
         return requestDelegate.interactor.compute(contract, args, invalidate)
     }
 
-    override suspend fun <C : Contract.Execution> execute(contract: C) {
+    override suspend fun execute(contract: Contract.Execution) {
         requestDelegate.interactor.execute(contract)
     }
 

@@ -59,7 +59,7 @@ internal class TransformerRequestDelegate(scope: CoroutineScope, identity: Contr
                 .first().data
         }
 
-        override suspend fun <C : Contract.Execution> execute(contract: C) {
+        override suspend fun execute(contract: Contract.Execution) {
             outGoingQuery.trySend(
                 Query.Execution(
                     sender = identity.key,
