@@ -20,8 +20,7 @@ class Holder : Transformer(Contracts.identity("master")) {
 
     override val computations: ComputationRegistry = computations {
         register(lookUpAndReturn) { id ->
-            counterData.update { it.copy(value = it.value.plus(1)) }
-            val data = counterData.getValue().value
+            val data = counterData.updateAndReturn { it.copy(value = it.value.plus(1)) }.value
             println("Master is $data")
             data
         }
