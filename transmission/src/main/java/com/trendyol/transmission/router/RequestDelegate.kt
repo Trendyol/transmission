@@ -103,7 +103,7 @@ internal class RequestDelegate(
         }
     }
 
-    private suspend fun <A : Any> processComputationQueryWithArgs(
+    private fun <A : Any> processComputationQueryWithArgs(
         query: Query.ComputationWithArgs<A>
     ) = queryScope.launch {
         val computationHolder = routerRef.transformerSet
