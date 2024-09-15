@@ -14,13 +14,11 @@ internal class ComputationDelegate(
     private val lock = Mutex()
 
     override suspend fun getResult(scope: RequestHandler, invalidate: Boolean): Any? {
-        return lock.withLock {
-            if (useCache && invalidate.not()) {
-                result ?: computation?.invoke(scope).also { result = it }
-            } else {
-                result = null
-                computation?.invoke(scope)
-            }
+        return if (useCache && invalidate.not()) {
+            result ?: lock.withLock { computation?.invoke(scope) }.also { result = it }
+        } else {
+            result = null
+            lock.withLock { computation?.invoke(scope) }
         }
     }
 }
@@ -34,13 +32,11 @@ internal class ComputationDelegateWithArgs<A : Any>(
     private val lock = Mutex()
 
     override suspend fun getResult(scope: RequestHandler, invalidate: Boolean, args: A): Any? {
-        return lock.withLock {
-            if (useCache && invalidate.not()) {
-                result ?: computation(scope, args).also { lock.withLock { result = it } }
-            } else {
-                result = null
-                computation(scope, args)
-            }
+        return if (useCache && invalidate.not()) {
+            result ?: lock.withLock { computation(scope, args) }.also { result = it }
+        } else {
+            result = null
+            lock.withLock { computation(scope, args) }
         }
     }
 }
