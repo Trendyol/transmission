@@ -1,6 +1,9 @@
+@file:OptIn(ExperimentalUuidApi::class)
+
 package com.trendyol.transmission.router
 
 import com.trendyol.transmission.Transmission
+import com.trendyol.transmission.identifier.IdentifierGenerator
 import com.trendyol.transmission.transformer.request.Contract
 import com.trendyol.transmission.transformer.request.Query
 import com.trendyol.transmission.transformer.request.QueryResult
@@ -17,6 +20,7 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.launch
+import kotlin.uuid.ExperimentalUuidApi
 
 internal class RequestDelegate(
     private val queryScope: CoroutineScope,
@@ -65,6 +69,7 @@ internal class RequestDelegate(
             owner = query.sender,
             key = query.key,
             data = dataHolder?.storage?.getHolderDataByKey(query.key),
+            resultIdentifier = query.queryIdentifier,
         )
         if (query.sender == routerRef.routerName) {
             routerQueryResultChannel.emit(dataToSend)
@@ -90,6 +95,7 @@ internal class RequestDelegate(
                 owner = query.sender,
                 key = query.key,
                 data = computationData,
+                resultIdentifier = query.queryIdentifier
             )
         }
         if (query.sender == routerRef.routerName) {
@@ -124,6 +130,7 @@ internal class RequestDelegate(
                 owner = query.sender,
                 key = query.key,
                 data = computationData,
+                resultIdentifier = query.queryIdentifier
             )
         }
         if (query.sender == routerRef.routerName) {
@@ -178,7 +185,8 @@ internal class RequestDelegate(
         val dataToSend = QueryResult.Data(
             owner = query.sender,
             data = registry?.dataMap?.get(query.key),
-            key = query.key
+            key = query.key,
+            resultIdentifier = query.queryIdentifier
         )
         queryScope.launch {
             queryResultChannel.trySend(dataToSend)
@@ -191,7 +199,8 @@ internal class RequestDelegate(
         val computationToSend = QueryResult.Computation(
             owner = query.sender,
             data = registry?.computationMap?.get(query.key),
-            key = query.key
+            key = query.key,
+            resultIdentifier = query.queryIdentifier
         )
         queryResultChannel.trySend(computationToSend)
     }
@@ -202,7 +211,8 @@ internal class RequestDelegate(
         val computationToSend = QueryResult.Computation(
             owner = query.sender,
             data = registry?.computationMap?.get(query.key),
-            key = query.key
+            key = query.key,
+            resultIdentifier = query.queryIdentifier
         )
         queryResultChannel.trySend(computationToSend)
     }
@@ -210,12 +220,17 @@ internal class RequestDelegate(
     // region Request Handler
 
     override suspend fun <C : Contract.DataHolder<D>, D : Transmission.Data> getData(contract: C): D? {
+        val queryIdentifier = IdentifierGenerator.generateIdentifier()
         outGoingQuery.send(
-            Query.Data(sender = routerRef.routerName, key = contract.key)
+            Query.Data(
+                sender = routerRef.routerName,
+                key = contract.key,
+                queryIdentifier = queryIdentifier
+            )
         )
         return routerQueryResultChannel
             .filterIsInstance<QueryResult.Data<D>>()
-            .filter { it.key == contract.key && it.owner == routerRef.routerName }
+            .filter { it.resultIdentifier == queryIdentifier && it.key == contract.key }
             .first().data
     }
 
@@ -223,16 +238,18 @@ internal class RequestDelegate(
         contract: C,
         invalidate: Boolean
     ): D? {
+        val queryIdentifier = IdentifierGenerator.generateIdentifier()
         outGoingQuery.send(
             Query.Computation(
                 sender = routerRef.routerName,
                 key = contract.key,
-                invalidate = invalidate
+                invalidate = invalidate,
+                queryIdentifier = queryIdentifier
             )
         )
         return routerQueryResultChannel
             .filterIsInstance<QueryResult.Computation<D>>()
-            .filter { it.key == contract.key && it.owner == routerRef.routerName }
+            .filter { it.resultIdentifier == queryIdentifier && it.key == contract.key }
             .first().data
     }
 
@@ -241,17 +258,19 @@ internal class RequestDelegate(
         args: A,
         invalidate: Boolean
     ): D? {
+        val queryIdentifier = IdentifierGenerator.generateIdentifier()
         outGoingQuery.send(
             Query.ComputationWithArgs(
                 sender = routerRef.routerName,
                 key = contract.key,
                 args = args,
-                invalidate = invalidate
+                invalidate = invalidate,
+                queryIdentifier = queryIdentifier
             )
         )
         return routerQueryResultChannel
             .filterIsInstance<QueryResult.Computation<D>>()
-            .filter { it.key == contract.key && it.owner == routerRef.routerName }
+            .filter { it.resultIdentifier == queryIdentifier && it.key == contract.key }
             .first().data
     }
 
