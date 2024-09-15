@@ -4,6 +4,7 @@ import com.trendyol.transmission.Transmission
 import com.trendyol.transmission.transformer.Transformer
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.flow.updateAndGet
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
@@ -11,7 +12,7 @@ import kotlinx.coroutines.sync.withLock
 interface TransmissionDataHolder<T : Transmission.Data?> {
     fun getValue(): T
     fun update(updater: (T) -> @UnsafeVariance T)
-    suspend fun updateAndReturn(updater: (T) -> @UnsafeVariance T): T
+    suspend fun updateAndGet(updater: (T) -> @UnsafeVariance T): T
 }
 
 @PublishedApi
@@ -30,10 +31,9 @@ internal class TransmissionDataHolderImpl<T : Transmission.Data?>(
         return holder.value
     }
 
-    override suspend fun updateAndReturn(updater: (T) -> T): T {
-        lock.withLock {
-            holder.update(updater)
-            return holder.value
+    override suspend fun updateAndGet(updater: (T) -> T): T {
+        return lock.withLock {
+            holder.updateAndGet(updater)
         }
     }
 
