@@ -55,7 +55,7 @@ internal class RequestDelegate(
         }
     }
 
-    private suspend fun processDataQuery(
+    private fun processDataQuery(
         query: Query.Data
     ) = queryScope.launch {
         val dataHolder = routerRef.transformerSet
@@ -69,11 +69,11 @@ internal class RequestDelegate(
         if (query.sender == routerRef.routerName) {
             routerQueryResultChannel.emit(dataToSend)
         } else {
-            queryResultChannel.trySend(dataToSend)
+            queryResultChannel.send(dataToSend)
         }
     }
 
-    private suspend fun processComputationQuery(
+    private fun processComputationQuery(
         query: Query.Computation
     ) = queryScope.launch {
         val computationHolder = routerRef.transformerSet
@@ -98,7 +98,7 @@ internal class RequestDelegate(
             }
         } else {
             queryScope.launch {
-                queryResultChannel.trySend(computationToSend.await())
+                queryResultChannel.send(computationToSend.await())
             }
         }
     }
@@ -132,7 +132,7 @@ internal class RequestDelegate(
             }
         } else {
             queryScope.launch {
-                queryResultChannel.trySend(computationToSend.await())
+                queryResultChannel.send(computationToSend.await())
             }
         }
     }
@@ -193,7 +193,7 @@ internal class RequestDelegate(
             data = registry?.computationMap?.get(query.key),
             key = query.key
         )
-        queryResultChannel.trySend(computationToSend)
+        queryResultChannel.send(computationToSend)
     }
 
     private fun <A : Any> testComputationQueryWithArgs(
@@ -204,13 +204,13 @@ internal class RequestDelegate(
             data = registry?.computationMap?.get(query.key),
             key = query.key
         )
-        queryResultChannel.trySend(computationToSend)
+        queryResultChannel.send(computationToSend)
     }
 
     // region Request Handler
 
     override suspend fun <C : Contract.DataHolder<D>, D : Transmission.Data> getData(contract: C): D? {
-        outGoingQuery.trySend(
+        outGoingQuery.send(
             Query.Data(sender = routerRef.routerName, key = contract.key)
         )
         return routerQueryResultChannel
@@ -223,7 +223,7 @@ internal class RequestDelegate(
         contract: C,
         invalidate: Boolean
     ): D? {
-        outGoingQuery.trySend(
+        outGoingQuery.send(
             Query.Computation(
                 sender = routerRef.routerName,
                 key = contract.key,
@@ -241,7 +241,7 @@ internal class RequestDelegate(
         args: A,
         invalidate: Boolean
     ): D? {
-        outGoingQuery.trySend(
+        outGoingQuery.send(
             Query.ComputationWithArgs(
                 sender = routerRef.routerName,
                 key = contract.key,
@@ -255,8 +255,8 @@ internal class RequestDelegate(
             .first().data
     }
 
-    override suspend fun <C : Contract.Execution> execute(contract: C) {
-        outGoingQuery.trySend(
+    override suspend fun execute(contract: Contract.Execution) {
+        outGoingQuery.send(
             Query.Execution(
                 sender = routerRef.routerName,
                 key = contract.key,
@@ -268,7 +268,7 @@ internal class RequestDelegate(
         contract: C,
         args: A
     ) {
-        outGoingQuery.trySend(
+        outGoingQuery.send(
             Query.ExecutionWithArgs(
                 sender = routerRef.routerName,
                 key = contract.key,

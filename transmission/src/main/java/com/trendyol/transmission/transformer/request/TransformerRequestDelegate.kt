@@ -16,7 +16,7 @@ internal class TransformerRequestDelegate(scope: CoroutineScope, identity: Contr
     val interactor: RequestHandler = object : RequestHandler {
 
         override suspend fun <C : Contract.DataHolder<D>, D : Transmission.Data> getData(contract: C): D? {
-            outGoingQuery.trySend(Query.Data(sender = identity.key, key = contract.key))
+            outGoingQuery.send(Query.Data(sender = identity.key, key = contract.key))
             return resultBroadcast.output
                 .filterIsInstance<QueryResult.Data<D>>()
                 .filter { it.key == contract.key && it.owner == identity.key }
@@ -27,7 +27,7 @@ internal class TransformerRequestDelegate(scope: CoroutineScope, identity: Contr
             contract: C,
             invalidate: Boolean
         ): D? {
-            outGoingQuery.trySend(
+            outGoingQuery.send(
                 Query.Computation(
                     sender = identity.key,
                     key = contract.key,
@@ -45,7 +45,7 @@ internal class TransformerRequestDelegate(scope: CoroutineScope, identity: Contr
             args: A,
             invalidate: Boolean
         ): D? {
-            outGoingQuery.trySend(
+            outGoingQuery.send(
                 Query.ComputationWithArgs(
                     sender = identity.key,
                     key = contract.key,
@@ -59,8 +59,8 @@ internal class TransformerRequestDelegate(scope: CoroutineScope, identity: Contr
                 .first().data
         }
 
-        override suspend fun <C : Contract.Execution> execute(contract: C) {
-            outGoingQuery.trySend(
+        override suspend fun execute(contract: Contract.Execution) {
+            outGoingQuery.send(
                 Query.Execution(
                     sender = identity.key,
                     key = contract.key,
@@ -72,7 +72,7 @@ internal class TransformerRequestDelegate(scope: CoroutineScope, identity: Contr
             contract: C,
             args: A
         ) {
-            outGoingQuery.trySend(
+            outGoingQuery.send(
                 Query.ExecutionWithArgs(
                     sender = identity.key,
                     key = contract.key,

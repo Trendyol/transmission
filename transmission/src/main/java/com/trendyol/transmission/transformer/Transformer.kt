@@ -111,12 +111,12 @@ open class Transformer(
                     incomingQuery
                         .filter { it.owner == _identity.key }
                         .collect {
-                            this@Transformer.requestDelegate.resultBroadcast.producer.trySend(it)
+                            this@Transformer.requestDelegate.resultBroadcast.producer.send(it)
                         }
                 }
                 launch {
                     this@Transformer.requestDelegate.outGoingQuery.receiveAsFlow().collect {
-                        outGoingQuery.trySend(it)
+                        outGoingQuery.send(it)
                     }
                 }
             }
