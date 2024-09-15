@@ -5,11 +5,13 @@ internal sealed interface Query {
     class Data(
         val sender: String,
         val key: String,
+        val queryIdentifier: String,
     ) : Query
 
     class Computation(
         val sender: String,
         val key: String,
+        val queryIdentifier: String,
         val invalidate: Boolean = false,
     ) : Query
 
@@ -17,6 +19,7 @@ internal sealed interface Query {
         val sender: String,
         val key: String,
         val args: A,
+        val queryIdentifier: String,
         val invalidate: Boolean = false,
     ) : Query
 
