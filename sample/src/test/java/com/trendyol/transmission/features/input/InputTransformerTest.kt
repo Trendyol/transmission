@@ -1,9 +1,12 @@
 package com.trendyol.transmission.features.input
 
 import androidx.compose.ui.graphics.Color
-import com.trendyol.transmission.features.colorpicker.ColorPickerEffect
+import com.trendyol.transmission.components.features.input.InputEffect
+import com.trendyol.transmission.components.features.input.InputSignal
+import com.trendyol.transmission.components.features.colorpicker.ColorPickerEffect
 import com.trendyol.transmission.transformer.util.TestCoroutineRule
-import com.trendyol.transmission.ui.InputUiState
+import com.trendyol.transmission.components.features.InputUiState
+import com.trendyol.transmission.components.features.input.InputTransformer
 import com.trendyol.transmissiontest.attachToRouter
 import com.trendyol.transmissiontest.test
 import org.junit.Before

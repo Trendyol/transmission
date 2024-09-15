@@ -1,13 +1,13 @@
-package com.trendyol.transmission.features.output
+package com.trendyol.transmission.components.features.output
 
 import android.util.Log
 import com.trendyol.transmission.DefaultDispatcher
 import com.trendyol.transmission.effect.RouterEffect
-import com.trendyol.transmission.features.colorpicker.ColorPickerEffect
-import com.trendyol.transmission.features.colorpicker.ColorPickerTransformer
-import com.trendyol.transmission.features.colorpicker.colorPickerIdentity
-import com.trendyol.transmission.features.input.InputEffect
-import com.trendyol.transmission.features.input.InputTransformer
+import com.trendyol.transmission.components.features.colorpicker.ColorPickerEffect
+import com.trendyol.transmission.components.features.colorpicker.ColorPickerTransformer
+import com.trendyol.transmission.components.features.colorpicker.colorPickerIdentity
+import com.trendyol.transmission.components.features.input.InputEffect
+import com.trendyol.transmission.components.features.input.InputTransformer
 import com.trendyol.transmission.transformer.Transformer
 import com.trendyol.transmission.transformer.dataholder.dataHolder
 import com.trendyol.transmission.transformer.handler.HandlerRegistry
@@ -23,8 +23,8 @@ import com.trendyol.transmission.transformer.request.execution.ExecutionRegistry
 import com.trendyol.transmission.transformer.request.execution.executions
 import com.trendyol.transmission.transformer.request.execution.register
 import com.trendyol.transmission.transformer.request.identity
-import com.trendyol.transmission.ui.ColorPickerUiState
-import com.trendyol.transmission.ui.OutputUiState
+import com.trendyol.transmission.components.features.ColorPickerUiState
+import com.trendyol.transmission.components.features.OutputUiState
 import com.trendyol.transmission.ui.theme.Pink80
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.delay

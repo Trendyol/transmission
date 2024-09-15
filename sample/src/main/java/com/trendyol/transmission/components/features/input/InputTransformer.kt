@@ -1,7 +1,7 @@
-package com.trendyol.transmission.features.input
+package com.trendyol.transmission.components.features.input
 
 import com.trendyol.transmission.DefaultDispatcher
-import com.trendyol.transmission.features.colorpicker.ColorPickerEffect
+import com.trendyol.transmission.components.features.colorpicker.ColorPickerEffect
 import com.trendyol.transmission.transformer.Transformer
 import com.trendyol.transmission.transformer.dataholder.dataHolder
 import com.trendyol.transmission.transformer.handler.HandlerRegistry
@@ -16,7 +16,7 @@ import com.trendyol.transmission.transformer.request.computation.register
 import com.trendyol.transmission.transformer.request.computationWithArgs
 import com.trendyol.transmission.transformer.request.dataHolder
 import com.trendyol.transmission.transformer.request.identity
-import com.trendyol.transmission.ui.InputUiState
+import com.trendyol.transmission.components.features.InputUiState
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.delay
 import javax.inject.Inject
