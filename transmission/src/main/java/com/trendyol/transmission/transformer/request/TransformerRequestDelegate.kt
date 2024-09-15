@@ -62,7 +62,6 @@ internal class TransformerRequestDelegate(scope: CoroutineScope, identity: Contr
         override suspend fun execute(contract: Contract.Execution) {
             outGoingQuery.send(
                 Query.Execution(
-                    sender = identity.key,
                     key = contract.key,
                 )
             )
@@ -74,7 +73,6 @@ internal class TransformerRequestDelegate(scope: CoroutineScope, identity: Contr
         ) {
             outGoingQuery.send(
                 Query.ExecutionWithArgs(
-                    sender = identity.key,
                     key = contract.key,
                     args = args,
                 )

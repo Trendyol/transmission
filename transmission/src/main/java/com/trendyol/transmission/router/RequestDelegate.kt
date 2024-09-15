@@ -193,7 +193,7 @@ internal class RequestDelegate(
             data = registry?.computationMap?.get(query.key),
             key = query.key
         )
-        queryResultChannel.send(computationToSend)
+        queryResultChannel.trySend(computationToSend)
     }
 
     private fun <A : Any> testComputationQueryWithArgs(
@@ -204,7 +204,7 @@ internal class RequestDelegate(
             data = registry?.computationMap?.get(query.key),
             key = query.key
         )
-        queryResultChannel.send(computationToSend)
+        queryResultChannel.trySend(computationToSend)
     }
 
     // region Request Handler
@@ -258,7 +258,6 @@ internal class RequestDelegate(
     override suspend fun execute(contract: Contract.Execution) {
         outGoingQuery.send(
             Query.Execution(
-                sender = routerRef.routerName,
                 key = contract.key,
             )
         )
@@ -270,7 +269,6 @@ internal class RequestDelegate(
     ) {
         outGoingQuery.send(
             Query.ExecutionWithArgs(
-                sender = routerRef.routerName,
                 key = contract.key,
                 args = args,
             )
