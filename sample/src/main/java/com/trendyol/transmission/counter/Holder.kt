@@ -8,11 +8,10 @@ import com.trendyol.transmission.transformer.request.computation.ComputationRegi
 import com.trendyol.transmission.transformer.request.computation.computations
 import com.trendyol.transmission.transformer.request.computation.register
 import com.trendyol.transmission.transformer.request.computationWithArgs
-import com.trendyol.transmission.transformer.request.identity
 
-val lookUpAndReturn = Contracts.computationWithArgs<String, Int>("lookupAndReturn")
+val lookUpAndReturn = Contracts.computationWithArgs<String, Int>()
 
-class Holder : Transformer(Contracts.identity("master")) {
+class Holder : Transformer() {
 
     data class TestCounter(val value: Int) : Transmission.Data
 

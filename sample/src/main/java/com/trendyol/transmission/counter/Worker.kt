@@ -4,10 +4,8 @@ import com.trendyol.transmission.transformer.Transformer
 import com.trendyol.transmission.transformer.handler.HandlerRegistry
 import com.trendyol.transmission.transformer.handler.handlers
 import com.trendyol.transmission.transformer.handler.onSignal
-import com.trendyol.transmission.transformer.request.Contracts
-import com.trendyol.transmission.transformer.request.identity
 
-class Worker(val id: String) : Transformer(Contracts.identity("$id")) {
+class Worker(val id: String) : Transformer() {
 
     override val handlers: HandlerRegistry = handlers {
         onSignal<CounterSignal.Lookup> {
