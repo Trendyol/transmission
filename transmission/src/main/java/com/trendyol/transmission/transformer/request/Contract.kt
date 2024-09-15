@@ -4,27 +4,25 @@ import com.trendyol.transmission.Transmission
 
 sealed interface Contract {
 
-    data class Identity(val key: String) : Contract
+    class Identity internal constructor(internal val key: String) : Contract
 
-    abstract class DataHolder<T : Transmission.Data?> : Contract {
-        abstract val key: String
-    }
+    class DataHolder<T : Transmission.Data?> internal constructor(
+        internal val key: String,
+    ) : Contract
 
-    abstract class Computation<T : Any> : Contract {
-        abstract val key: String
-        open val useCache: Boolean = false
-    }
+    class Computation<T : Any> internal constructor(
+        internal val key: String,
+        internal val useCache: Boolean = false
+    ) : Contract
 
-    abstract class ComputationWithArgs<A : Any, T : Any> : Contract {
-        abstract val key: String
-        open val useCache: Boolean = false
-    }
+    class ComputationWithArgs<A : Any, T : Any> internal constructor(
+        internal val key: String,
+        internal val useCache: Boolean = false
+    ) : Contract
 
-    abstract class Execution : Contract {
-        abstract val key: String
-    }
+    class Execution internal constructor(internal val key: String) : Contract
 
-    abstract class ExecutionWithArgs<A : Any> : Contract {
-        abstract val key: String
-    }
+    class ExecutionWithArgs<A : Any> internal constructor(
+        internal val key: String
+    ) : Contract
 }

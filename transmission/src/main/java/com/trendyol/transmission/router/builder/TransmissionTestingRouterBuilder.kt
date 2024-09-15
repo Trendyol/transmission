@@ -9,7 +9,7 @@ object TransmissionTestingRouterBuilder {
     fun build(scope: TransmissionTestingRouterBuilderScope.() -> Unit): TransmissionRouter {
         val builder = TransmissionRouterBuilderInternal(scope)
         return TransmissionRouter(
-            identity = Contracts.identity("testingRouter"),
+            identity = Contracts.identity(),
             transformerSetLoader = builder.transformerSetLoader,
             dispatcher = builder.dispatcher,
             registryScope = builder.registryScope

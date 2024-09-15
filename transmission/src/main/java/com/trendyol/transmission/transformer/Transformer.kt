@@ -6,11 +6,13 @@ import com.trendyol.transmission.effect.RouterEffect
 import com.trendyol.transmission.transformer.handler.CommunicationScope
 import com.trendyol.transmission.transformer.handler.HandlerRegistry
 import com.trendyol.transmission.transformer.request.Contract
+import com.trendyol.transmission.transformer.request.Contracts
 import com.trendyol.transmission.transformer.request.Query
 import com.trendyol.transmission.transformer.request.QueryResult
 import com.trendyol.transmission.transformer.request.TransformerRequestDelegate
 import com.trendyol.transmission.transformer.request.computation.ComputationRegistry
 import com.trendyol.transmission.transformer.request.execution.ExecutionRegistry
+import com.trendyol.transmission.transformer.request.identity
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineScope
@@ -29,7 +31,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.supervisorScope
 
 open class Transformer(
-    identity: Contract.Identity,
+    identity: Contract.Identity = Contracts.identity(),
     dispatcher: CoroutineDispatcher = Dispatchers.Default,
 ) {
 

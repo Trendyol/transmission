@@ -15,7 +15,7 @@ import com.trendyol.transmission.components.features.ColorPickerUiState
 import kotlinx.coroutines.CoroutineDispatcher
 import javax.inject.Inject
 
-val colorPickerIdentity = Contracts.identity("ColorPicker")
+val colorPickerIdentity = Contracts.identity()
 
 class ColorPickerTransformer @Inject constructor(
     @DefaultDispatcher private val defaultDispatcher: CoroutineDispatcher
@@ -42,6 +42,6 @@ class ColorPickerTransformer @Inject constructor(
     }
 
     companion object {
-        val holderContract = Contracts.dataHolder<ColorPickerUiState>("ColorPickerUiState")
+        val holderContract = Contracts.dataHolder<ColorPickerUiState>()
     }
 }

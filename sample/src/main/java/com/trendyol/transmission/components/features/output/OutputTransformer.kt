@@ -34,7 +34,7 @@ import kotlin.time.Duration.Companion.seconds
 
 class OutputTransformer @Inject constructor(
     @DefaultDispatcher private val defaultDispatcher: CoroutineDispatcher
-) : Transformer(Contracts.identity("OutputTransformer"), defaultDispatcher) {
+) : Transformer(dispatcher = defaultDispatcher) {
 
     private val holder = dataHolder(OutputUiState())
 
@@ -90,9 +90,7 @@ class OutputTransformer @Inject constructor(
 
     companion object {
         private const val TAG = "OutputTransformer"
-        val outputCalculationContract =
-            Contracts.computation<OutputCalculationResult>("OutputCalculationResult")
-        val outputExecutionContract =
-            Contracts.execution("outputExecutionContract")
+        val outputCalculationContract = Contracts.computation<OutputCalculationResult>()
+        val outputExecutionContract = Contracts.execution()
     }
 }
