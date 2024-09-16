@@ -24,7 +24,7 @@ class CounterViewModel @Inject constructor() : ViewModel() {
             this@build.addTransformerSet(this.toSet())
         }
     }
-    val counter = AtomicInteger(0)
+    private val counter = AtomicInteger(0)
     private val _transmissionList = MutableStateFlow<List<Pair<String, Boolean>>>(emptyList())
     val transmissionList = _transmissionList.asStateFlow()
     private val _areAllDistinct = MutableStateFlow("")

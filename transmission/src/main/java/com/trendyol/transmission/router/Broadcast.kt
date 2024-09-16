@@ -5,6 +5,7 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.SendChannel
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.buffer
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.shareIn
 
@@ -18,6 +19,8 @@ fun <T> CoroutineScope.createBroadcast(): Broadcast<T> = object : Broadcast<T> {
     override val producer: SendChannel<T> = _source
 
     override val output by lazy {
-        _source.receiveAsFlow().shareIn(this@createBroadcast, SharingStarted.Lazily)
+        _source.receiveAsFlow()
+            .buffer(Channel.BUFFERED)
+            .shareIn(this@createBroadcast, SharingStarted.Lazily)
     }
 }
