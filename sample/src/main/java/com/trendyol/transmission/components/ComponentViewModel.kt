@@ -1,17 +1,18 @@
-package com.trendyol.transmission
+package com.trendyol.transmission.components
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.trendyol.transmission.Transmission
 import com.trendyol.transmission.effect.RouterEffect
-import com.trendyol.transmission.features.colorpicker.ColorPickerTransformer
-import com.trendyol.transmission.features.input.InputTransformer
+import com.trendyol.transmission.components.features.colorpicker.ColorPickerTransformer
+import com.trendyol.transmission.components.features.input.InputTransformer
 import com.trendyol.transmission.router.TransmissionRouter
 import com.trendyol.transmission.router.onEach
 import com.trendyol.transmission.router.toState
-import com.trendyol.transmission.ui.ColorPickerUiState
-import com.trendyol.transmission.ui.InputUiState
-import com.trendyol.transmission.ui.MultiOutputUiState
-import com.trendyol.transmission.ui.OutputUiState
+import com.trendyol.transmission.components.features.ColorPickerUiState
+import com.trendyol.transmission.components.features.InputUiState
+import com.trendyol.transmission.components.features.MultiOutputUiState
+import com.trendyol.transmission.components.features.OutputUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -22,7 +23,7 @@ import javax.inject.Inject
 import kotlin.time.Duration.Companion.seconds
 
 @HiltViewModel
-class SampleViewModel @Inject constructor(
+class ComponentViewModel @Inject constructor(
     private val router: TransmissionRouter
 ) : ViewModel() {
 

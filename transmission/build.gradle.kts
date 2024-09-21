@@ -11,8 +11,10 @@ java {
 
 dependencies {
     implementation(libs.kotlinx.coroutines.core)
+    implementation(libs.kotlin.stdlib)
     testImplementation(libs.kotlinx.coroutines.test)
     testImplementation(libs.junit)
+
     testImplementation(kotlin("test"))
     testImplementation(libs.turbine)
 }

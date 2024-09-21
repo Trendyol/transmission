@@ -73,11 +73,15 @@ class TransmissionRouter internal constructor(
     }
 
     fun processSignal(signal: Transmission.Signal) {
-        signalBroadcast.producer.trySend(signal)
+        routerScope.launch {
+            signalBroadcast.producer.send(signal)
+        }
     }
 
     fun processEffect(effect: Transmission.Effect) {
-        effectBroadcast.producer.trySend(EffectWrapper(effect))
+        routerScope.launch {
+            effectBroadcast.producer.send(EffectWrapper(effect))
+        }
     }
 
     private fun initializeInternal(transformerSetLoader: TransformerSetLoader?) {

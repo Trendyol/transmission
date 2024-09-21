@@ -11,18 +11,18 @@ interface CommunicationScope : RequestHandler {
      * Sends data to [TransmissionRouter]
      * @param data of type [Transmission.Data]
      */
-    fun <D : Transmission.Data> send(data: D?)
+    suspend fun <D : Transmission.Data> send(data: D?)
 
     /**
      * Publishes [Transmission.Effect] to other [Transformer]s
      * @param effect of type [Transmission.Effect]
      */
-    fun <E : Transmission.Effect> publish(effect: E)
+    suspend fun <E : Transmission.Effect> publish(effect: E)
 
     /**
      * Sends [Transmission.Effect] to a specific [Transformer]
      * @param effect of type [Transmission.Effect]
      * @param to Target [Transformer] identity Contract
      */
-    fun <E : Transmission.Effect> send(effect: E, identity: Contract.Identity)
+    suspend fun <E : Transmission.Effect> send(effect: E, identity: Contract.Identity)
 }

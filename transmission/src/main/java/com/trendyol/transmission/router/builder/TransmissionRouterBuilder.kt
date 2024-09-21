@@ -8,7 +8,7 @@ import com.trendyol.transmission.transformer.request.identity
 object TransmissionRouterBuilder {
 
     fun build(
-        identity: Contract.Identity = Contracts.identity("router"),
+        identity: Contract.Identity = Contracts.identity(),
         scope: TransmissionRouterBuilderScope.() -> Unit
     ): TransmissionRouter {
         val builder = TransmissionRouterBuilderInternal(scope)

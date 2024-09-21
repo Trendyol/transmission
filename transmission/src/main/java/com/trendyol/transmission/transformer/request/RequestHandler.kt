@@ -17,7 +17,7 @@ interface RequestHandler {
         invalidate: Boolean = false,
     ): D?
 
-    suspend fun <C : Contract.Execution> execute(contract: C)
+    suspend fun execute(contract: Contract.Execution)
 
     suspend fun <C : Contract.ExecutionWithArgs<A>, A : Any> execute(contract: C, args: A)
 }
