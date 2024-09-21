@@ -20,7 +20,6 @@ fun <T> CoroutineScope.createBroadcast(): Broadcast<T> = object : Broadcast<T> {
 
     override val output by lazy {
         _source.receiveAsFlow()
-            .buffer(Channel.BUFFERED)
             .shareIn(this@createBroadcast, SharingStarted.Lazily)
     }
 }
