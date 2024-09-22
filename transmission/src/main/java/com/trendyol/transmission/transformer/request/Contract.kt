@@ -1,6 +1,7 @@
 package com.trendyol.transmission.transformer.request
 
 import com.trendyol.transmission.Transmission
+import com.trendyol.transmission.transformer.checkpoint.Frequency
 
 sealed interface Contract {
 
@@ -20,9 +21,20 @@ sealed interface Contract {
         internal val useCache: Boolean = false
     ) : Contract
 
-    class Execution internal constructor(internal val key: String) : Contract
+    @JvmInline
+    value class Execution internal constructor(internal val key: String) : Contract
 
     class ExecutionWithArgs<A : Any> internal constructor(
         internal val key: String
+    ) : Contract
+
+    class Checkpoint internal constructor(
+        internal val key: String,
+        internal val frequency: Frequency
+    ) : Contract
+
+    class CheckpointWithArgs<A : Any> internal constructor(
+        internal val key: String,
+        internal val frequency: Frequency
     ) : Contract
 }
