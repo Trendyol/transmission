@@ -25,8 +25,16 @@ interface CheckpointHandler {
     )
 
     @ExperimentalTransmissionApi
+    suspend fun <C : Contract.CheckpointWithArgs<A>, C2 : Contract.CheckpointWithArgs<B>, A : Any, B : Any> CommunicationScope.pauseOn(
+        contract: C,
+        contract2: C2,
+        resumeBlock: suspend CommunicationScope.(A, B) -> Unit
+    )
+
+    @ExperimentalTransmissionApi
     suspend fun validate(contract: Contract.Checkpoint)
 
     @ExperimentalTransmissionApi
     suspend fun <C : Contract.CheckpointWithArgs<A>, A : Any> validate(contract: C, args: A)
 }
+

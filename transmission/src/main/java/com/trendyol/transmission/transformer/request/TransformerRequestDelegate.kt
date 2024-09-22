@@ -10,6 +10,7 @@ import com.trendyol.transmission.transformer.checkpoint.Frequency
 import com.trendyol.transmission.transformer.handler.CommunicationScope
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.filterIsInstance
@@ -170,6 +171,69 @@ internal class TransformerRequestDelegate(
                                     frequencyWithArgsTracker[contract] = it.data
                                     resumeBlock.invoke(this, it.data)
                                 }
+                        }
+                    }
+                }
+            }
+
+            @ExperimentalTransmissionApi
+            override suspend fun <C : Contract.CheckpointWithArgs<A>, C2 : Contract.CheckpointWithArgs<B>, A : Any, B : Any> CommunicationScope.pauseOn(
+                contract: C,
+                contract2: C2,
+                resumeBlock: suspend CommunicationScope.(A, B) -> Unit
+            ) {
+                when (contract.frequency) {
+                    Frequency.Continous -> {
+                        val queryIdentifier = IdentifierGenerator.generateIdentifier()
+                        listOf(contract, contract2).forEach {
+                            checkpointTrackerProvider()?.putOrCreate(
+                                contract = it,
+                                barrierOwner = identity,
+                                identifier = queryIdentifier
+                            )
+                        }
+                        val flow1 =
+                            resultBroadcast.output.filterIsInstance<QueryResult.Checkpoint<A>>()
+                                .filter { it.resultIdentifier == queryIdentifier && it.key == contract.key }
+                        val flow2 =
+                            resultBroadcast.output.filterIsInstance<QueryResult.Checkpoint<B>>()
+                                .filter { it.resultIdentifier == queryIdentifier && it.key == contract.key }
+                        combine(flow1, flow2) { checkpoint1, checkpoint2 ->
+                            resumeBlock.invoke(this, checkpoint1.data, checkpoint2.data)
+                        }
+                    }
+
+                    Frequency.Once -> {
+                        if (frequencyWithArgsTracker.containsKey(contract) && frequencyWithArgsTracker.containsKey(
+                                contract2
+                            )
+                        ) {
+                            @Suppress("UNCHECKED_CAST")
+                            resumeBlock.invoke(
+                                this,
+                                frequencyWithArgsTracker[contract] as A,
+                                frequencyWithArgsTracker[contract2] as B
+                            )
+                        } else {
+                            val queryIdentifier = IdentifierGenerator.generateIdentifier()
+                            listOf(contract, contract2).forEach {
+                                checkpointTrackerProvider()?.putOrCreate(
+                                    contract = it,
+                                    barrierOwner = identity,
+                                    identifier = queryIdentifier
+                                )
+                            }
+                            val flow1 =
+                                resultBroadcast.output.filterIsInstance<QueryResult.Checkpoint<A>>()
+                                    .filter { it.resultIdentifier == queryIdentifier && it.key == contract.key }
+                            val flow2 =
+                                resultBroadcast.output.filterIsInstance<QueryResult.Checkpoint<B>>()
+                                    .filter { it.resultIdentifier == queryIdentifier && it.key == contract.key }
+                            combine(flow1, flow2) { checkpoint1, checkpoint2 ->
+                                frequencyWithArgsTracker[contract] = checkpoint1.data
+                                frequencyWithArgsTracker[contract2] = checkpoint2.data
+                                resumeBlock.invoke(this, checkpoint1.data, checkpoint2.data)
+                            }
                         }
                     }
                 }
