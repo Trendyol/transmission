@@ -1,7 +1,9 @@
 package com.trendyol.transmission.transformer.request
 
+import com.trendyol.transmission.ExperimentalTransmissionApi
 import com.trendyol.transmission.Transmission
 import com.trendyol.transmission.identifier.IdentifierGenerator
+import com.trendyol.transmission.transformer.checkpoint.Frequency
 
 object Contracts
 
@@ -37,4 +39,22 @@ fun Contracts.execution(): Contract.Execution {
 
 fun <A : Any> Contracts.executionWithArgs(): Contract.ExecutionWithArgs<A> {
     return Contract.ExecutionWithArgs<A>(key = IdentifierGenerator.generateIdentifier())
+}
+
+@ExperimentalTransmissionApi
+fun Contracts.checkpoint(frequency: Frequency = Frequency.Once): Contract.Checkpoint {
+    return Contract.Checkpoint(
+        key = IdentifierGenerator.generateIdentifier(),
+        frequency = frequency
+    )
+}
+
+@ExperimentalTransmissionApi
+fun <A : Any> Contracts.checkpointWithArgs(
+    frequency: Frequency = Frequency.Once
+): Contract.CheckpointWithArgs<A> {
+    return Contract.CheckpointWithArgs(
+        key = IdentifierGenerator.generateIdentifier(),
+        frequency = frequency
+    )
 }
