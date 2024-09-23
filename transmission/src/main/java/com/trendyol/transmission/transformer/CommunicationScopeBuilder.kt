@@ -87,6 +87,17 @@ internal class CommunicationScopeBuilder(
         }
     }
 
+    @ExperimentalTransmissionApi
+    override suspend fun <C : Contract.CheckpointWithArgs<A>, C2 : Contract.CheckpointWithArgs<B>, A : Any, B : Any> CommunicationScope.pauseOn(
+        contract: C,
+        contract2: C2,
+        resumeBlock: suspend CommunicationScope.(A, B) -> Unit
+    ) {
+        with(requestDelegate.checkpointHandler) {
+            pauseOn(contract, contract2, resumeBlock)
+        }
+    }
+
     override suspend fun validate(contract: Contract.Checkpoint) {
         requestDelegate.checkpointHandler.validate(contract)
     }
