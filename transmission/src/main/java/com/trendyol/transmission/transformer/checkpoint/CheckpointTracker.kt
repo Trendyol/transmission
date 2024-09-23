@@ -8,19 +8,14 @@ internal class CheckpointTracker {
     private val tracker: ConcurrentMap<Contract, ArrayDeque<IdentifierBundle>> =
         ConcurrentHashMap()
 
-    fun putOrCreate(contract: Contract, barrierOwner: Contract.Identity, identifier: String) {
+    fun putOrCreate(contract: Contract, checkpointOwner: Contract.Identity, identifier: String) {
         tracker
             .putIfAbsent(
                 contract,
                 ArrayDeque<IdentifierBundle>().apply {
-                    addLast(
-                        IdentifierBundle(
-                            barrierOwner,
-                            identifier
-                        )
-                    )
+                    addLast(IdentifierBundle(checkpointOwner, identifier))
                 })
-            ?.addLast(IdentifierBundle(barrierOwner, identifier))
+            ?.addLast(IdentifierBundle(checkpointOwner, identifier))
     }
 
     fun useIdentifier(contract: Contract): IdentifierBundle? {

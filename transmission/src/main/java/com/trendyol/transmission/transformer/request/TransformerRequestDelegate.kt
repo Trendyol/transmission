@@ -41,11 +41,11 @@ internal class TransformerRequestDelegate(
                 resumeBlock: suspend CommunicationScope.() -> Unit
             ) {
                 when (contract.frequency) {
-                    Frequency.Continous -> {
+                    Frequency.Continuous -> {
                         val queryIdentifier = IdentifierGenerator.generateIdentifier()
                         checkpointTrackerProvider()?.putOrCreate(
                             contract = contract,
-                            barrierOwner = identity,
+                            checkpointOwner = identity,
                             identifier = queryIdentifier
                         )
                         resultBroadcast.output.filterIsInstance<QueryResult.Checkpoint<Unit>>()
@@ -62,7 +62,7 @@ internal class TransformerRequestDelegate(
                             val queryIdentifier = IdentifierGenerator.generateIdentifier()
                             checkpointTrackerProvider()?.putOrCreate(
                                 contract = contract,
-                                barrierOwner = identity,
+                                checkpointOwner = identity,
                                 identifier = queryIdentifier
                             )
                             frequencyTracker.add(contract)
@@ -83,21 +83,21 @@ internal class TransformerRequestDelegate(
             ) {
                 val contractList = contract.toList()
                 check(contractList.distinctBy { it.frequency }.size == 1) {
-                    "All Barriers should have the same frequency"
+                    "All Checkpoints should have the same frequency"
                 }
                 check(contractList.isNotEmpty()) {
-                    "At least one barrier should be provided"
+                    "At least one checkpoint should be provided"
                 }
                 check(contractList.toSet().size == contractList.size) {
-                    "All Barrier Contracts should be unique"
+                    "All Checkpoint Contracts should be unique"
                 }
                 when (contractList.first().frequency) {
-                    Frequency.Continous -> {
+                    Frequency.Continuous -> {
                         val queryIdentifier = IdentifierGenerator.generateIdentifier()
                         contractList.forEach { internalContract ->
                             checkpointTrackerProvider()?.putOrCreate(
                                 contract = internalContract,
-                                barrierOwner = identity,
+                                checkpointOwner = identity,
                                 identifier = queryIdentifier
                             )
                         }
@@ -118,7 +118,7 @@ internal class TransformerRequestDelegate(
                             contractList.forEach { internalContract ->
                                 checkpointTrackerProvider()?.putOrCreate(
                                     contract = internalContract,
-                                    barrierOwner = identity,
+                                    checkpointOwner = identity,
                                     identifier = queryIdentifier
                                 )
                             }
@@ -140,11 +140,11 @@ internal class TransformerRequestDelegate(
                 resumeBlock: suspend CommunicationScope.(args: A) -> Unit
             ) {
                 when (contract.frequency) {
-                    Frequency.Continous -> {
+                    Frequency.Continuous -> {
                         val queryIdentifier = IdentifierGenerator.generateIdentifier()
                         checkpointTrackerProvider()?.putOrCreate(
                             contract = contract,
-                            barrierOwner = identity,
+                            checkpointOwner = identity,
                             identifier = queryIdentifier
                         )
                         resultBroadcast.output.filterIsInstance<QueryResult.Checkpoint<A>>()
@@ -162,7 +162,7 @@ internal class TransformerRequestDelegate(
                             val queryIdentifier = IdentifierGenerator.generateIdentifier()
                             checkpointTrackerProvider()?.putOrCreate(
                                 contract = contract,
-                                barrierOwner = identity,
+                                checkpointOwner = identity,
                                 identifier = queryIdentifier
                             )
                             resultBroadcast.output.filterIsInstance<QueryResult.Checkpoint<A>>()
@@ -182,13 +182,20 @@ internal class TransformerRequestDelegate(
                 contract2: C2,
                 resumeBlock: suspend CommunicationScope.(A, B) -> Unit
             ) {
+                val contractList = listOf(contract, contract2)
+                check(contractList.distinctBy { it.frequency }.size == 1) {
+                    "All Checkpoint should have the same frequency"
+                }
+                check(contractList.toSet().size == contractList.size) {
+                    "All Checkpoint Contracts should be unique"
+                }
                 when (contract.frequency) {
-                    Frequency.Continous -> {
+                    Frequency.Continuous -> {
                         val queryIdentifier = IdentifierGenerator.generateIdentifier()
                         listOf(contract, contract2).forEach {
                             checkpointTrackerProvider()?.putOrCreate(
                                 contract = it,
-                                barrierOwner = identity,
+                                checkpointOwner = identity,
                                 identifier = queryIdentifier
                             )
                         }
@@ -219,7 +226,7 @@ internal class TransformerRequestDelegate(
                             listOf(contract, contract2).forEach {
                                 checkpointTrackerProvider()?.putOrCreate(
                                     contract = it,
-                                    barrierOwner = identity,
+                                    checkpointOwner = identity,
                                     identifier = queryIdentifier
                                 )
                             }

@@ -52,7 +52,6 @@ class InputTransformer @Inject constructor(
                 )
                 publish(effect = InputEffect.InputUpdate(signal.value))
             }
-            pauseOn(colorCheckpoint, colorCheckpoint) {}
         }
         onEffect<ColorPickerEffect.BackgroundColorUpdate> { effect ->
             validate(colorCheckpoint, effect.color)

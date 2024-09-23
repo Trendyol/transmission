@@ -46,7 +46,8 @@ class TransmissionRouter internal constructor(
     private val checkpointTracker = CheckpointTracker()
 
     val dataStream = dataBroadcast.output
-    val effectStream: SharedFlow<Transmission.Effect> = effectBroadcast.output.map { it.effect }
+    val effectStream: SharedFlow<Transmission.Effect> = effectBroadcast.output
+        .map { it.effect }
         .shareIn(routerScope, SharingStarted.Lazily)
 
     private val _requestDelegate = RequestDelegate(
@@ -54,6 +55,7 @@ class TransmissionRouter internal constructor(
         routerRef = this@TransmissionRouter,
         registry = registryScope
     )
+
     val requestHelper: RequestHandler = _requestDelegate
 
     init {

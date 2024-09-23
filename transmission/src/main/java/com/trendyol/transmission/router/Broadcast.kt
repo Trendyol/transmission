@@ -8,16 +8,18 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.shareIn
 
-interface Broadcast<T> {
+internal interface Broadcast<T> {
     val producer: SendChannel<T>
     val output: SharedFlow<T>
 }
 
-fun <T> CoroutineScope.createBroadcast(): Broadcast<T> = object : Broadcast<T> {
+internal fun <T> CoroutineScope.createBroadcast(): Broadcast<T> = object : Broadcast<T> {
+
     private val _source = Channel<T>(capacity = Channel.BUFFERED)
     override val producer: SendChannel<T> = _source
 
     override val output by lazy {
-        _source.receiveAsFlow().shareIn(this@createBroadcast, SharingStarted.Lazily)
+        _source.receiveAsFlow()
+            .shareIn(this@createBroadcast, SharingStarted.Lazily)
     }
 }
