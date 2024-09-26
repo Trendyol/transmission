@@ -2,7 +2,7 @@ package com.trendyol.transmission.transformer.request
 
 import com.trendyol.transmission.Transmission
 
-sealed class QueryResult(
+internal sealed class QueryResult(
     open val owner: String,
     open val key: String,
 ) {
@@ -19,4 +19,12 @@ sealed class QueryResult(
         val data: D?,
         val resultIdentifier: String,
     ) : QueryResult(owner, key)
+
+    class Checkpoint<D : Any>(
+        override val owner: String,
+        override val key: String,
+        val data: D,
+        val resultIdentifier: String,
+    ) : QueryResult(owner, key)
+
 }

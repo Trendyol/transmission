@@ -31,4 +31,11 @@ internal sealed interface Query {
         val key: String,
         val args: A,
     ) : Query
+
+    class Checkpoint<A : Any>(
+        val sender: String,
+        val key: String,
+        val args: A,
+        val queryIdentifier: String,
+    ) : Query
 }

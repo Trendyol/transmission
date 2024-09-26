@@ -3,10 +3,11 @@ package com.trendyol.transmission.transformer.handler
 import com.trendyol.transmission.Transmission
 import com.trendyol.transmission.router.TransmissionRouter
 import com.trendyol.transmission.transformer.Transformer
+import com.trendyol.transmission.transformer.checkpoint.CheckpointHandler
 import com.trendyol.transmission.transformer.request.Contract
 import com.trendyol.transmission.transformer.request.RequestHandler
 
-interface CommunicationScope : RequestHandler {
+interface CommunicationScope : RequestHandler, CheckpointHandler {
     /**
      * Sends data to [TransmissionRouter]
      * @param data of type [Transmission.Data]

@@ -5,6 +5,7 @@ import com.trendyol.transmission.effect.EffectWrapper
 import com.trendyol.transmission.router.builder.TransmissionRouterBuilderScope
 import com.trendyol.transmission.router.loader.TransformerSetLoader
 import com.trendyol.transmission.transformer.Transformer
+import com.trendyol.transmission.transformer.checkpoint.CheckpointTracker
 import com.trendyol.transmission.transformer.request.Contract
 import com.trendyol.transmission.transformer.request.RequestHandler
 import kotlinx.coroutines.CoroutineDispatcher
@@ -42,8 +43,11 @@ class TransmissionRouter internal constructor(
     private val dataBroadcast = routerScope.createBroadcast<Transmission.Data>()
     private val effectBroadcast = routerScope.createBroadcast<EffectWrapper>()
 
+    private val checkpointTracker = CheckpointTracker()
+
     val dataStream = dataBroadcast.output
-    val effectStream: SharedFlow<Transmission.Effect> = effectBroadcast.output.map { it.effect }
+    val effectStream: SharedFlow<Transmission.Effect> = effectBroadcast.output
+        .map { it.effect }
         .shareIn(routerScope, SharingStarted.Lazily)
 
     private val _requestDelegate = RequestDelegate(
@@ -51,6 +55,7 @@ class TransmissionRouter internal constructor(
         routerRef = this@TransmissionRouter,
         registry = registryScope
     )
+
     val requestHelper: RequestHandler = _requestDelegate
 
     init {
@@ -97,6 +102,7 @@ class TransmissionRouter internal constructor(
         }
         transformerSet.forEach { transformer ->
             transformer.run {
+                bindCheckpointTracker(checkpointTracker)
                 startSignalCollection(incoming = signalBroadcast.output)
                 startDataPublishing(data = dataBroadcast.producer)
                 startEffectProcessing(
