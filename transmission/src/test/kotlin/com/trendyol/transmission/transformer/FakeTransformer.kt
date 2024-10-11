@@ -10,12 +10,10 @@ import com.trendyol.transmission.transformer.handler.HandlerRegistry
 import com.trendyol.transmission.transformer.handler.handlers
 import com.trendyol.transmission.transformer.handler.onEffect
 import com.trendyol.transmission.transformer.handler.onSignal
-import com.trendyol.transmission.transformer.request.Contracts
-import com.trendyol.transmission.transformer.request.identity
 import kotlinx.coroutines.CoroutineDispatcher
 
 open class FakeTransformer(dispatcher: CoroutineDispatcher) :
-    Transformer(Contracts.identity("FakeTransformer"), dispatcher) {
+    Transformer(dispatcher = dispatcher) {
     val signalList = mutableListOf<Transmission.Signal>()
     val effectList = mutableListOf<Transmission.Effect>()
 
