@@ -4,6 +4,8 @@ import com.trendyol.transmission.Transmission
 import com.trendyol.transmission.effect.EffectWrapper
 import com.trendyol.transmission.effect.RouterEffect
 import com.trendyol.transmission.transformer.handler.CommunicationScope
+import com.trendyol.transmission.transformer.handler.ExtendedHandlers
+import com.trendyol.transmission.transformer.handler.Handlers
 import com.trendyol.transmission.transformer.handler.HandlerRegistry
 import com.trendyol.transmission.transformer.request.Contract
 import com.trendyol.transmission.transformer.request.Contracts
@@ -11,7 +13,11 @@ import com.trendyol.transmission.transformer.request.Query
 import com.trendyol.transmission.transformer.request.QueryResult
 import com.trendyol.transmission.transformer.request.TransformerRequestDelegate
 import com.trendyol.transmission.transformer.request.computation.ComputationRegistry
+import com.trendyol.transmission.transformer.request.computation.Computations
+import com.trendyol.transmission.transformer.request.computation.ExtendedComputations
 import com.trendyol.transmission.transformer.request.execution.ExecutionRegistry
+import com.trendyol.transmission.transformer.request.execution.Executions
+import com.trendyol.transmission.transformer.request.execution.ExtendedExecutions
 import com.trendyol.transmission.transformer.request.identity
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineExceptionHandler
@@ -49,10 +55,20 @@ open class Transformer(
     internal val dataChannel: Channel<Transmission.Data> = Channel(capacity = Channel.BUFFERED)
     internal val storage = TransformerStorage()
 
-    protected open val handlers: HandlerRegistry? = null
+    internal val handlerRegistry by lazy { HandlerRegistry() }
+    internal val executionRegistry: ExecutionRegistry by lazy { ExecutionRegistry(this) }
+    internal val computationRegistry: ComputationRegistry by lazy {
+        ComputationRegistry(this)
+    }
 
-    protected open val executions: ExecutionRegistry? = null
-    protected open val computations: ComputationRegistry? = null
+    protected open val handlers: Handlers by lazy { Handlers() }
+    protected open val extendedHandlers: ExtendedHandlers by lazy { ExtendedHandlers() }
+
+    protected open val computations: Computations by lazy { Computations() }
+    protected open val extendedComputations: ExtendedComputations by lazy { ExtendedComputations() }
+
+    protected open val executions: Executions by lazy { Executions() }
+    protected open val extendedExecutions: ExtendedExecutions by lazy { ExtendedExecutions() }
 
     var currentEffectProcessing: Job? = null
     var currentSignalProcessing: Job? = null
@@ -67,8 +83,10 @@ open class Transformer(
         transformerScope.launch {
             incoming.collect {
                 currentSignalProcessing = transformerScope.launch {
-                    handlers?.signalHandlerRegistry?.get(it::class)
-                        ?.invoke(communicationScope, it)
+                    handlerRegistry.signalHandlerRegistry[it::class]?.invoke(
+                        communicationScope,
+                        it
+                    )
                 }
             }
         }
@@ -91,7 +109,7 @@ open class Transformer(
                         .map { it.effect }
                         .collect {
                             currentEffectProcessing = launch {
-                                handlers?.effectHandlerRegistry?.get(it::class)
+                                handlerRegistry.effectHandlerRegistry[it::class]
                                     ?.invoke(communicationScope, it)
                             }
                         }

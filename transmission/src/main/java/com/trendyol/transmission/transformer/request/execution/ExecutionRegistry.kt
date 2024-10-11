@@ -5,6 +5,10 @@ import com.trendyol.transmission.transformer.request.RequestHandler
 
 class ExecutionRegistry internal constructor(private val transformer: Transformer) {
 
+    internal fun clear() {
+        transformer.storage.clearExecutions()
+    }
+
     internal fun buildWith(
         key: String,
         execution: suspend RequestHandler.() -> Unit

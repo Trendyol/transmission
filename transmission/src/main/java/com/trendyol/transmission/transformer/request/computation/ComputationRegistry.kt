@@ -3,7 +3,11 @@ package com.trendyol.transmission.transformer.request.computation
 import com.trendyol.transmission.transformer.Transformer
 import com.trendyol.transmission.transformer.request.RequestHandler
 
-class ComputationRegistry internal constructor(private val transformer: Transformer) {
+internal class ComputationRegistry internal constructor(private val transformer: Transformer) {
+
+    internal fun clear() {
+        transformer.storage.clearComputations()
+    }
 
     internal fun <T : Any> buildWith(
         key: String,
