@@ -9,7 +9,7 @@ class Handlers internal constructor()
 
 class ExtendedHandlers internal constructor()
 
-fun Transformer.extendedHandlers(scope: HandlerScope.() -> Unit): ExtendedHandlers {
+fun Transformer.extendHandlers(scope: HandlerScope.() -> Unit): ExtendedHandlers {
     HandlerScope(handlerRegistry).apply(scope)
     return ExtendedHandlers()
 }
