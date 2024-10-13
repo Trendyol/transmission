@@ -44,7 +44,7 @@ class TransmissionRouter internal constructor(
 
     val dataStream = dataBroadcast.output
     val effectStream: SharedFlow<Transmission.Effect> = effectBroadcast.output.map { it.effect }
-        .shareIn(routerScope, SharingStarted.Lazily)
+        .shareIn(routerScope, SharingStarted.WhileSubscribed())
 
     private val _requestDelegate = RequestDelegate(
         queryScope = routerScope,

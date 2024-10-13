@@ -7,6 +7,11 @@ import kotlin.reflect.KClass
 
 class HandlerRegistry internal constructor() {
 
+    internal fun clear() {
+        signalHandlerRegistry.clear()
+        effectHandlerRegistry.clear()
+    }
+
     @PublishedApi
     internal val signalHandlerRegistry =
         mutableMapOf<KClass<out Transmission.Signal>, suspend CommunicationScope.(effect: Transmission.Signal) -> Unit>()

@@ -4,18 +4,17 @@ import com.trendyol.transmission.DefaultDispatcher
 import com.trendyol.transmission.components.features.colorpicker.ColorPickerEffect
 import com.trendyol.transmission.transformer.Transformer
 import com.trendyol.transmission.transformer.dataholder.dataHolder
-import com.trendyol.transmission.transformer.handler.HandlerRegistry
-import com.trendyol.transmission.transformer.handler.handlers
+import com.trendyol.transmission.transformer.handler.Handlers
+import com.trendyol.transmission.transformer.handler.createHandlers
 import com.trendyol.transmission.transformer.handler.onEffect
 import com.trendyol.transmission.transformer.handler.onSignal
 import com.trendyol.transmission.transformer.request.Contracts
 import com.trendyol.transmission.transformer.request.computation
-import com.trendyol.transmission.transformer.request.computation.ComputationRegistry
-import com.trendyol.transmission.transformer.request.computation.computations
+import com.trendyol.transmission.transformer.request.computation.Computations
+import com.trendyol.transmission.transformer.request.computation.createComputations
 import com.trendyol.transmission.transformer.request.computation.register
 import com.trendyol.transmission.transformer.request.computationWithArgs
 import com.trendyol.transmission.transformer.request.dataHolder
-import com.trendyol.transmission.transformer.request.identity
 import com.trendyol.transmission.components.features.InputUiState
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.delay
@@ -28,7 +27,7 @@ class InputTransformer @Inject constructor(
 
     private val holder = dataHolder(InputUiState(), holderContract)
 
-    override val computations: ComputationRegistry = computations {
+    override val computations: Computations = createComputations {
         register(writtenInputContract) {
             delay(1.seconds)
             WrittenInput(holder.getValue().writtenText)
@@ -38,7 +37,7 @@ class InputTransformer @Inject constructor(
         }
     }
 
-    override val handlers: HandlerRegistry = handlers {
+    override val handlers: Handlers = createHandlers {
         onSignal<InputSignal.InputUpdate> { signal ->
             holder.update { it.copy(writtenText = signal.value) }
             publish(effect = InputEffect.InputUpdate(signal.value))
@@ -54,3 +53,4 @@ class InputTransformer @Inject constructor(
         val holderContract = Contracts.dataHolder<InputUiState>()
     }
 }
+
