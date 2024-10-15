@@ -1,8 +1,10 @@
 package com.trendyol.transmission.transformer
 
+import com.trendyol.transmission.ExperimentalTransmissionApi
 import com.trendyol.transmission.Transmission
 import com.trendyol.transmission.effect.EffectWrapper
 import com.trendyol.transmission.effect.RouterEffect
+import com.trendyol.transmission.transformer.checkpoint.CheckpointTracker
 import com.trendyol.transmission.transformer.handler.CommunicationScope
 import com.trendyol.transmission.transformer.handler.ExtendedHandlers
 import com.trendyol.transmission.transformer.handler.Handlers
@@ -36,6 +38,7 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.supervisorScope
 
+@OptIn(ExperimentalTransmissionApi::class)
 open class Transformer(
     identity: Contract.Identity = Contracts.identity(),
     dispatcher: CoroutineDispatcher = Dispatchers.Default,
@@ -51,7 +54,14 @@ open class Transformer(
     private val _identity: Contract.Identity = identity
 
     private val effectChannel: Channel<EffectWrapper> = Channel(capacity = Channel.BUFFERED)
-    private val requestDelegate = TransformerRequestDelegate(transformerScope, _identity)
+    private var checkpointProvider: () -> CheckpointTracker? = { null }
+    private val requestDelegate by lazy {
+        TransformerRequestDelegate(
+            scope = transformerScope,
+            checkpointTrackerProvider = checkpointProvider,
+            identity = _identity
+        )
+    }
     internal val dataChannel: Channel<Transmission.Data> = Channel(capacity = Channel.BUFFERED)
     internal val storage = TransformerStorage()
 
@@ -73,11 +83,18 @@ open class Transformer(
     var currentEffectProcessing: Job? = null
     var currentSignalProcessing: Job? = null
 
-    val communicationScope: CommunicationScope = CommunicationScopeBuilder(
-        effectChannel = effectChannel,
-        dataChannel = dataChannel,
-        requestDelegate = requestDelegate
-    )
+    val communicationScope: CommunicationScope by lazy {
+        CommunicationScopeBuilder(
+            effectChannel = effectChannel,
+            dataChannel = dataChannel,
+            requestDelegate = requestDelegate
+        )
+    }
+
+
+    internal fun bindCheckpointTracker(tracker: CheckpointTracker) {
+        checkpointProvider = { tracker }
+    }
 
     internal fun startSignalCollection(incoming: SharedFlow<Transmission.Signal>) {
         transformerScope.launch {
