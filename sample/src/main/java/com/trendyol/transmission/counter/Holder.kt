@@ -4,8 +4,8 @@ import com.trendyol.transmission.Transmission
 import com.trendyol.transmission.transformer.Transformer
 import com.trendyol.transmission.transformer.dataholder.dataHolder
 import com.trendyol.transmission.transformer.request.Contracts
-import com.trendyol.transmission.transformer.request.computation.ComputationRegistry
-import com.trendyol.transmission.transformer.request.computation.computations
+import com.trendyol.transmission.transformer.request.computation.Computations
+import com.trendyol.transmission.transformer.request.computation.createComputations
 import com.trendyol.transmission.transformer.request.computation.register
 import com.trendyol.transmission.transformer.request.computationWithArgs
 
@@ -17,7 +17,7 @@ class Holder : Transformer() {
 
     val counterData = dataHolder(TestCounter(0))
 
-    override val computations: ComputationRegistry = computations {
+    override val computations: Computations = createComputations {
         register(lookUpAndReturn) { id ->
             counterData.updateAndGet { it.copy(value = it.value.plus(1)) }.value
         }

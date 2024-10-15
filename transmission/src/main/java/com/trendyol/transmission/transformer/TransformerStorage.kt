@@ -20,6 +20,14 @@ internal class TransformerStorage {
     private val internalExecutionMap: MutableMap<String, ExecutionOwner> =
         mutableMapOf()
 
+    fun clearComputations() {
+       internalComputationMap.clear()
+    }
+
+    fun clearExecutions() {
+       internalExecutionMap.clear()
+    }
+
     fun isHolderStateInitialized(): Boolean {
         return internalTransmissionHolderSet is HolderState.Initialized
     }

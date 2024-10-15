@@ -5,10 +5,19 @@ import com.trendyol.transmission.transformer.Transformer
 
 class HandlerScope internal constructor(val handlerRegistry: HandlerRegistry)
 
-fun Transformer.handlers(scope: HandlerScope.() -> Unit): HandlerRegistry {
-    val handlerRegistry = HandlerRegistry()
+class Handlers internal constructor()
+
+class ExtendedHandlers internal constructor()
+
+fun Transformer.extendHandlers(scope: HandlerScope.() -> Unit): ExtendedHandlers {
     HandlerScope(handlerRegistry).apply(scope)
-    return handlerRegistry
+    return ExtendedHandlers()
+}
+
+fun Transformer.createHandlers(scope: HandlerScope.() -> Unit): Handlers {
+    this.handlerRegistry.clear()
+    HandlerScope(handlerRegistry).apply(scope)
+    return Handlers()
 }
 
 inline fun <reified T : Transmission.Effect> HandlerScope.onEffect(

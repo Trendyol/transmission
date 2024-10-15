@@ -4,14 +4,14 @@ import com.trendyol.transmission.DefaultDispatcher
 import com.trendyol.transmission.components.features.multioutput.multiOutputTransformerIdentity
 import com.trendyol.transmission.transformer.Transformer
 import com.trendyol.transmission.transformer.dataholder.dataHolder
-import com.trendyol.transmission.transformer.handler.HandlerRegistry
-import com.trendyol.transmission.transformer.handler.handlers
+import com.trendyol.transmission.transformer.handler.createHandlers
 import com.trendyol.transmission.transformer.handler.onEffect
 import com.trendyol.transmission.transformer.handler.onSignal
 import com.trendyol.transmission.transformer.request.Contracts
 import com.trendyol.transmission.transformer.request.dataHolder
 import com.trendyol.transmission.transformer.request.identity
 import com.trendyol.transmission.components.features.ColorPickerUiState
+import com.trendyol.transmission.transformer.handler.Handlers
 import kotlinx.coroutines.CoroutineDispatcher
 import javax.inject.Inject
 
@@ -23,7 +23,7 @@ class ColorPickerTransformer @Inject constructor(
 
     private val holder = dataHolder(ColorPickerUiState(), holderContract)
 
-    override val handlers: HandlerRegistry = handlers {
+    override val handlers: Handlers = createHandlers {
         onSignal<ColorPickerSignal.SelectColor> { signal ->
             holder.update { it.copy(selectedColorIndex = signal.index) }
             publish(
