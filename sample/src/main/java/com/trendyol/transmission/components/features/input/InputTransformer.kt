@@ -45,13 +45,12 @@ class InputTransformer @Inject constructor(
     override val handlers: Handlers = createHandlers {
         onSignal<InputSignal.InputUpdate> { signal ->
             holder.update { it.copy(writtenText = signal.value) }
-            pauseOn(colorCheckpoint) { color ->
-                send(
-                    effect = ColorPickerEffect.SelectedColorUpdate(color),
-                    identity = multiOutputTransformerIdentity
-                )
-                publish(effect = InputEffect.InputUpdate(signal.value))
-            }
+            val color = pauseOn(colorCheckpoint)
+            send(
+                effect = ColorPickerEffect.SelectedColorUpdate(color),
+                identity = multiOutputTransformerIdentity
+            )
+            publish(effect = InputEffect.InputUpdate(signal.value))
         }
         onEffect<ColorPickerEffect.BackgroundColorUpdate> { effect ->
             validate(colorCheckpoint, effect.color)

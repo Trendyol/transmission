@@ -1,26 +1,43 @@
 package com.trendyol.transmission.transformer.checkpoint
 
+import com.trendyol.transmission.InternalTransmissionApi
 import com.trendyol.transmission.transformer.request.Contract
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.ConcurrentMap
 
+@OptIn(InternalTransmissionApi::class)
 internal class CheckpointTracker {
-    private val tracker: ConcurrentMap<Contract, ArrayDeque<IdentifierBundle>> =
+    private val tracker: ConcurrentMap<String, ArrayDeque<CheckpointValidator<*, *>>> =
         ConcurrentHashMap()
+    private val contractTracker: ConcurrentMap<Contract.Checkpoint, String> = ConcurrentHashMap()
 
-    fun putOrCreate(contract: Contract, checkpointOwner: Contract.Identity, identifier: String) {
-        tracker
-            .putIfAbsent(
-                contract,
-                ArrayDeque<IdentifierBundle>().apply {
-                    addLast(IdentifierBundle(checkpointOwner, identifier))
-                })
-            ?.addLast(IdentifierBundle(checkpointOwner, identifier))
+    fun registerContract(contract: Contract.Checkpoint, identifier: String) {
+        contractTracker.put(contract, identifier)
     }
 
-    fun useIdentifier(contract: Contract): IdentifierBundle? {
-        return tracker[contract]?.removeFirstOrNull()
+    fun <C : Contract.Checkpoint, A : Any> putOrCreate(
+        identifier: String,
+        validator: CheckpointValidator<C, A>
+    ) {
+        tracker
+            .putIfAbsent(identifier, ArrayDeque<CheckpointValidator<*, *>>().apply {
+                addLast(validator)
+            })?.addLast(validator)
+    }
+
+    fun <C : Contract.Checkpoint, A : Any> useValidator(contract: Contract.Checkpoint): CheckpointValidator<C, A>? {
+        val identifier = contractTracker[contract] ?: return null
+        return tracker[identifier]?.firstOrNull() as? CheckpointValidator<C, A>
+    }
+
+    fun removeValidator(contract: Contract.Checkpoint) {
+        val identifier = contractTracker[contract] ?: return
+        val contractsToRemove = contractTracker.entries
+            .filter { it.value == identifier }
+            .map { it.key }
+        contractsToRemove.forEach {
+            contractTracker.remove(it)
+        }
+        tracker[identifier]?.removeFirstOrNull()
     }
 }
-
-internal class IdentifierBundle(val barrierOwner: Contract.Identity, val value: String)

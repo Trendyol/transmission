@@ -53,19 +53,7 @@ internal class RequestDelegate(
             is Query.ComputationWithArgs<*> -> processComputationQueryWithArgs(query)
             is Query.Execution -> processExecution(query)
             is Query.ExecutionWithArgs<*> -> processExecutionWithArgs(query)
-            is Query.Checkpoint<*> -> processCheckpoint(query)
         }
-    }
-
-    private fun <A : Any> processCheckpoint(query: Query.Checkpoint<A>) = queryScope.launch {
-        queryResultChannel.send(
-            QueryResult.Checkpoint(
-                owner = query.sender,
-                key = query.key,
-                data = query.args,
-                resultIdentifier = query.queryIdentifier
-            )
-        )
     }
 
     private fun processDataQuery(
@@ -185,7 +173,6 @@ internal class RequestDelegate(
             is Query.ComputationWithArgs<*> -> testComputationQueryWithArgs(query)
             is Query.Execution -> {}
             is Query.ExecutionWithArgs<*> -> {}
-            is Query.Checkpoint<*> -> {}
         }
     }
 

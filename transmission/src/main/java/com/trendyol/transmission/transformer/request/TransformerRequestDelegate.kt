@@ -1,23 +1,26 @@
 package com.trendyol.transmission.transformer.request
 
 import com.trendyol.transmission.ExperimentalTransmissionApi
+import com.trendyol.transmission.InternalTransmissionApi
 import com.trendyol.transmission.Transmission
 import com.trendyol.transmission.identifier.IdentifierGenerator
 import com.trendyol.transmission.router.createBroadcast
 import com.trendyol.transmission.transformer.checkpoint.CheckpointHandler
 import com.trendyol.transmission.transformer.checkpoint.CheckpointTracker
-import com.trendyol.transmission.transformer.checkpoint.Frequency
+import com.trendyol.transmission.transformer.checkpoint.CheckpointValidator
 import com.trendyol.transmission.transformer.handler.CommunicationScope
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.suspendCancellableCoroutine
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import java.util.concurrent.ConcurrentHashMap
-import java.util.concurrent.ConcurrentMap
+import kotlin.coroutines.resume
 
+@OptIn(InternalTransmissionApi::class)
 @ExperimentalTransmissionApi
 internal class TransformerRequestDelegate(
     scope: CoroutineScope,
@@ -28,249 +31,107 @@ internal class TransformerRequestDelegate(
     val outGoingQuery: Channel<Query> = Channel(capacity = Channel.BUFFERED)
     val resultBroadcast = scope.createBroadcast<QueryResult>()
 
-    private val frequencyTracker: MutableSet<Contract> = mutableSetOf()
-    private val arbitraryFrequencyTracker: MutableSet<Set<Contract>> = mutableSetOf()
-    private val frequencyWithArgsTracker: ConcurrentMap<Contract.CheckpointWithArgs<*>, Any> =
-        ConcurrentHashMap()
-
     val checkpointHandler: CheckpointHandler by lazy {
         object : CheckpointHandler {
 
-            override suspend fun CommunicationScope.pauseOn(
-                contract: Contract.Checkpoint,
-                resumeBlock: suspend CommunicationScope.() -> Unit
-            ) {
-                when (contract.frequency) {
-                    Frequency.Continuous -> {
-                        val queryIdentifier = IdentifierGenerator.generateIdentifier()
-                        checkpointTrackerProvider()?.putOrCreate(
-                            contract = contract,
-                            checkpointOwner = identity,
-                            identifier = queryIdentifier
-                        )
-                        resultBroadcast.output.filterIsInstance<QueryResult.Checkpoint<Unit>>()
-                            .filter { it.resultIdentifier == queryIdentifier && it.key == contract.key }
-                            .collect {
-                                resumeBlock.invoke(this)
-                            }
-                    }
+            @ExperimentalTransmissionApi
+            override suspend fun CommunicationScope.pauseOn(contract: Contract.Checkpoint.Default) {
+                val queryIdentifier = IdentifierGenerator.generateIdentifier()
+                suspendCancellableCoroutine<Unit> { continuation ->
+                    val validator =
+                        object : CheckpointValidator<Contract.Checkpoint.Default, Unit> {
 
-                    Frequency.Once -> {
-                        if (frequencyTracker.contains(contract)) {
-                            resumeBlock.invoke(this)
-                        } else {
-                            val queryIdentifier = IdentifierGenerator.generateIdentifier()
-                            checkpointTrackerProvider()?.putOrCreate(
-                                contract = contract,
-                                checkpointOwner = identity,
-                                identifier = queryIdentifier
-                            )
-                            frequencyTracker.add(contract)
-                            resultBroadcast.output.filterIsInstance<QueryResult.Checkpoint<Unit>>()
-                                .filter { it.resultIdentifier == queryIdentifier && it.key == contract.key }
-                                .collect {
-                                    resumeBlock.invoke(this)
-                                }
+                            override suspend fun validate(
+                                contract: Contract.Checkpoint.Default,
+                                args: Unit
+                            ): Boolean {
+                                continuation.resume(Unit)
+                                return true
+                            }
                         }
+                    checkpointTrackerProvider()?.run {
+                        registerContract(contract, queryIdentifier)
+                        putOrCreate(queryIdentifier, validator)
                     }
                 }
             }
 
             @ExperimentalTransmissionApi
             override suspend fun CommunicationScope.pauseOn(
-                vararg contract: Contract.Checkpoint,
-                resumeBlock: suspend CommunicationScope.() -> Unit
+                vararg contract: Contract.Checkpoint.Default
             ) {
                 val contractList = contract.toList()
-                check(contractList.distinctBy { it.frequency }.size == 1) {
-                    "All Checkpoints should have the same frequency"
-                }
                 check(contractList.isNotEmpty()) {
                     "At least one checkpoint should be provided"
                 }
                 check(contractList.toSet().size == contractList.size) {
                     "All Checkpoint Contracts should be unique"
                 }
-                when (contractList.first().frequency) {
-                    Frequency.Continuous -> {
-                        val queryIdentifier = IdentifierGenerator.generateIdentifier()
-                        contractList.forEach { internalContract ->
-                            checkpointTrackerProvider()?.putOrCreate(
-                                contract = internalContract,
-                                checkpointOwner = identity,
-                                identifier = queryIdentifier
-                            )
-                        }
-                        resultBroadcast.output.filterIsInstance<QueryResult.Checkpoint<Unit>>()
-                            .filter { it.resultIdentifier == queryIdentifier }
-                            .drop(contractList.size.dec())
-                            .collect {
-                                resumeBlock.invoke(this)
+                val queryIdentifier = IdentifierGenerator.generateIdentifier()
+                suspendCancellableCoroutine<Unit> { continuation ->
+                    val validator =
+                        object : CheckpointValidator<Contract.Checkpoint.Default, Unit> {
+                            private val lock = Mutex()
+                            private val contractMap =
+                                ConcurrentHashMap<Contract.Checkpoint.Default, Boolean>()
+                                    .apply { putAll(contractList.map { it to false }) }
+
+                            override suspend fun validate(
+                                contract: Contract.Checkpoint.Default,
+                                args: Unit
+                            ): Boolean {
+                                lock.withLock { contractMap.put(contract, true) }
+                                if (contractMap.values.all { it }) {
+                                    continuation.resume(Unit)
+                                    return true
+                                } else return false
                             }
-
-                    }
-
-                    Frequency.Once -> {
-                        if (arbitraryFrequencyTracker.contains(contractList.toSet())) {
-                            resumeBlock.invoke(this)
-                        } else {
-                            val queryIdentifier = IdentifierGenerator.generateIdentifier()
-                            contractList.forEach { internalContract ->
-                                checkpointTrackerProvider()?.putOrCreate(
-                                    contract = internalContract,
-                                    checkpointOwner = identity,
-                                    identifier = queryIdentifier
-                                )
-                            }
-                            arbitraryFrequencyTracker.add(contractList.toSet())
-                            resultBroadcast.output.filterIsInstance<QueryResult.Checkpoint<Unit>>()
-                                .filter { it.resultIdentifier == queryIdentifier }
-                                .drop(contractList.size.dec())
-                                .collect {
-                                    resumeBlock.invoke(this)
-                                }
                         }
-                    }
-                }
-
-            }
-
-            override suspend fun <C : Contract.CheckpointWithArgs<A>, A : Any> CommunicationScope.pauseOn(
-                contract: C,
-                resumeBlock: suspend CommunicationScope.(args: A) -> Unit
-            ) {
-                when (contract.frequency) {
-                    Frequency.Continuous -> {
-                        val queryIdentifier = IdentifierGenerator.generateIdentifier()
-                        checkpointTrackerProvider()?.putOrCreate(
-                            contract = contract,
-                            checkpointOwner = identity,
-                            identifier = queryIdentifier
-                        )
-                        resultBroadcast.output.filterIsInstance<QueryResult.Checkpoint<A>>()
-                            .filter { it.resultIdentifier == queryIdentifier && it.key == contract.key }
-                            .collect {
-                                resumeBlock.invoke(this, it.data)
-                            }
-                    }
-
-                    Frequency.Once -> {
-                        if (frequencyWithArgsTracker.containsKey(contract)) {
-                            @Suppress("UNCHECKED_CAST")
-                            resumeBlock.invoke(this, frequencyWithArgsTracker[contract] as A)
-                        } else {
-                            val queryIdentifier = IdentifierGenerator.generateIdentifier()
-                            checkpointTrackerProvider()?.putOrCreate(
-                                contract = contract,
-                                checkpointOwner = identity,
-                                identifier = queryIdentifier
-                            )
-                            resultBroadcast.output.filterIsInstance<QueryResult.Checkpoint<A>>()
-                                .filter { it.resultIdentifier == queryIdentifier && it.key == contract.key }
-                                .collect {
-                                    frequencyWithArgsTracker[contract] = it.data
-                                    resumeBlock.invoke(this, it.data)
-                                }
-                        }
+                    checkpointTrackerProvider()?.run {
+                        contractList.forEach { registerContract(it, queryIdentifier) }
+                        putOrCreate(queryIdentifier, validator)
                     }
                 }
             }
 
             @ExperimentalTransmissionApi
-            override suspend fun <C : Contract.CheckpointWithArgs<A>, C2 : Contract.CheckpointWithArgs<B>, A : Any, B : Any> CommunicationScope.pauseOn(
-                contract: C,
-                contract2: C2,
-                resumeBlock: suspend CommunicationScope.(A, B) -> Unit
-            ) {
-                val contractList = listOf(contract, contract2)
-                check(contractList.distinctBy { it.frequency }.size == 1) {
-                    "All Checkpoint should have the same frequency"
-                }
-                check(contractList.toSet().size == contractList.size) {
-                    "All Checkpoint Contracts should be unique"
-                }
-                when (contract.frequency) {
-                    Frequency.Continuous -> {
-                        val queryIdentifier = IdentifierGenerator.generateIdentifier()
-                        listOf(contract, contract2).forEach {
-                            checkpointTrackerProvider()?.putOrCreate(
-                                contract = it,
-                                checkpointOwner = identity,
-                                identifier = queryIdentifier
-                            )
-                        }
-                        val flow1 =
-                            resultBroadcast.output.filterIsInstance<QueryResult.Checkpoint<A>>()
-                                .filter { it.resultIdentifier == queryIdentifier && it.key == contract.key }
-                        val flow2 =
-                            resultBroadcast.output.filterIsInstance<QueryResult.Checkpoint<B>>()
-                                .filter { it.resultIdentifier == queryIdentifier && it.key == contract.key }
-                        combine(flow1, flow2) { checkpoint1, checkpoint2 ->
-                            resumeBlock.invoke(this, checkpoint1.data, checkpoint2.data)
+            override suspend fun <C : Contract.Checkpoint.WithArgs<A>, A : Any> CommunicationScope.pauseOn(
+                contract: C
+            ): A {
+                val queryIdentifier = IdentifierGenerator.generateIdentifier()
+                return suspendCancellableCoroutine<A> { continuation ->
+                    val validator = object : CheckpointValidator<C, A> {
+                        override suspend fun validate(contract: C, args: A): Boolean {
+                            continuation.resume(args)
+                            return true
                         }
                     }
-
-                    Frequency.Once -> {
-                        if (frequencyWithArgsTracker.containsKey(contract) && frequencyWithArgsTracker.containsKey(
-                                contract2
-                            )
-                        ) {
-                            @Suppress("UNCHECKED_CAST")
-                            resumeBlock.invoke(
-                                this,
-                                frequencyWithArgsTracker[contract] as A,
-                                frequencyWithArgsTracker[contract2] as B
-                            )
-                        } else {
-                            val queryIdentifier = IdentifierGenerator.generateIdentifier()
-                            listOf(contract, contract2).forEach {
-                                checkpointTrackerProvider()?.putOrCreate(
-                                    contract = it,
-                                    checkpointOwner = identity,
-                                    identifier = queryIdentifier
-                                )
-                            }
-                            val flow1 =
-                                resultBroadcast.output.filterIsInstance<QueryResult.Checkpoint<A>>()
-                                    .filter { it.resultIdentifier == queryIdentifier && it.key == contract.key }
-                            val flow2 =
-                                resultBroadcast.output.filterIsInstance<QueryResult.Checkpoint<B>>()
-                                    .filter { it.resultIdentifier == queryIdentifier && it.key == contract.key }
-                            combine(flow1, flow2) { checkpoint1, checkpoint2 ->
-                                frequencyWithArgsTracker[contract] = checkpoint1.data
-                                frequencyWithArgsTracker[contract2] = checkpoint2.data
-                                resumeBlock.invoke(this, checkpoint1.data, checkpoint2.data)
-                            }
-                        }
+                    checkpointTrackerProvider()?.run {
+                        registerContract(contract, queryIdentifier)
+                        putOrCreate(queryIdentifier, validator)
                     }
                 }
             }
 
-            override suspend fun validate(contract: Contract.Checkpoint) {
-                val identifier = checkpointTrackerProvider()?.useIdentifier(contract) ?: return
-                outGoingQuery.send(
-                    Query.Checkpoint(
-                        sender = identifier.barrierOwner.key,
-                        key = contract.key,
-                        args = Unit,
-                        queryIdentifier = identifier.value
-                    )
-                )
+            override suspend fun validate(contract: Contract.Checkpoint.Default) {
+                val validator = checkpointTrackerProvider()
+                    ?.useValidator<Contract.Checkpoint.Default, Unit>(contract)
+                if (validator?.validate(contract, Unit) == true) {
+                    checkpointTrackerProvider()
+                        ?.removeValidator(contract)
+                }
             }
 
-            override suspend fun <C : Contract.CheckpointWithArgs<A>, A : Any> validate(
+            override suspend fun <C : Contract.Checkpoint.WithArgs<A>, A : Any> validate(
                 contract: C,
                 args: A
             ) {
-                val identifier = checkpointTrackerProvider()?.useIdentifier(contract) ?: return
-                outGoingQuery.send(
-                    Query.Checkpoint(
-                        sender = identifier.barrierOwner.key,
-                        key = contract.key,
-                        args = args,
-                        queryIdentifier = identifier.value
-                    )
-                )
+                val validator = checkpointTrackerProvider()
+                    ?.useValidator<C, A>(contract)
+                if (validator?.validate(contract, args) == true) {
+                    checkpointTrackerProvider()
+                        ?.removeValidator(contract)
+                }
             }
         }
     }

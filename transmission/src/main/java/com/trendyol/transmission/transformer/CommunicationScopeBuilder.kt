@@ -60,49 +60,38 @@ internal class CommunicationScopeBuilder(
         requestDelegate.requestHandler.execute(contract, args)
     }
 
+    @ExperimentalTransmissionApi
     override suspend fun CommunicationScope.pauseOn(
-        contract: Contract.Checkpoint,
-        resumeBlock: suspend CommunicationScope.() -> Unit
+        contract: Contract.Checkpoint.Default
     ) {
         with(requestDelegate.checkpointHandler) {
-            pauseOn(contract, resumeBlock)
-        }
-    }
-
-    override suspend fun CommunicationScope.pauseOn(
-        vararg contract: Contract.Checkpoint,
-        resumeBlock: suspend CommunicationScope.() -> Unit
-    ) {
-        with(requestDelegate.checkpointHandler) {
-            pauseOn(contract = contract, resumeBlock = resumeBlock)
-        }
-    }
-
-    override suspend fun <C : Contract.CheckpointWithArgs<A>, A : Any> CommunicationScope.pauseOn(
-        contract: C,
-        resumeBlock: suspend CommunicationScope.(args: A) -> Unit
-    ) {
-        with(requestDelegate.checkpointHandler) {
-            pauseOn(contract, resumeBlock)
+            pauseOn(contract)
         }
     }
 
     @ExperimentalTransmissionApi
-    override suspend fun <C : Contract.CheckpointWithArgs<A>, C2 : Contract.CheckpointWithArgs<B>, A : Any, B : Any> CommunicationScope.pauseOn(
-        contract: C,
-        contract2: C2,
-        resumeBlock: suspend CommunicationScope.(A, B) -> Unit
+    override suspend fun CommunicationScope.pauseOn(
+        vararg contract: Contract.Checkpoint.Default
     ) {
         with(requestDelegate.checkpointHandler) {
-            pauseOn(contract, contract2, resumeBlock)
+            pauseOn(*contract)
         }
     }
 
-    override suspend fun validate(contract: Contract.Checkpoint) {
+    @ExperimentalTransmissionApi
+    override suspend fun <C : Contract.Checkpoint.WithArgs<A>, A : Any> CommunicationScope.pauseOn(
+        contract: C
+    ): A {
+        return with(requestDelegate.checkpointHandler) {
+            pauseOn(contract)
+        }
+    }
+
+    override suspend fun validate(contract: Contract.Checkpoint.Default) {
         requestDelegate.checkpointHandler.validate(contract)
     }
 
-    override suspend fun <C : Contract.CheckpointWithArgs<A>, A : Any> validate(
+    override suspend fun <C : Contract.Checkpoint.WithArgs<A>, A : Any> validate(
         contract: C,
         args: A
     ) {
