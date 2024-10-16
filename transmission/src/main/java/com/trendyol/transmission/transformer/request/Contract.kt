@@ -1,7 +1,6 @@
 package com.trendyol.transmission.transformer.request
 
 import com.trendyol.transmission.Transmission
-import com.trendyol.transmission.transformer.checkpoint.Frequency
 
 sealed interface Contract {
 
@@ -28,13 +27,15 @@ sealed interface Contract {
         internal val key: String
     ) : Contract
 
-    class Checkpoint internal constructor(
-        internal val key: String,
-        internal val frequency: Frequency
-    ) : Contract
+    sealed class Checkpoint(
+        internal open val key: String,
+    ) : Contract {
+        class Default internal constructor(
+            internal override val key: String,
+        ) : Checkpoint(key)
 
-    class CheckpointWithArgs<A : Any> internal constructor(
-        internal val key: String,
-        internal val frequency: Frequency
-    ) : Contract
+        class WithArgs<A : Any> internal constructor(
+            internal override val key: String,
+        ) : Checkpoint(key)
+    }
 }
