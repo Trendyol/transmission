@@ -31,4 +31,5 @@ internal sealed interface Query {
         val key: String,
         val args: A,
     ) : Query
+
 }

@@ -1,5 +1,3 @@
-@file:OptIn(ExperimentalUuidApi::class)
-
 package com.trendyol.transmission.router
 
 import com.trendyol.transmission.Transmission
@@ -20,7 +18,6 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.launch
-import kotlin.uuid.ExperimentalUuidApi
 
 internal class RequestDelegate(
     private val queryScope: CoroutineScope,
@@ -49,7 +46,7 @@ internal class RequestDelegate(
 
     // region process queries
 
-    private suspend fun processQuery(query: Query) = queryScope.launch {
+    private fun processQuery(query: Query) = queryScope.launch {
         when (query) {
             is Query.Computation -> processComputationQuery(query)
             is Query.Data -> processDataQuery(query)
@@ -60,7 +57,7 @@ internal class RequestDelegate(
     }
 
     private fun processDataQuery(
-        query: Query.Data
+        query: Query.Data,
     ) = queryScope.launch {
         val dataHolder = routerRef.transformerSet
             .filter { it.storage.isHolderStateInitialized() }
@@ -79,7 +76,7 @@ internal class RequestDelegate(
     }
 
     private fun processComputationQuery(
-        query: Query.Computation
+        query: Query.Computation,
     ) = queryScope.launch {
         val computationHolder = routerRef.transformerSet
             .find { it.storage.hasComputation(query.key) }
@@ -110,7 +107,7 @@ internal class RequestDelegate(
     }
 
     private fun <A : Any> processComputationQueryWithArgs(
-        query: Query.ComputationWithArgs<A>
+        query: Query.ComputationWithArgs<A>,
     ) = queryScope.launch {
         val computationHolder = routerRef.transformerSet
             .find { it.storage.hasComputation(query.key) }
@@ -145,7 +142,7 @@ internal class RequestDelegate(
     }
 
     private fun processExecution(
-        query: Query.Execution
+        query: Query.Execution,
     ) = queryScope.launch {
         val executionHolder = routerRef.transformerSet
             .find { it.storage.hasExecution(query.key) } ?: return@launch
@@ -180,7 +177,7 @@ internal class RequestDelegate(
     }
 
     private fun testDataQuery(
-        query: Query.Data
+        query: Query.Data,
     ) = queryScope.launch {
         val dataToSend = QueryResult.Data(
             owner = query.sender,
@@ -194,7 +191,7 @@ internal class RequestDelegate(
     }
 
     private fun testComputationQuery(
-        query: Query.Computation
+        query: Query.Computation,
     ) = queryScope.launch {
         val computationToSend = QueryResult.Computation(
             owner = query.sender,
@@ -206,7 +203,7 @@ internal class RequestDelegate(
     }
 
     private fun <A : Any> testComputationQueryWithArgs(
-        query: Query.ComputationWithArgs<A>
+        query: Query.ComputationWithArgs<A>,
     ) = queryScope.launch {
         val computationToSend = QueryResult.Computation(
             owner = query.sender,
@@ -236,7 +233,7 @@ internal class RequestDelegate(
 
     override suspend fun <C : Contract.Computation<D>, D : Any> compute(
         contract: C,
-        invalidate: Boolean
+        invalidate: Boolean,
     ): D? {
         val queryIdentifier = IdentifierGenerator.generateIdentifier()
         outGoingQuery.send(
@@ -256,7 +253,7 @@ internal class RequestDelegate(
     override suspend fun <C : Contract.ComputationWithArgs<A, D>, A : Any, D : Any> compute(
         contract: C,
         args: A,
-        invalidate: Boolean
+        invalidate: Boolean,
     ): D? {
         val queryIdentifier = IdentifierGenerator.generateIdentifier()
         outGoingQuery.send(
@@ -284,7 +281,7 @@ internal class RequestDelegate(
 
     override suspend fun <C : Contract.ExecutionWithArgs<A>, A : Any> execute(
         contract: C,
-        args: A
+        args: A,
     ) {
         outGoingQuery.send(
             Query.ExecutionWithArgs(

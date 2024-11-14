@@ -16,7 +16,6 @@ interface TransmissionDataHolder<T : Transmission.Data?> {
     suspend fun updateAndGet(updater: (T) -> @UnsafeVariance T): T
 }
 
-@PublishedApi
 internal class TransmissionDataHolderImpl<T : Transmission.Data?>(
     initialValue: T,
     publishUpdates: Boolean,

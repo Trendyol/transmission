@@ -20,9 +20,22 @@ sealed interface Contract {
         internal val useCache: Boolean = false
     ) : Contract
 
-    class Execution internal constructor(internal val key: String) : Contract
+    @JvmInline
+    value class Execution internal constructor(internal val key: String) : Contract
 
     class ExecutionWithArgs<A : Any> internal constructor(
         internal val key: String
     ) : Contract
+
+    sealed class Checkpoint(
+        internal open val key: String,
+    ) : Contract {
+        class Default internal constructor(
+            internal override val key: String,
+        ) : Checkpoint(key)
+
+        class WithArgs<A : Any> internal constructor(
+            internal override val key: String,
+        ) : Checkpoint(key)
+    }
 }
