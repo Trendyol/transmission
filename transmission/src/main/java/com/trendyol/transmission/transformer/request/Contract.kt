@@ -10,12 +10,12 @@ sealed interface Contract {
         internal val key: String,
     ) : Contract
 
-    class Computation<T : Any> internal constructor(
+    class Computation<T : Any?> internal constructor(
         internal val key: String,
         internal val useCache: Boolean = false
     ) : Contract
 
-    class ComputationWithArgs<A : Any, T : Any> internal constructor(
+    class ComputationWithArgs<A : Any, T : Any?> internal constructor(
         internal val key: String,
         internal val useCache: Boolean = false
     ) : Contract
