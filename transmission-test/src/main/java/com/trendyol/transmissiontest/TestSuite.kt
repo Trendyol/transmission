@@ -1,8 +1,8 @@
 package com.trendyol.transmissiontest
 
 import com.trendyol.transmission.Transmission
-import com.trendyol.transmission.router.TransmissionRouter
 import com.trendyol.transmission.router.RegistryScope
+import com.trendyol.transmission.router.TransmissionRouter
 import com.trendyol.transmission.router.builder.TransmissionTestingRouterBuilder
 import com.trendyol.transmission.transformer.Transformer
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -64,15 +64,15 @@ class TestSuite {
                 orderedInitialProcessing.forEach {
                     when (it) {
                         is Transmission.Data -> throw IllegalArgumentException("Transmission.Data should not be sent for processing")
-                        is Transmission.Effect -> router.processEffect(it)
-                        is Transmission.Signal -> router.processSignal(it)
+                        is Transmission.Effect -> router.process(it)
+                        is Transmission.Signal -> router.process(it)
                     }
                     transformer?.waitProcessingToFinish()
                 }
                 if (transmission is Transmission.Signal) {
-                    router.processSignal(transmission)
+                    router.process(transmission)
                 } else if (transmission is Transmission.Effect) {
-                    router.processEffect(transmission)
+                    router.process(transmission)
                 }
                 transformer?.waitProcessingToFinish()
                 testScope.scope(this)

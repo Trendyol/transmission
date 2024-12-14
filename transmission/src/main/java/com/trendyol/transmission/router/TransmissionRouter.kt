@@ -45,9 +45,13 @@ class TransmissionRouter internal constructor(
 
     private val checkpointTracker = CheckpointTracker()
 
-    val dataStream = dataBroadcast.output
-    val effectStream: SharedFlow<Transmission.Effect> = effectBroadcast.output.map { it.effect }
-        .shareIn(routerScope, SharingStarted.WhileSubscribed())
+    @PublishedApi
+    internal val dataStream = dataBroadcast.output
+
+    @PublishedApi
+    internal val effectStream: SharedFlow<Transmission.Effect> =
+        effectBroadcast.output.map { it.effect }
+            .shareIn(routerScope, SharingStarted.WhileSubscribed())
 
     private val _requestDelegate = RequestDelegate(
         queryScope = routerScope,
@@ -76,13 +80,13 @@ class TransmissionRouter internal constructor(
         initializeInternal(loader)
     }
 
-    fun processSignal(signal: Transmission.Signal) {
+    fun process(signal: Transmission.Signal) {
         routerScope.launch {
             signalBroadcast.producer.send(signal)
         }
     }
 
-    fun processEffect(effect: Transmission.Effect) {
+    fun process(effect: Transmission.Effect) {
         routerScope.launch {
             effectBroadcast.producer.send(EffectWrapper(effect))
         }
