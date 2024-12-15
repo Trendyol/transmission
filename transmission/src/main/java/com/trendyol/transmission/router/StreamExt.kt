@@ -9,28 +9,34 @@ import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.stateIn
 
+@JvmName("streamData")
 fun TransmissionRouter.streamData(): Flow<Transmission.Data> {
     return this.dataStream
 }
 
+@JvmName("streamDataWithType")
 inline fun <reified T : Transmission.Data> TransmissionRouter.streamData(): Flow<T> {
     return this.dataStream.filterIsInstance<T>()
 }
 
+@JvmName("streamDataWithAction")
 inline fun <reified T : Transmission.Data> TransmissionRouter.streamData(
     noinline action: suspend (T) -> Unit
 ): Flow<T> {
     return this.dataStream.filterIsInstance<T>().onEach(action)
 }
 
+@JvmName("streamEffect")
 inline fun <reified T : Transmission.Effect> TransmissionRouter.streamEffect(): Flow<T> {
     return this.effectStream.filterIsInstance<T>()
 }
 
+@JvmName("streamEffectWithType")
 fun TransmissionRouter.streamEffect(): Flow<Transmission.Effect> {
     return this.effectStream
 }
 
+@JvmName("streamEffectWithAction")
 inline fun <reified T : Transmission.Effect> TransmissionRouter.streamEffect(
     noinline action: suspend (T) -> Unit
 ): Flow<T> {
@@ -49,6 +55,6 @@ inline fun <reified T : Transmission.Data> Flow<T>.asState(
     scope: CoroutineScope,
     initialValue: T,
     sharingStarted: SharingStarted = SharingStarted.WhileSubscribed(),
-): Flow<T> {
+): StateFlow<T> {
     return this.filterIsInstance<T>().stateIn(scope, sharingStarted, initialValue)
 }
