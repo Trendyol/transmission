@@ -1,10 +1,13 @@
 package com.trendyol.transmissiontest
 
 import com.trendyol.transmission.Transmission
-import com.trendyol.transmission.router.RegistryScope
 import com.trendyol.transmission.router.TransmissionRouter
-import com.trendyol.transmission.router.builder.TransmissionTestingRouterBuilder
+import com.trendyol.transmission.router.builder.TransmissionRouterBuilder
 import com.trendyol.transmission.transformer.Transformer
+import com.trendyol.transmission.transformer.request.Contract
+import com.trendyol.transmissiontest.computation.ComputationTransformer
+import com.trendyol.transmissiontest.computation.ComputationWithArgsTransformer
+import com.trendyol.transmissiontest.data.DataTransformer
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.launch
@@ -15,23 +18,39 @@ import kotlinx.coroutines.test.runTest
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class TestSuite {
-    private var orderedInitialProcessing: List<Transmission> = emptyList()
+    private var orderedInitialProcessing: MutableList<Transmission> = mutableListOf()
     private var transformer: Transformer? = null
-    private var registryScope: RegistryScope.() -> Unit = {}
     private lateinit var router: TransmissionRouter
+    private val supplementaryTransformerSet: MutableList<Transformer> = mutableListOf()
 
     fun initialize(transformer: Transformer): TestSuite {
         this.transformer = transformer
         return this
     }
 
-    fun register(registry: RegistryScope.() -> Unit = {}): TestSuite {
-        this.registryScope = registry
+    fun <D : Transmission.Data?> registerData(
+        contract: Contract.DataHolder<D>, data: () -> D
+    ): TestSuite {
+        supplementaryTransformerSet += DataTransformer(contract, data)
+        return this
+    }
+
+    fun <C : Contract.Computation<D?>, D : Any> registerComputation(
+        contract: C, data: () -> D?
+    ): TestSuite {
+        supplementaryTransformerSet += ComputationTransformer(contract, data)
+        return this
+    }
+
+    fun <C : Contract.ComputationWithArgs<A,D?>, D : Any, A: Any> registerComputation(
+        contract: C, data: () -> D?
+    ): TestSuite {
+        supplementaryTransformerSet += ComputationWithArgsTransformer(contract, data)
         return this
     }
 
     fun processBeforeTesting(vararg transmissions: Transmission): TestSuite {
-        orderedInitialProcessing = transmissions.toList()
+        orderedInitialProcessing += transmissions.toList()
         return this
     }
 
@@ -41,10 +60,11 @@ class TestSuite {
         transmission: Transmission,
         scope: suspend TransformerTestScope.(scope: TestScope) -> Unit
     ) {
-        router = TransmissionTestingRouterBuilder.build {
+        router = TransmissionRouterBuilder.build {
             addDispatcher(UnconfinedTestDispatcher())
-            this@TestSuite.transformer?.let { addTransformerSet(setOf(it)) }
-            testing(this@TestSuite.registryScope)
+            this@TestSuite.transformer?.let {
+                addTransformerSet((listOf(it) + supplementaryTransformerSet).toSet())
+            }
         }
 
         runTest {

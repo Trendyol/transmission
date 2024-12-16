@@ -1,0 +1,20 @@
+package com.trendyol.transmissiontest.computation
+
+import com.trendyol.transmission.transformer.Transformer
+import com.trendyol.transmission.transformer.request.Contract
+import com.trendyol.transmission.transformer.request.computation.Computations
+import com.trendyol.transmission.transformer.request.computation.createComputations
+import com.trendyol.transmission.transformer.request.computation.register
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
+
+@OptIn(ExperimentalCoroutinesApi::class)
+internal class ComputationTransformer<C: Contract.Computation<D?>, D: Any?>(
+    contract: C, data: () -> D?
+): Transformer(dispatcher = UnconfinedTestDispatcher()) {
+    override val computations: Computations = createComputations {
+        register(contract) {
+            data()
+        }
+    }
+}

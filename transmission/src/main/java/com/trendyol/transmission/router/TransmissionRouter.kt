@@ -28,7 +28,6 @@ class TransmissionRouter internal constructor(
     internal val transformerSetLoader: TransformerSetLoader? = null,
     internal val autoInitialization: Boolean = true,
     dispatcher: CoroutineDispatcher = Dispatchers.Default,
-    registryScope: RegistryScopeImpl? = null
 ) {
 
     private val exceptionHandler = CoroutineExceptionHandler { _, _ -> }
@@ -56,7 +55,6 @@ class TransmissionRouter internal constructor(
     private val _requestDelegate = RequestDelegate(
         queryScope = routerScope,
         routerRef = this@TransmissionRouter,
-        registry = registryScope
     )
 
     val requestHelper: RequestHandler = _requestDelegate

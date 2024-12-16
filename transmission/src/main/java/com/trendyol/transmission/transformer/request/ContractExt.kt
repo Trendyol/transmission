@@ -14,7 +14,7 @@ fun <T : Transmission.Data?> Contracts.dataHolder(): Contract.DataHolder<T> {
     return Contract.DataHolder<T>(key = IdentifierGenerator.generateIdentifier())
 }
 
-fun <A : Any> Contracts.computation(
+fun <A : Any?> Contracts.computation(
     useCache: Boolean = false
 ): Contract.Computation<A> {
     return Contract.Computation<A>(
@@ -23,7 +23,7 @@ fun <A : Any> Contracts.computation(
     )
 }
 
-fun <A : Any, T : Any> Contracts.computationWithArgs(
+fun <A : Any, T : Any?> Contracts.computationWithArgs(
     useCache: Boolean = false
 ): Contract.ComputationWithArgs<A, T> {
     return Contract.ComputationWithArgs<A, T>(

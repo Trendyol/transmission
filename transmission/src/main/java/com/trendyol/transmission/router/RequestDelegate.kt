@@ -22,7 +22,6 @@ import kotlinx.coroutines.launch
 internal class RequestDelegate(
     private val queryScope: CoroutineScope,
     private val routerRef: TransmissionRouter,
-    private val registry: RegistryScopeImpl? = null,
 ) : RequestHandler {
 
     private val routerQueryResultChannel: MutableSharedFlow<QueryResult> = MutableSharedFlow()
@@ -36,11 +35,7 @@ internal class RequestDelegate(
 
     init {
         queryScope.launch {
-            if (registry != null) {
-                outGoingQuery.consumeAsFlow().collect { testQuery(it) }
-            } else {
-                outGoingQuery.consumeAsFlow().collect { processQuery(it) }
-            }
+            outGoingQuery.consumeAsFlow().collect { processQuery(it) }
         }
     }
 
@@ -163,56 +158,6 @@ internal class RequestDelegate(
         }
 
     // endregion
-
-    // region test queries
-
-    private fun testQuery(query: Query) = queryScope.launch {
-        when (query) {
-            is Query.Computation -> testComputationQuery(query)
-            is Query.Data -> testDataQuery(query)
-            is Query.ComputationWithArgs<*> -> testComputationQueryWithArgs(query)
-            is Query.Execution -> {}
-            is Query.ExecutionWithArgs<*> -> {}
-        }
-    }
-
-    private fun testDataQuery(
-        query: Query.Data,
-    ) = queryScope.launch {
-        val dataToSend = QueryResult.Data(
-            owner = query.sender,
-            data = registry?.dataMap?.get(query.key),
-            key = query.key,
-            resultIdentifier = query.queryIdentifier
-        )
-        queryScope.launch {
-            queryResultChannel.trySend(dataToSend)
-        }
-    }
-
-    private fun testComputationQuery(
-        query: Query.Computation,
-    ) = queryScope.launch {
-        val computationToSend = QueryResult.Computation(
-            owner = query.sender,
-            data = registry?.computationMap?.get(query.key),
-            key = query.key,
-            resultIdentifier = query.queryIdentifier
-        )
-        queryResultChannel.trySend(computationToSend)
-    }
-
-    private fun <A : Any> testComputationQueryWithArgs(
-        query: Query.ComputationWithArgs<A>,
-    ) = queryScope.launch {
-        val computationToSend = QueryResult.Computation(
-            owner = query.sender,
-            data = registry?.computationMap?.get(query.key),
-            key = query.key,
-            resultIdentifier = query.queryIdentifier
-        )
-        queryResultChannel.trySend(computationToSend)
-    }
 
     // region Request Handler
 
