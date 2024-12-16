@@ -3,6 +3,8 @@ package com.trendyol.transmissiontest
 import com.trendyol.transmission.Transmission
 import com.trendyol.transmission.router.TransmissionRouter
 import com.trendyol.transmission.router.builder.TransmissionRouterBuilder
+import com.trendyol.transmission.router.streamData
+import com.trendyol.transmission.router.streamEffect
 import com.trendyol.transmission.transformer.Transformer
 import com.trendyol.transmission.transformer.request.Contract
 import com.trendyol.transmissiontest.computation.ComputationTransformer
@@ -72,10 +74,10 @@ class TestSuite {
             val effectStream: MutableList<Transmission.Effect> = mutableListOf()
             try {
                 backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) {
-                    router.dataStream.toList(dataStream)
+                    router.streamData().toList(dataStream)
                 }
                 backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) {
-                    router.effectStream.toList(effectStream)
+                    router.streamEffect().toList(effectStream)
                 }
                 val testScope = object : TransformerTestScope {
                     override val dataStream: List<Transmission.Data> = dataStream
