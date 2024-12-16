@@ -73,7 +73,7 @@ class TransmissionRouterTest {
             addDispatcher(testDispatcher)
         }
         // When
-        sut.processSignal(TestSignal)
+        sut.process(TestSignal)
 
         // Then
         assertEquals(transformer.signalList.last(), TestSignal)
@@ -90,7 +90,7 @@ class TransmissionRouterTest {
             addDispatcher(testDispatcher)
         }
         // When
-        sut.processSignal(TestSignal)
+        sut.process(TestSignal)
 
         // Then
         assertEquals(transformer1.signalList.last(), TestSignal)
@@ -113,7 +113,7 @@ class TransmissionRouterTest {
             addDispatcher(testDispatcher)
         }
         // When
-        sut.processSignal(TestSignal)
+        sut.process(TestSignal)
 
         // Then
         assertEquals(transformer1.effectList.last(), TestEffect)
@@ -135,7 +135,7 @@ class TransmissionRouterTest {
                 }
                 // When
                 val effects = sut.effectStream.testIn(backgroundScope)
-                sut.processSignal(TestSignal)
+                sut.process(TestSignal)
                 assertEquals(6, effects.cancelAndConsumeRemainingEvents().size)
                 // Then
             }
@@ -154,7 +154,7 @@ class TransmissionRouterTest {
                     addDispatcher(testDispatcher)
                 }
                 // When
-                sut.processSignal(TestSignal)
+                sut.process(TestSignal)
                 sut.dataStream.test {
                     assertEquals(TestData("update with TestTransformer1"), awaitItem())
                     assertEquals(TestData("update with TestTransformer2"), awaitItem())
@@ -176,7 +176,7 @@ class TransmissionRouterTest {
             addDispatcher(testDispatcher)
         }
         // When
-        sut.processSignal(TestSignal)
+        sut.process(TestSignal)
 
         // Then
         assertEquals(transformer1.effectList.contains(RouterEffect("")), false)

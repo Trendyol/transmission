@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.trendyol.transmission.Transmission
 import com.trendyol.transmission.router.builder.TransmissionRouterBuilder
+import com.trendyol.transmission.router.streamData
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -34,12 +35,12 @@ class CounterViewModel @Inject constructor() : ViewModel() {
 
     init {
         viewModelScope.launch(Dispatchers.Default) {
-            router.dataStream.collect(::onData)
+            router.streamData().collect(::onData)
         }
     }
 
     fun processSignal(signal: Transmission.Signal) {
-        router.processSignal(signal)
+        router.process(signal)
         _areAllDistinct.tryEmit("Calculating")
         checkTransmissions()
         counter.addAndGet(1)
