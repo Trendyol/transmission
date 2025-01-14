@@ -3,16 +3,18 @@ package com.trendyol.transmission.components
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.trendyol.transmission.Transmission
-import com.trendyol.transmission.effect.RouterEffect
-import com.trendyol.transmission.components.features.colorpicker.ColorPickerTransformer
-import com.trendyol.transmission.components.features.input.InputTransformer
-import com.trendyol.transmission.router.TransmissionRouter
-import com.trendyol.transmission.router.onEach
-import com.trendyol.transmission.router.toState
 import com.trendyol.transmission.components.features.ColorPickerUiState
 import com.trendyol.transmission.components.features.InputUiState
 import com.trendyol.transmission.components.features.MultiOutputUiState
 import com.trendyol.transmission.components.features.OutputUiState
+import com.trendyol.transmission.components.features.colorpicker.ColorPickerTransformer
+import com.trendyol.transmission.components.features.input.InputTransformer
+import com.trendyol.transmission.effect.RouterEffect
+import com.trendyol.transmission.router.TransmissionRouter
+import com.trendyol.transmission.router.asState
+import com.trendyol.transmission.router.streamData
+import com.trendyol.transmission.router.streamDataAsState
+import com.trendyol.transmission.router.streamEffect
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -27,13 +29,13 @@ class ComponentViewModel @Inject constructor(
     private val router: TransmissionRouter
 ) : ViewModel() {
 
-    val inputUiState = router.dataStream
-        .onEach<InputUiState> { _transmissionList.value = listOf() }
-        .toState(viewModelScope, InputUiState())
+    val inputUiState = router
+        .streamData<InputUiState> { _transmissionList.value = listOf() }
+        .asState(viewModelScope, InputUiState())
 
-    val outputUiState = router.dataStream.toState(viewModelScope, OutputUiState())
-    val colorPickerUiState = router.dataStream.toState(viewModelScope, ColorPickerUiState())
-    val multiOutputUiState = router.dataStream.toState(viewModelScope, MultiOutputUiState())
+    val outputUiState = router.streamDataAsState(viewModelScope, OutputUiState())
+    val colorPickerUiState = router.streamDataAsState(viewModelScope, ColorPickerUiState())
+    val multiOutputUiState = router.streamDataAsState(viewModelScope, MultiOutputUiState())
 
     private val _transmissionList = MutableStateFlow<List<String>>(emptyList())
     val transmissionList = _transmissionList.asStateFlow()
@@ -41,16 +43,16 @@ class ComponentViewModel @Inject constructor(
     init {
         viewModelScope.launch {
             launch {
-                router.dataStream.collect(::onData)
+                router.streamData().collect(::onData)
             }
             launch {
-                router.effectStream.collect(::onEffect)
+                router.streamEffect().collect(::onEffect)
             }
         }
     }
 
     fun processSignal(signal: Transmission.Signal) {
-        router.processSignal(signal)
+        router.process(signal)
         _transmissionList.update { it.plus("Signal: $signal") }
     }
 
