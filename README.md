@@ -1,3 +1,5 @@
+
+[![OpenSSF Scorecard](https://api.scorecard.dev/projects/github.com/Trendyol/transmission/badge)](https://scorecard.dev/viewer/?uri=github.com/Trendyol/transmission)
 # Transmission
 
 [![](https://jitpack.io/v/Trendyol/transmission.svg)](https://jitpack.io/#Trendyol/transmission)
