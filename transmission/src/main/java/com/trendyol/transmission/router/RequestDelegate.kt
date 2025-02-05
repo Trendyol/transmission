@@ -91,13 +91,9 @@ internal class RequestDelegate(
             )
         }
         if (query.sender == routerRef.routerName) {
-            queryScope.launch {
-                routerQueryResultChannel.emit(computationToSend.await())
-            }
+            routerQueryResultChannel.emit(computationToSend.await())
         } else {
-            queryScope.launch {
-                queryResultChannel.send(computationToSend.await())
-            }
+            queryResultChannel.send(computationToSend.await())
         }
     }
 
@@ -126,13 +122,9 @@ internal class RequestDelegate(
             )
         }
         if (query.sender == routerRef.routerName) {
-            queryScope.launch {
-                routerQueryResultChannel.emit(computationToSend.await())
-            }
+            routerQueryResultChannel.emit(computationToSend.await())
         } else {
-            queryScope.launch {
-                queryResultChannel.send(computationToSend.await())
-            }
+            queryResultChannel.send(computationToSend.await())
         }
     }
 
