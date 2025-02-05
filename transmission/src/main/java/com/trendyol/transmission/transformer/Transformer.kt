@@ -1,17 +1,26 @@
 package com.trendyol.transmission.transformer
 
+import com.trendyol.transmission.ExperimentalTransmissionApi
 import com.trendyol.transmission.Transmission
 import com.trendyol.transmission.effect.EffectWrapper
 import com.trendyol.transmission.effect.RouterEffect
+import com.trendyol.transmission.transformer.checkpoint.CheckpointTracker
 import com.trendyol.transmission.transformer.handler.CommunicationScope
+import com.trendyol.transmission.transformer.handler.ExtendedHandlers
+import com.trendyol.transmission.transformer.handler.Handlers
 import com.trendyol.transmission.transformer.handler.HandlerRegistry
 import com.trendyol.transmission.transformer.request.Contract
+import com.trendyol.transmission.transformer.request.Contracts
 import com.trendyol.transmission.transformer.request.Query
 import com.trendyol.transmission.transformer.request.QueryResult
 import com.trendyol.transmission.transformer.request.TransformerRequestDelegate
 import com.trendyol.transmission.transformer.request.computation.ComputationRegistry
-import com.trendyol.transmission.transformer.request.createIdentity
+import com.trendyol.transmission.transformer.request.computation.Computations
+import com.trendyol.transmission.transformer.request.computation.ExtendedComputations
 import com.trendyol.transmission.transformer.request.execution.ExecutionRegistry
+import com.trendyol.transmission.transformer.request.execution.Executions
+import com.trendyol.transmission.transformer.request.execution.ExtendedExecutions
+import com.trendyol.transmission.transformer.request.identity
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineScope
@@ -29,44 +38,72 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.supervisorScope
 
+@OptIn(ExperimentalTransmissionApi::class)
 open class Transformer(
+    identity: Contract.Identity = Contracts.identity(),
     dispatcher: CoroutineDispatcher = Dispatchers.Default,
-    identity: Contract.Identity? = null
 ) {
 
     private val exceptionHandler = CoroutineExceptionHandler { _, throwable ->
         onError(throwable)
     }
-    val transformerScope = CoroutineScope(dispatcher + SupervisorJob() + exceptionHandler)
 
-    private val internalIdentity: Contract.Identity =
-        identity ?: createIdentity(this::class.simpleName.orEmpty())
+    @PublishedApi
+    internal val transformerScope = CoroutineScope(dispatcher + SupervisorJob() + exceptionHandler)
+
+    private val _identity: Contract.Identity = identity
 
     private val effectChannel: Channel<EffectWrapper> = Channel(capacity = Channel.BUFFERED)
-    private val requestDelegate = TransformerRequestDelegate(transformerScope, internalIdentity)
+    private var checkpointProvider: () -> CheckpointTracker? = { null }
+    private val requestDelegate by lazy {
+        TransformerRequestDelegate(
+            scope = transformerScope,
+            checkpointTrackerProvider = checkpointProvider,
+            identity = _identity
+        )
+    }
     internal val dataChannel: Channel<Transmission.Data> = Channel(capacity = Channel.BUFFERED)
     internal val storage = TransformerStorage()
 
-    protected open val handlerRegistry: HandlerRegistry? = null
+    internal val handlerRegistry by lazy { HandlerRegistry() }
+    internal val executionRegistry: ExecutionRegistry by lazy { ExecutionRegistry(this) }
+    internal val computationRegistry: ComputationRegistry by lazy {
+        ComputationRegistry(this)
+    }
 
-    protected open val executionRegistry: ExecutionRegistry? = null
-    protected open val computationRegistry: ComputationRegistry? = null
+    protected open val handlers: Handlers by lazy { Handlers() }
+    protected open val extendedHandlers: ExtendedHandlers by lazy { ExtendedHandlers() }
+
+    protected open val computations: Computations by lazy { Computations() }
+    protected open val extendedComputations: ExtendedComputations by lazy { ExtendedComputations() }
+
+    protected open val executions: Executions by lazy { Executions() }
+    protected open val extendedExecutions: ExtendedExecutions by lazy { ExtendedExecutions() }
 
     var currentEffectProcessing: Job? = null
     var currentSignalProcessing: Job? = null
 
-    val communicationScope: CommunicationScope = CommunicationScopeBuilder(
-        effectChannel = effectChannel,
-        dataChannel = dataChannel,
-        requestDelegate = requestDelegate
-    )
+    val communicationScope: CommunicationScope by lazy {
+        CommunicationScopeBuilder(
+            effectChannel = effectChannel,
+            dataChannel = dataChannel,
+            requestDelegate = requestDelegate
+        )
+    }
+
+
+    internal fun bindCheckpointTracker(tracker: CheckpointTracker) {
+        checkpointProvider = { tracker }
+    }
 
     internal fun startSignalCollection(incoming: SharedFlow<Transmission.Signal>) {
         transformerScope.launch {
             incoming.collect {
                 currentSignalProcessing = transformerScope.launch {
-                    handlerRegistry?.signalHandlerRegistry?.get(it::class)
-                        ?.invoke(communicationScope, it)
+                    handlerRegistry.signalHandlerRegistry[it::class]?.invoke(
+                        communicationScope,
+                        it
+                    )
                 }
             }
         }
@@ -85,11 +122,11 @@ open class Transformer(
                 launch {
                     incoming
                         .filterNot { it.effect is RouterEffect }
-                        .filter { it.identity == null || it.identity == internalIdentity }
+                        .filter { it.identity == null || it.identity == _identity }
                         .map { it.effect }
                         .collect {
                             currentEffectProcessing = launch {
-                                handlerRegistry?.effectHandlerRegistry?.get(it::class)
+                                handlerRegistry.effectHandlerRegistry[it::class]
                                     ?.invoke(communicationScope, it)
                             }
                         }
@@ -109,14 +146,14 @@ open class Transformer(
             supervisorScope {
                 launch {
                     incomingQuery
-                        .filter { it.owner == internalIdentity.key }
+                        .filter { it.owner == _identity.key }
                         .collect {
-                            this@Transformer.requestDelegate.resultBroadcast.producer.trySend(it)
+                            this@Transformer.requestDelegate.resultBroadcast.producer.send(it)
                         }
                 }
                 launch {
                     this@Transformer.requestDelegate.outGoingQuery.receiveAsFlow().collect {
-                        outGoingQuery.trySend(it)
+                        outGoingQuery.send(it)
                     }
                 }
             }

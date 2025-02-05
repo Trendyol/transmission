@@ -1,39 +1,55 @@
 package com.trendyol.transmission.transformer.request
 
+import com.trendyol.transmission.ExperimentalTransmissionApi
 import com.trendyol.transmission.Transmission
+import com.trendyol.transmission.identifier.IdentifierGenerator
 
-fun createIdentity(key: String): Contract.Identity = Contract.Identity(key)
+object Contracts
 
-fun <T : Transmission.Data?> buildDataContract(
-    key: String
-) = object : Contract.Data<T>() {
-    override val key: String = key
+fun Contracts.identity(): Contract.Identity {
+    return Contract.Identity(key = IdentifierGenerator.generateIdentifier())
 }
 
-fun <A : Any> buildComputationContract(
-    key: String,
+fun <T : Transmission.Data?> Contracts.dataHolder(): Contract.DataHolder<T> {
+    return Contract.DataHolder<T>(key = IdentifierGenerator.generateIdentifier())
+}
+
+fun <A : Any?> Contracts.computation(
     useCache: Boolean = false
-) = object : Contract.Computation<A>() {
-    override val key: String = key
-    override val useCache: Boolean = useCache
+): Contract.Computation<A> {
+    return Contract.Computation<A>(
+        key = IdentifierGenerator.generateIdentifier(),
+        useCache = useCache
+    )
 }
 
-fun <A : Any, T : Any> buildComputationContractWithArgs(
-    key: String,
+fun <A : Any, T : Any?> Contracts.computationWithArgs(
     useCache: Boolean = false
-) = object : Contract.ComputationWithArgs<A, T>() {
-    override val key: String = key
-    override val useCache: Boolean = useCache
+): Contract.ComputationWithArgs<A, T> {
+    return Contract.ComputationWithArgs<A, T>(
+        key = IdentifierGenerator.generateIdentifier(),
+        useCache = useCache
+    )
 }
 
-fun buildExecutionContract(
-    key: String,
-) = object : Contract.Execution() {
-    override val key: String = key
+fun Contracts.execution(): Contract.Execution {
+    return Contract.Execution(key = IdentifierGenerator.generateIdentifier())
 }
 
-fun <A : Any> buildExecutionContractWithArgs(
-    key: String,
-) = object : Contract.ExecutionWithArgs<A>() {
-    override val key: String = key
+fun <A : Any> Contracts.executionWithArgs(): Contract.ExecutionWithArgs<A> {
+    return Contract.ExecutionWithArgs<A>(key = IdentifierGenerator.generateIdentifier())
+}
+
+@ExperimentalTransmissionApi
+fun Contracts.checkpoint(): Contract.Checkpoint.Default {
+    return Contract.Checkpoint.Default(
+        key = IdentifierGenerator.generateIdentifier(),
+    )
+}
+
+@ExperimentalTransmissionApi
+fun <A : Any> Contracts.checkpointWithArgs(): Contract.Checkpoint.WithArgs<A> {
+    return Contract.Checkpoint.WithArgs(
+        key = IdentifierGenerator.generateIdentifier(),
+    )
 }

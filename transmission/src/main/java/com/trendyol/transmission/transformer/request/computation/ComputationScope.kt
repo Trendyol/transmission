@@ -4,8 +4,17 @@ import com.trendyol.transmission.transformer.Transformer
 
 class ComputationScope internal constructor(internal val computationRegistry: ComputationRegistry)
 
-fun Transformer.computationRegistry(scope: ComputationScope.() -> Unit): ComputationRegistry {
-    val computationRegistry = ComputationRegistry(this)
+class Computations internal constructor()
+
+class ExtendedComputations internal constructor()
+
+fun Transformer.createComputations(scope: ComputationScope.() -> Unit): Computations {
+    this.computationRegistry.clear()
     ComputationScope(computationRegistry).apply(scope)
-    return computationRegistry
+    return Computations()
+}
+
+fun Transformer.extendComputations(scope: ComputationScope.() -> Unit): ExtendedComputations {
+    ComputationScope(computationRegistry).apply(scope)
+    return ExtendedComputations()
 }

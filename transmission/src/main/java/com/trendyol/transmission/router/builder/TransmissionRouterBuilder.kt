@@ -1,13 +1,22 @@
 package com.trendyol.transmission.router.builder
 
-import com.trendyol.transmission.TransmissionRouter
+import com.trendyol.transmission.router.TransmissionRouter
+import com.trendyol.transmission.transformer.request.Contract
+import com.trendyol.transmission.transformer.request.Contracts
+import com.trendyol.transmission.transformer.request.identity
 
 object TransmissionRouterBuilder {
 
-    fun build(scope: TransmissionRouterBuilderScope.() -> Unit): TransmissionRouter {
+    fun build(
+        identity: Contract.Identity = Contracts.identity(),
+        scope: TransmissionRouterBuilderScope.() -> Unit
+    ): TransmissionRouter {
         val builder = TransmissionRouterBuilderInternal(scope)
         return TransmissionRouter(
-            transformerSet = builder.transformerSet,
+            identity = identity,
+            transformerSetLoader =
+            builder.transformerSetLoader.takeIf { builder.autoInitialization },
+            autoInitialization = builder.autoInitialization,
             dispatcher = builder.dispatcher,
         )
     }

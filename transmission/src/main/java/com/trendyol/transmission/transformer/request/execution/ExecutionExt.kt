@@ -13,8 +13,8 @@ import com.trendyol.transmission.transformer.request.RequestHandler
  * Can be queried using [RequestHandler.execute]
  * @param execution execution to get the result [Transmission.Data]
  */
-fun <C : Contract.Execution> ExecutionScope.registerExecution(
-    contract: C,
+fun ExecutionScope.register(
+    contract: Contract.Execution,
     execution: suspend RequestHandler.() -> Unit,
 ) {
     this.executionRegistry.buildWith(contract.key, execution)
@@ -29,7 +29,7 @@ fun <C : Contract.Execution> ExecutionScope.registerExecution(
  * Can be queried using [RequestHandler.execute]
  * @param execution execution to get the result [Transmission.Data]
  */
-fun <C : Contract.ExecutionWithArgs<A>, A : Any> ExecutionScope.registerExecution(
+fun <C : Contract.ExecutionWithArgs<A>, A : Any> ExecutionScope.register(
     contract: C,
     execution: suspend RequestHandler.(args: A) -> Unit,
 ) {

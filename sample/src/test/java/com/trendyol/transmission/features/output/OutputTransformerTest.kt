@@ -1,10 +1,12 @@
 package com.trendyol.transmission.features.output
 
 import com.trendyol.transmission.effect.RouterEffect
-import com.trendyol.transmission.features.input.InputEffect
+import com.trendyol.transmission.components.features.input.InputEffect
+import com.trendyol.transmission.components.features.output.OutputTransformer
 import com.trendyol.transmission.transformer.util.TestCoroutineRule
-import com.trendyol.transmission.ui.ColorPickerUiState
-import com.trendyol.transmission.ui.OutputUiState
+import com.trendyol.transmission.components.features.ColorPickerUiState
+import com.trendyol.transmission.components.features.OutputUiState
+import com.trendyol.transmission.components.features.colorpicker.ColorPickerTransformer
 import com.trendyol.transmissiontest.attachToRouter
 import com.trendyol.transmissiontest.test
 import org.junit.Before
@@ -44,8 +46,8 @@ class OutputTransformerTest {
     @Test
     fun `GIVEN sut, WHEN inputUpdate effect comes and ColorPickerUIState exists, THEN RouterPayloadEffect should be published`() {
         sut.attachToRouter()
-            .register {
-                addQueryData(ColorPickerUiState(), key = "ColorPickerUiState")
+            .registerData(ColorPickerTransformer.holderContract) {
+                ColorPickerUiState()
             }
             .test(effect = InputEffect.InputUpdate("test")) {
                 assertEquals(OutputUiState(outputText = "test"), dataStream[1])

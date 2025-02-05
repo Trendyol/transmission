@@ -4,13 +4,13 @@ import com.trendyol.transmission.Transmission
 import com.trendyol.transmission.transformer.dataholder.HolderState
 import com.trendyol.transmission.transformer.request.computation.ComputationOwner
 import com.trendyol.transmission.transformer.request.execution.ExecutionOwner
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 
 internal class TransformerStorage {
 
-    private val holderDataReference: MutableStateFlow<MutableMap<String, Transmission.Data?>> =
-        MutableStateFlow(mutableMapOf())
+    private val holderDataReference: MutableMap<String, Transmission.Data?> = mutableMapOf()
+    private val lock = Mutex()
 
     private var internalTransmissionHolderSet: HolderState = HolderState.Undefined
 
@@ -19,6 +19,14 @@ internal class TransformerStorage {
 
     private val internalExecutionMap: MutableMap<String, ExecutionOwner> =
         mutableMapOf()
+
+    fun clearComputations() {
+       internalComputationMap.clear()
+    }
+
+    fun clearExecutions() {
+       internalExecutionMap.clear()
+    }
 
     fun isHolderStateInitialized(): Boolean {
         return internalTransmissionHolderSet is HolderState.Initialized
@@ -29,10 +37,9 @@ internal class TransformerStorage {
         else (internalTransmissionHolderSet as HolderState.Initialized).valueSet.contains(key)
     }
 
-    fun updateHolderData(data: Transmission.Data) {
-        holderDataReference.update { holderDataReference ->
-            holderDataReference[data::class.simpleName.orEmpty()] = data
-            holderDataReference
+    suspend fun updateHolderData(data: Transmission.Data, key: String) {
+        lock.withLock {
+            holderDataReference[key] = data
         }
     }
 
@@ -91,7 +98,7 @@ internal class TransformerStorage {
     }
 
     fun getHolderDataByKey(key: String): Transmission.Data? {
-        return holderDataReference.value[key]
+        return holderDataReference[key]
     }
 
     fun clear() {

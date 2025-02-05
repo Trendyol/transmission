@@ -1,6 +1,8 @@
 package com.trendyol.transmission.transformer.request.computation
 
 import com.trendyol.transmission.transformer.request.RequestHandler
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 
 internal class ComputationDelegate(
     private val useCache: Boolean = false,
@@ -9,12 +11,14 @@ internal class ComputationDelegate(
 
     private var result: Any? = null
 
+    private val lock = Mutex()
+
     override suspend fun getResult(scope: RequestHandler, invalidate: Boolean): Any? {
         return if (useCache && invalidate.not()) {
-            result ?: computation?.invoke(scope).also { result = it }
+            result ?: lock.withLock { computation?.invoke(scope) }.also { result = it }
         } else {
             result = null
-            computation?.invoke(scope)
+            lock.withLock { computation?.invoke(scope) }
         }
     }
 }
@@ -25,13 +29,14 @@ internal class ComputationDelegateWithArgs<A : Any>(
 ) : ComputationOwner.WithArgs<A> {
 
     private var result: Any? = null
+    private val lock = Mutex()
 
     override suspend fun getResult(scope: RequestHandler, invalidate: Boolean, args: A): Any? {
         return if (useCache && invalidate.not()) {
-            result ?: computation(scope, args).also { result = it }
+            result ?: lock.withLock { computation(scope, args) }.also { result = it }
         } else {
             result = null
-            computation(scope, args)
+            lock.withLock { computation(scope, args) }
         }
     }
 }
