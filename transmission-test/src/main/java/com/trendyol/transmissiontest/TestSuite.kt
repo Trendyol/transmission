@@ -61,26 +61,18 @@ class TestSuite {
         args: A
     ): TestSuite {
         supplementaryTransformerSet += CheckpointWithArgsTransformer<C, A>(checkpoint, { args })
+        orderedCheckpoints.plusAssign(checkpoint)
         return this
     }
 
     fun registerCheckpoint(checkpoint: Contract.Checkpoint.Default): TestSuite {
         supplementaryTransformerSet += CheckpointTransformer({ checkpoint })
+        orderedCheckpoints.plusAssign(checkpoint)
         return this
     }
 
-    fun processBeforeTest(vararg transmissions: Transmission): TestSuite {
+    fun prerequisites(vararg transmissions: Transmission): TestSuite {
         orderedInitialProcessing += transmissions.toList()
-        return this
-    }
-
-    fun <C : Contract.Checkpoint.WithArgs<A>, A : Any> validateForTest(checkpoint: C): TestSuite {
-        orderedCheckpoints.plusAssign(checkpoint)
-        return this
-    }
-
-    fun validateForTest(checkpoint: Contract.Checkpoint.Default): TestSuite {
-        orderedCheckpoints.plusAssign(checkpoint)
         return this
     }
 
