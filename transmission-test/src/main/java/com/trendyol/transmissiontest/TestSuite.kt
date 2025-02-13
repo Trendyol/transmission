@@ -1,5 +1,6 @@
 package com.trendyol.transmissiontest
 
+import com.trendyol.transmission.ExperimentalTransmissionApi
 import com.trendyol.transmission.Transmission
 import com.trendyol.transmission.router.TransmissionRouter
 import com.trendyol.transmission.router.builder.TransmissionRouterBuilder
@@ -56,6 +57,7 @@ class TestSuite {
         return this
     }
 
+    @ExperimentalTransmissionApi
     fun <C : Contract.Checkpoint.WithArgs<A>, A : Any> registerCheckpoint(
         checkpoint: C,
         args: A
@@ -65,6 +67,7 @@ class TestSuite {
         return this
     }
 
+    @ExperimentalTransmissionApi
     fun registerCheckpoint(checkpoint: Contract.Checkpoint.Default): TestSuite {
         supplementaryTransformerSet += CheckpointTransformer({ checkpoint })
         orderedCheckpoints.plusAssign(checkpoint)

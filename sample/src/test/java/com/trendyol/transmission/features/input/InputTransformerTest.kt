@@ -1,6 +1,7 @@
 package com.trendyol.transmission.features.input
 
 import androidx.compose.ui.graphics.Color
+import com.trendyol.transmission.ExperimentalTransmissionApi
 import com.trendyol.transmission.components.features.input.InputEffect
 import com.trendyol.transmission.components.features.input.InputSignal
 import com.trendyol.transmission.components.features.colorpicker.ColorPickerEffect
@@ -26,6 +27,7 @@ class InputTransformerTest {
         sut = InputTransformer(testCoroutineRule.testDispatcher)
     }
 
+    @OptIn(ExperimentalTransmissionApi::class)
     @Test
     fun `GIVEN inputTransformer, WHEN inputUpdate signal is sent, THEN inputUpdate effect is published`() {
         sut.attachToRouter()
