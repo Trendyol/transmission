@@ -7,6 +7,10 @@ import com.trendyol.transmission.router.streamData
 import com.trendyol.transmission.router.streamEffect
 import com.trendyol.transmission.transformer.Transformer
 import com.trendyol.transmission.transformer.request.Contract
+import com.trendyol.transmissiontest.checkpoint.CheckpointTransformer
+import com.trendyol.transmissiontest.checkpoint.CheckpointWithArgs
+import com.trendyol.transmissiontest.checkpoint.CheckpointWithArgsTransformer
+import com.trendyol.transmissiontest.checkpoint.DefaultCheckPoint
 import com.trendyol.transmissiontest.computation.ComputationTransformer
 import com.trendyol.transmissiontest.computation.ComputationWithArgsTransformer
 import com.trendyol.transmissiontest.data.DataTransformer
@@ -21,6 +25,7 @@ import kotlinx.coroutines.test.runTest
 @OptIn(ExperimentalCoroutinesApi::class)
 class TestSuite {
     private var orderedInitialProcessing: MutableList<Transmission> = mutableListOf()
+    private var orderedCheckpoints: MutableList<Contract.Checkpoint> = mutableListOf()
     private var transformer: Transformer? = null
     private lateinit var router: TransmissionRouter
     private val supplementaryTransformerSet: MutableList<Transformer> = mutableListOf()
@@ -44,15 +49,38 @@ class TestSuite {
         return this
     }
 
-    fun <C : Contract.ComputationWithArgs<A,D?>, D : Any, A: Any> registerComputation(
+    fun <C : Contract.ComputationWithArgs<A, D?>, D : Any, A : Any> registerComputation(
         contract: C, data: () -> D?
     ): TestSuite {
         supplementaryTransformerSet += ComputationWithArgsTransformer(contract, data)
         return this
     }
 
-    fun processBeforeTesting(vararg transmissions: Transmission): TestSuite {
+    fun <C : Contract.Checkpoint.WithArgs<A>, A : Any> registerCheckpoint(
+        checkpoint: C,
+        args: A
+    ): TestSuite {
+        supplementaryTransformerSet += CheckpointWithArgsTransformer<C, A>(checkpoint, { args })
+        return this
+    }
+
+    fun registerCheckpoint(checkpoint: Contract.Checkpoint.Default): TestSuite {
+        supplementaryTransformerSet += CheckpointTransformer({ checkpoint })
+        return this
+    }
+
+    fun processBeforeTest(vararg transmissions: Transmission): TestSuite {
         orderedInitialProcessing += transmissions.toList()
+        return this
+    }
+
+    fun <C : Contract.Checkpoint.WithArgs<A>, A : Any> validateForTest(checkpoint: C): TestSuite {
+        orderedCheckpoints.plusAssign(checkpoint)
+        return this
+    }
+
+    fun validateForTest(checkpoint: Contract.Checkpoint.Default): TestSuite {
+        orderedCheckpoints.plusAssign(checkpoint)
         return this
     }
 
@@ -95,6 +123,12 @@ class TestSuite {
                     router.process(transmission)
                 } else if (transmission is Transmission.Effect) {
                     router.process(transmission)
+                }
+                orderedCheckpoints.forEach {
+                    when (it) {
+                        is Contract.Checkpoint.Default -> router.process(DefaultCheckPoint)
+                        is Contract.Checkpoint.WithArgs<*> -> router.process(CheckpointWithArgs(it))
+                    }
                 }
                 transformer?.waitProcessingToFinish()
                 testScope.scope(this)

@@ -29,8 +29,10 @@ class InputTransformerTest {
     @Test
     fun `GIVEN inputTransformer, WHEN inputUpdate signal is sent, THEN inputUpdate effect is published`() {
         sut.attachToRouter()
+            .registerCheckpoint(InputTransformer.colorCheckpoint, Color.Gray)
+            .validateForTest(InputTransformer.colorCheckpoint)
             .test(signal = InputSignal.InputUpdate("test")) {
-                assertEquals(InputEffect.InputUpdate("test"), effectStream.first())
+                assertEquals(InputEffect.InputUpdate("test"), effectStream.last())
                 assertEquals(InputUiState("test"), dataStream.last())
             }
     }
