@@ -1,11 +1,13 @@
 package com.trendyol.transmission.router
 
 import com.trendyol.transmission.Transmission
+import com.trendyol.transmission.effect.WrappedEffect
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.filterIsInstance
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.stateIn
 
@@ -28,11 +30,15 @@ inline fun <reified T : Transmission.Data> TransmissionRouter.streamData(
 
 @JvmName("streamEffect")
 inline fun <reified T : Transmission.Effect> TransmissionRouter.streamEffect(): Flow<T> {
-    return this.effectStream.filterIsInstance<T>()
+    return this.effectStream.map { it.effect }.filterIsInstance<T>()
 }
 
 @JvmName("streamEffectWithType")
 fun TransmissionRouter.streamEffect(): Flow<Transmission.Effect> {
+    return this.effectStream.map { it.effect }
+}
+
+fun TransmissionRouter.streamWrappedEffect(): Flow<WrappedEffect> {
     return this.effectStream
 }
 

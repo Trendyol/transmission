@@ -1,7 +1,7 @@
 package com.trendyol.transmission.router
 
 import com.trendyol.transmission.Transmission
-import com.trendyol.transmission.effect.EffectWrapper
+import com.trendyol.transmission.effect.WrappedEffect
 import com.trendyol.transmission.router.builder.TransmissionRouterBuilderScope
 import com.trendyol.transmission.router.loader.TransformerSetLoader
 import com.trendyol.transmission.transformer.Transformer
@@ -40,7 +40,7 @@ class TransmissionRouter internal constructor(
 
     private val signalBroadcast = routerScope.createBroadcast<Transmission.Signal>()
     private val dataBroadcast = routerScope.createBroadcast<Transmission.Data>()
-    private val effectBroadcast = routerScope.createBroadcast<EffectWrapper>()
+    private val effectBroadcast = routerScope.createBroadcast<WrappedEffect>()
 
     private val checkpointTracker = CheckpointTracker()
 
@@ -48,9 +48,7 @@ class TransmissionRouter internal constructor(
     internal val dataStream = dataBroadcast.output
 
     @PublishedApi
-    internal val effectStream: SharedFlow<Transmission.Effect> =
-        effectBroadcast.output.map { it.effect }
-            .shareIn(routerScope, SharingStarted.WhileSubscribed())
+    internal val effectStream = effectBroadcast.output
 
     private val _requestDelegate = RequestDelegate(
         queryScope = routerScope,
@@ -86,7 +84,7 @@ class TransmissionRouter internal constructor(
 
     fun process(effect: Transmission.Effect) {
         routerScope.launch {
-            effectBroadcast.producer.send(EffectWrapper(effect))
+            effectBroadcast.producer.send(WrappedEffect(effect))
         }
     }
 

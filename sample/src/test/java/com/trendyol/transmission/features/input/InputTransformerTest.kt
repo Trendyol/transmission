@@ -1,6 +1,7 @@
 package com.trendyol.transmission.features.input
 
 import androidx.compose.ui.graphics.Color
+import app.cash.turbine.testIn
 import com.trendyol.transmission.ExperimentalTransmissionApi
 import com.trendyol.transmission.components.features.input.InputEffect
 import com.trendyol.transmission.components.features.input.InputSignal
@@ -33,8 +34,10 @@ class InputTransformerTest {
         sut.attachToRouter()
             .registerCheckpoint(InputTransformer.colorCheckpoint, Color.Gray)
             .test(signal = InputSignal.InputUpdate("test")) {
-                assertEquals(InputEffect.InputUpdate("test"), effectStream.last())
-                assertEquals(InputUiState("test"), dataStream.last())
+                val effectCollector = effectStream.testIn(it.backgroundScope)
+                val dataCollector = dataStream.testIn(it.backgroundScope)
+                assertEquals(InputEffect.InputUpdate("test"), effectCollector.expectMostRecentItem())
+                assertEquals(InputUiState("test"), dataCollector.expectMostRecentItem())
             }
     }
 
@@ -42,7 +45,8 @@ class InputTransformerTest {
     fun `GIVEN inputTransformer, WHEN BackgroundColorUpdate effect is received, THEN color should be changed`() {
         sut.attachToRouter()
             .test(effect = ColorPickerEffect.BackgroundColorUpdate(Color.Gray)) {
-                assertEquals(InputUiState(backgroundColor = Color.Gray), dataStream.last())
+                val dataCollector = dataStream.testIn(it.backgroundScope)
+                assertEquals(InputUiState(backgroundColor = Color.Gray), dataCollector.expectMostRecentItem())
             }
     }
 }

@@ -14,7 +14,7 @@ interface Broadcast<T> {
 }
 
 internal fun <T> CoroutineScope.createBroadcast(
-    sharingStarted: SharingStarted = SharingStarted.WhileSubscribed()
+    sharingStarted: SharingStarted = SharingStarted.Lazily
 ): Broadcast<T> = object : Broadcast<T> {
 
     private val _source = Channel<T>(capacity = Channel.BUFFERED)

@@ -2,7 +2,7 @@ package com.trendyol.transmission.transformer
 
 import com.trendyol.transmission.ExperimentalTransmissionApi
 import com.trendyol.transmission.Transmission
-import com.trendyol.transmission.effect.EffectWrapper
+import com.trendyol.transmission.effect.WrappedEffect
 import com.trendyol.transmission.transformer.handler.CommunicationScope
 import com.trendyol.transmission.transformer.request.Contract
 import com.trendyol.transmission.transformer.request.TransformerRequestDelegate
@@ -10,7 +10,7 @@ import kotlinx.coroutines.channels.Channel
 
 @OptIn(ExperimentalTransmissionApi::class)
 internal class CommunicationScopeBuilder(
-    private val effectChannel: Channel<EffectWrapper>,
+    private val effectChannel: Channel<WrappedEffect>,
     private val dataChannel: Channel<Transmission.Data>,
     private val requestDelegate: TransformerRequestDelegate
 ) : CommunicationScope {
@@ -23,11 +23,11 @@ internal class CommunicationScopeBuilder(
         effect: E,
         identity: Contract.Identity
     ) {
-        effectChannel.send(EffectWrapper(effect, identity))
+        effectChannel.send(WrappedEffect(effect, identity))
     }
 
     override suspend fun <E : Transmission.Effect> publish(effect: E) {
-        effectChannel.send(EffectWrapper(effect))
+        effectChannel.send(WrappedEffect(effect))
     }
 
     override suspend fun <C : Contract.DataHolder<D>, D : Transmission.Data> getData(contract: C): D? {

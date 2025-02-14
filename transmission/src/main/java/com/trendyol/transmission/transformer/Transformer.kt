@@ -2,7 +2,7 @@ package com.trendyol.transmission.transformer
 
 import com.trendyol.transmission.ExperimentalTransmissionApi
 import com.trendyol.transmission.Transmission
-import com.trendyol.transmission.effect.EffectWrapper
+import com.trendyol.transmission.effect.WrappedEffect
 import com.trendyol.transmission.effect.RouterEffect
 import com.trendyol.transmission.transformer.checkpoint.CheckpointTracker
 import com.trendyol.transmission.transformer.handler.CommunicationScope
@@ -53,7 +53,7 @@ open class Transformer(
 
     private val _identity: Contract.Identity = identity
 
-    private val effectChannel: Channel<EffectWrapper> = Channel(capacity = Channel.BUFFERED)
+    private val effectChannel: Channel<WrappedEffect> = Channel(capacity = Channel.BUFFERED)
     private var checkpointProvider: () -> CheckpointTracker? = { null }
     private val requestDelegate by lazy {
         TransformerRequestDelegate(
@@ -114,8 +114,8 @@ open class Transformer(
     }
 
     internal fun startEffectProcessing(
-        producer: SendChannel<EffectWrapper>,
-        incoming: SharedFlow<EffectWrapper>
+        producer: SendChannel<WrappedEffect>,
+        incoming: SharedFlow<WrappedEffect>
     ) {
         transformerScope.launch {
             supervisorScope {

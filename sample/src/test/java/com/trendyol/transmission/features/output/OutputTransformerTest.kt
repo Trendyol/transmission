@@ -1,5 +1,6 @@
 package com.trendyol.transmission.features.output
 
+import app.cash.turbine.testIn
 import com.trendyol.transmission.effect.RouterEffect
 import com.trendyol.transmission.components.features.input.InputEffect
 import com.trendyol.transmission.components.features.output.OutputTransformer
@@ -31,7 +32,8 @@ class OutputTransformerTest {
     fun `GIVEN sut, WHEN inputUpdate effect comes, THEN, holder should be updated with correct value`() {
         sut.attachToRouter()
             .test(effect = InputEffect.InputUpdate("test")) {
-                assertEquals(OutputUiState(outputText = "test"), dataStream.last())
+                val dataCollector = dataStream.testIn(it.backgroundScope)
+                assertEquals(OutputUiState(outputText = "test"), dataCollector.expectMostRecentItem())
             }
     }
 
@@ -39,7 +41,8 @@ class OutputTransformerTest {
     fun `GIVEN sut, WHEN inputUpdate effect comes and no ColorPickerUIState data is present, THEN data should not be updated further`() {
         sut.attachToRouter()
             .test(effect = InputEffect.InputUpdate("test")) {
-                assertEquals(OutputUiState(outputText = "test"), dataStream.last())
+                val dataCollector = dataStream.testIn(it.backgroundScope)
+                assertEquals(OutputUiState(outputText = "test"), dataCollector.expectMostRecentItem())
             }
     }
 
@@ -50,8 +53,11 @@ class OutputTransformerTest {
                 ColorPickerUiState()
             }
             .test(effect = InputEffect.InputUpdate("test")) {
-                assertEquals(OutputUiState(outputText = "test"), dataStream[1])
-                assertTrue(effectStream.last() is RouterEffect)
+                val dataCollector = dataStream.testIn(it.backgroundScope)
+                val effectCollector = effectStream.testIn(it.backgroundScope)
+                dataCollector.skipItems(1)
+                assertEquals(OutputUiState(outputText = "test"), dataCollector.awaitItem())
+                assertTrue(effectCollector.expectMostRecentItem() is RouterEffect)
             }
     }
 }

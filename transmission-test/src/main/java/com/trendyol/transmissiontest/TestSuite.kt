@@ -2,6 +2,7 @@ package com.trendyol.transmissiontest
 
 import com.trendyol.transmission.ExperimentalTransmissionApi
 import com.trendyol.transmission.Transmission
+import com.trendyol.transmission.effect.WrappedEffect
 import com.trendyol.transmission.router.TransmissionRouter
 import com.trendyol.transmission.router.builder.TransmissionRouterBuilder
 import com.trendyol.transmission.router.streamData
@@ -16,6 +17,7 @@ import com.trendyol.transmissiontest.computation.ComputationTransformer
 import com.trendyol.transmissiontest.computation.ComputationWithArgsTransformer
 import com.trendyol.transmissiontest.data.DataTransformer
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.TestScope
@@ -93,18 +95,10 @@ class TestSuite {
         }
 
         runTest {
-            val dataStream: MutableList<Transmission.Data> = mutableListOf()
-            val effectStream: MutableList<Transmission.Effect> = mutableListOf()
             try {
-                backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) {
-                    router.streamData().toList(dataStream)
-                }
-                backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) {
-                    router.streamEffect().toList(effectStream)
-                }
                 val testScope = object : TransformerTestScope {
-                    override val dataStream: List<Transmission.Data> = dataStream
-                    override val effectStream: List<Transmission.Effect> = effectStream
+                    override val dataStream: Flow<Transmission.Data> = router.streamData()
+                    override val effectStream: Flow<Transmission.Effect> = router.streamEffect()
                 }
                 orderedInitialProcessing.forEach {
                     when (it) {
