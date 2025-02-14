@@ -7,26 +7,27 @@ class HandlerScope internal constructor(val handlerRegistry: HandlerRegistry)
 
 class Handlers internal constructor()
 
-class ExtendedHandlers internal constructor()
-
-fun Transformer.extendHandlers(scope: HandlerScope.() -> Unit): ExtendedHandlers {
-    HandlerScope(handlerRegistry).apply(scope)
-    return ExtendedHandlers()
-}
-
-fun Transformer.createHandlers(scope: HandlerScope.() -> Unit): Handlers {
+fun Transformer.handlers(scope: HandlerScope.() -> Unit = {}): Handlers {
     this.handlerRegistry.clear()
     HandlerScope(handlerRegistry).apply(scope)
     return Handlers()
 }
 
-inline fun <reified T : Transmission.Effect> HandlerScope.onEffect(
+fun Handlers.extendHandlers(
+    transformer: Transformer,
+    scope: HandlerScope.() -> Unit = {}
+): Handlers {
+    HandlerScope(transformer.handlerRegistry).apply(scope)
+    return Handlers()
+}
+
+inline fun <reified T : Transmission.Effect> HandlerScope.register(
     noinline lambda: suspend CommunicationScope.(effect: T) -> Unit
 ) {
     handlerRegistry.effect<T>(lambda)
 }
 
-inline fun <reified T : Transmission.Signal> HandlerScope.onSignal(
+inline fun <reified T : Transmission.Signal> HandlerScope.register(
     noinline lambda: suspend CommunicationScope.(signal: T) -> Unit
 ) {
     handlerRegistry.signal<T>(lambda)

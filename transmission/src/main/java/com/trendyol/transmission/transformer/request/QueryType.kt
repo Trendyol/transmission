@@ -1,19 +1,19 @@
 package com.trendyol.transmission.transformer.request
 
-internal sealed interface Query {
+internal sealed interface QueryType {
 
     class Data(
         val sender: String,
         val key: String,
         val queryIdentifier: String,
-    ) : Query
+    ) : QueryType
 
     class Computation(
         val sender: String,
         val key: String,
         val queryIdentifier: String,
         val invalidate: Boolean = false,
-    ) : Query
+    ) : QueryType
 
     class ComputationWithArgs<A : Any>(
         val sender: String,
@@ -21,15 +21,15 @@ internal sealed interface Query {
         val args: A,
         val queryIdentifier: String,
         val invalidate: Boolean = false,
-    ) : Query
+    ) : QueryType
 
     class Execution(
         val key: String,
-    ) : Query
+    ) : QueryType
 
     class ExecutionWithArgs<A : Any>(
         val key: String,
         val args: A,
-    ) : Query
+    ) : QueryType
 
 }

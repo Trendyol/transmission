@@ -22,13 +22,13 @@ import kotlin.coroutines.resume
 
 @OptIn(InternalTransmissionApi::class)
 @ExperimentalTransmissionApi
-internal class TransformerRequestDelegate(
+internal class TransformerQueryDelegate(
     scope: CoroutineScope,
     checkpointTrackerProvider: () -> CheckpointTracker?,
     identity: Contract.Identity
 ) {
 
-    val outGoingQuery: Channel<Query> = Channel(capacity = Channel.BUFFERED)
+    val outGoingQuery: Channel<QueryType> = Channel(capacity = Channel.BUFFERED)
     val resultBroadcast = scope.createBroadcast<QueryResult>()
 
     val checkpointHandler: CheckpointHandler by lazy {
@@ -136,12 +136,12 @@ internal class TransformerRequestDelegate(
         }
     }
 
-    val requestHandler: RequestHandler = object : RequestHandler {
+    val queryHandler: QueryHandler = object : QueryHandler {
 
         override suspend fun <C : Contract.DataHolder<D>, D : Transmission.Data> getData(contract: C): D? {
             val queryIdentifier = IdentifierGenerator.generateIdentifier()
             outGoingQuery.send(
-                Query.Data(
+                QueryType.Data(
                     sender = identity.key,
                     key = contract.key,
                     queryIdentifier = queryIdentifier
@@ -157,7 +157,7 @@ internal class TransformerRequestDelegate(
         ): D? {
             val queryIdentifier = IdentifierGenerator.generateIdentifier()
             outGoingQuery.send(
-                Query.Computation(
+                QueryType.Computation(
                     sender = identity.key,
                     key = contract.key,
                     invalidate = invalidate,
@@ -174,7 +174,7 @@ internal class TransformerRequestDelegate(
         ): D? {
             val queryIdentifier = IdentifierGenerator.generateIdentifier()
             outGoingQuery.send(
-                Query.ComputationWithArgs(
+                QueryType.ComputationWithArgs(
                     sender = identity.key,
                     key = contract.key,
                     args = args,
@@ -189,7 +189,7 @@ internal class TransformerRequestDelegate(
 
         override suspend fun execute(contract: Contract.Execution) {
             outGoingQuery.send(
-                Query.Execution(key = contract.key)
+                QueryType.Execution(key = contract.key)
             )
         }
 
@@ -197,7 +197,7 @@ internal class TransformerRequestDelegate(
             contract: C, args: A
         ) {
             outGoingQuery.send(
-                Query.ExecutionWithArgs(key = contract.key, args = args)
+                QueryType.ExecutionWithArgs(key = contract.key, args = args)
             )
         }
     }

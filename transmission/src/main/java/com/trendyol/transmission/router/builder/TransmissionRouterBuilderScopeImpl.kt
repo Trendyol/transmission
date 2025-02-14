@@ -5,7 +5,7 @@ import com.trendyol.transmission.transformer.Transformer
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 
-internal class TransmissionRouterBuilderInternal internal constructor(
+internal class TransmissionRouterBuilderScopeImpl internal constructor(
     scope: TransmissionRouterBuilderScope.() -> Unit
 ) {
 
@@ -16,11 +16,11 @@ internal class TransmissionRouterBuilderInternal internal constructor(
     private val scopeImpl = object : TransmissionRouterBuilderScope {
 
         override fun addDispatcher(dispatcher: CoroutineDispatcher) {
-            this@TransmissionRouterBuilderInternal.dispatcher = dispatcher
+            this@TransmissionRouterBuilderScopeImpl.dispatcher = dispatcher
         }
 
         override fun addTransformerSet(transformerSet: Set<Transformer>) {
-            val loader = object: TransformerSetLoader {
+            val loader = object : TransformerSetLoader {
                 override suspend fun load(): Set<Transformer> {
                     return transformerSet
                 }
@@ -29,11 +29,11 @@ internal class TransmissionRouterBuilderInternal internal constructor(
         }
 
         override fun addLoader(loader: TransformerSetLoader) {
-            this@TransmissionRouterBuilderInternal.transformerSetLoader = loader
+            this@TransmissionRouterBuilderScopeImpl.transformerSetLoader = loader
         }
 
         override fun overrideInitialization() {
-            this@TransmissionRouterBuilderInternal.autoInitialization = false
+            this@TransmissionRouterBuilderScopeImpl.autoInitialization = false
         }
     }
 

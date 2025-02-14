@@ -2,17 +2,17 @@ package com.trendyol.transmission.transformer
 
 import com.trendyol.transmission.ExperimentalTransmissionApi
 import com.trendyol.transmission.Transmission
-import com.trendyol.transmission.effect.EffectWrapper
+import com.trendyol.transmission.effect.WrappedEffect
 import com.trendyol.transmission.transformer.handler.CommunicationScope
 import com.trendyol.transmission.transformer.request.Contract
-import com.trendyol.transmission.transformer.request.TransformerRequestDelegate
+import com.trendyol.transmission.transformer.request.TransformerQueryDelegate
 import kotlinx.coroutines.channels.Channel
 
 @OptIn(ExperimentalTransmissionApi::class)
 internal class CommunicationScopeBuilder(
-    private val effectChannel: Channel<EffectWrapper>,
+    private val effectChannel: Channel<WrappedEffect>,
     private val dataChannel: Channel<Transmission.Data>,
-    private val requestDelegate: TransformerRequestDelegate
+    private val queryDelegate: TransformerQueryDelegate
 ) : CommunicationScope {
 
     override suspend fun <D : Transmission.Data> send(data: D?) {
@@ -23,22 +23,22 @@ internal class CommunicationScopeBuilder(
         effect: E,
         identity: Contract.Identity
     ) {
-        effectChannel.send(EffectWrapper(effect, identity))
+        effectChannel.send(WrappedEffect(effect, identity))
     }
 
     override suspend fun <E : Transmission.Effect> publish(effect: E) {
-        effectChannel.send(EffectWrapper(effect))
+        effectChannel.send(WrappedEffect(effect))
     }
 
     override suspend fun <C : Contract.DataHolder<D>, D : Transmission.Data> getData(contract: C): D? {
-        return requestDelegate.requestHandler.getData(contract)
+        return queryDelegate.queryHandler.getData(contract)
     }
 
     override suspend fun <C : Contract.Computation<D>, D : Any> compute(
         contract: C,
         invalidate: Boolean
     ): D? {
-        return requestDelegate.requestHandler.compute(contract, invalidate)
+        return queryDelegate.queryHandler.compute(contract, invalidate)
     }
 
     override suspend fun <C : Contract.ComputationWithArgs<A, D>, A : Any, D : Any> compute(
@@ -46,25 +46,25 @@ internal class CommunicationScopeBuilder(
         args: A,
         invalidate: Boolean
     ): D? {
-        return requestDelegate.requestHandler.compute(contract, args, invalidate)
+        return queryDelegate.queryHandler.compute(contract, args, invalidate)
     }
 
     override suspend fun execute(contract: Contract.Execution) {
-        requestDelegate.requestHandler.execute(contract)
+        queryDelegate.queryHandler.execute(contract)
     }
 
     override suspend fun <C : Contract.ExecutionWithArgs<A>, A : Any> execute(
         contract: C,
         args: A
     ) {
-        requestDelegate.requestHandler.execute(contract, args)
+        queryDelegate.queryHandler.execute(contract, args)
     }
 
     @ExperimentalTransmissionApi
     override suspend fun CommunicationScope.pauseOn(
         contract: Contract.Checkpoint.Default
     ) {
-        with(requestDelegate.checkpointHandler) {
+        with(queryDelegate.checkpointHandler) {
             pauseOn(contract)
         }
     }
@@ -73,7 +73,7 @@ internal class CommunicationScopeBuilder(
     override suspend fun CommunicationScope.pauseOn(
         vararg contract: Contract.Checkpoint.Default
     ) {
-        with(requestDelegate.checkpointHandler) {
+        with(queryDelegate.checkpointHandler) {
             pauseOn(*contract)
         }
     }
@@ -82,19 +82,19 @@ internal class CommunicationScopeBuilder(
     override suspend fun <C : Contract.Checkpoint.WithArgs<A>, A : Any> CommunicationScope.pauseOn(
         contract: C
     ): A {
-        return with(requestDelegate.checkpointHandler) {
+        return with(queryDelegate.checkpointHandler) {
             pauseOn(contract)
         }
     }
 
     override suspend fun validate(contract: Contract.Checkpoint.Default) {
-        requestDelegate.checkpointHandler.validate(contract)
+        queryDelegate.checkpointHandler.validate(contract)
     }
 
     override suspend fun <C : Contract.Checkpoint.WithArgs<A>, A : Any> validate(
         contract: C,
         args: A
     ) {
-        requestDelegate.checkpointHandler.validate(contract, args)
+        queryDelegate.checkpointHandler.validate(contract, args)
     }
 }

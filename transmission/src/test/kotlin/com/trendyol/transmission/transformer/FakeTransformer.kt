@@ -7,9 +7,8 @@ import com.trendyol.transmission.transformer.data.TestEffect
 import com.trendyol.transmission.transformer.data.TestSignal
 import com.trendyol.transmission.transformer.dataholder.dataHolder
 import com.trendyol.transmission.transformer.handler.Handlers
-import com.trendyol.transmission.transformer.handler.createHandlers
-import com.trendyol.transmission.transformer.handler.onEffect
-import com.trendyol.transmission.transformer.handler.onSignal
+import com.trendyol.transmission.transformer.handler.handlers
+import com.trendyol.transmission.transformer.handler.register
 import kotlinx.coroutines.CoroutineDispatcher
 
 open class FakeTransformer(dispatcher: CoroutineDispatcher) :
@@ -20,14 +19,14 @@ open class FakeTransformer(dispatcher: CoroutineDispatcher) :
 
     private val holder = dataHolder<TestData?>(null)
 
-    override val handlers: Handlers = createHandlers {
-        onSignal<TestSignal> { signal ->
+    override val handlers: Handlers = handlers {
+        register<TestSignal> { signal ->
             signalList.add(signal)
             publish(TestEffect)
             publish(RouterEffect(""))
             holder.update { TestData("update with ${this@FakeTransformer.javaClass.simpleName}") }
         }
-        onEffect<TestEffect> { effect ->
+        register<TestEffect> { effect ->
             effectList.add(effect)
         }
     }

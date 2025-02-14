@@ -13,19 +13,15 @@ internal class TransformerStorage {
     private val lock = Mutex()
 
     private var internalTransmissionHolderSet: HolderState = HolderState.Undefined
-
-    private val internalComputationMap: MutableMap<String, ComputationOwner> =
-        mutableMapOf()
-
-    private val internalExecutionMap: MutableMap<String, ExecutionOwner> =
-        mutableMapOf()
+    private val computationMap: MutableMap<String, ComputationOwner> = mutableMapOf()
+    private val executionMap: MutableMap<String, ExecutionOwner> = mutableMapOf()
 
     fun clearComputations() {
-       internalComputationMap.clear()
+        computationMap.clear()
     }
 
     fun clearExecutions() {
-       internalExecutionMap.clear()
+        executionMap.clear()
     }
 
     fun isHolderStateInitialized(): Boolean {
@@ -60,41 +56,41 @@ internal class TransformerStorage {
     }
 
     fun registerComputation(key: String, delegate: ComputationOwner) {
-        require(!internalComputationMap.containsKey(key)) {
+        require(!computationMap.containsKey(key)) {
             "Multiple computations with the same key is not allowed: $key"
         }
-        internalComputationMap[key] = delegate
+        computationMap[key] = delegate
     }
 
     fun registerExecution(key: String, delegate: ExecutionOwner) {
-        require(!internalExecutionMap.containsKey(key)) {
+        require(!executionMap.containsKey(key)) {
             "Multiple executions with the same key is not allowed: $key"
         }
-        internalExecutionMap[key] = delegate
+        executionMap[key] = delegate
     }
 
     fun hasComputation(type: String): Boolean {
-        return internalComputationMap.containsKey(type)
+        return computationMap.containsKey(type)
     }
 
     fun hasExecution(type: String): Boolean {
-        return internalExecutionMap.containsKey(type)
+        return executionMap.containsKey(type)
     }
 
     fun getComputationByKey(type: String): ComputationOwner.Default? {
-        return internalComputationMap[type] as? ComputationOwner.Default
+        return computationMap[type] as? ComputationOwner.Default
     }
 
     fun getExecutionByKey(type: String): ExecutionOwner.Default? {
-        return internalExecutionMap[type] as? ExecutionOwner.Default
+        return executionMap[type] as? ExecutionOwner.Default
     }
 
     fun <A : Any> getComputationByKey(type: String): ComputationOwner.WithArgs<A>? {
-        return internalComputationMap[type] as? ComputationOwner.WithArgs<A>
+        return computationMap[type] as? ComputationOwner.WithArgs<A>
     }
 
     fun <A : Any> getExecutionByKey(type: String): ExecutionOwner.WithArgs<A>? {
-        return internalExecutionMap[type] as? ExecutionOwner.WithArgs<A>
+        return executionMap[type] as? ExecutionOwner.WithArgs<A>
     }
 
     fun getHolderDataByKey(key: String): Transmission.Data? {
@@ -102,6 +98,6 @@ internal class TransformerStorage {
     }
 
     fun clear() {
-        internalComputationMap.clear()
+        computationMap.clear()
     }
 }

@@ -4,7 +4,7 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.trendyol.transmission.Transmission
-import com.trendyol.transmission.router.builder.TransmissionRouterBuilder
+import com.trendyol.transmission.router.builder.TransmissionRouter
 import com.trendyol.transmission.router.streamData
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
@@ -20,9 +20,9 @@ import javax.inject.Inject
 @HiltViewModel
 class CounterViewModel @Inject constructor() : ViewModel() {
     private val master = Holder()
-    private val router = TransmissionRouterBuilder.build {
+    private val router = TransmissionRouter {
         (1..120).map { Worker(id = it.toString()) }.plus(master).run {
-            this@build.addTransformerSet(this.toSet())
+            this@buildTransmissionRouter.addTransformerSet(this.toSet())
         }
     }
     private val counter = AtomicInteger(0)

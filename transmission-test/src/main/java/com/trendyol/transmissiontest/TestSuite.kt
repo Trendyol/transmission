@@ -2,7 +2,7 @@ package com.trendyol.transmissiontest
 
 import com.trendyol.transmission.Transmission
 import com.trendyol.transmission.router.TransmissionRouter
-import com.trendyol.transmission.router.builder.TransmissionRouterBuilder
+import com.trendyol.transmission.router.builder.TransmissionRouter
 import com.trendyol.transmission.router.streamData
 import com.trendyol.transmission.router.streamEffect
 import com.trendyol.transmission.transformer.Transformer
@@ -44,7 +44,7 @@ class TestSuite {
         return this
     }
 
-    fun <C : Contract.ComputationWithArgs<A,D?>, D : Any, A: Any> registerComputation(
+    fun <C : Contract.ComputationWithArgs<A, D?>, D : Any, A : Any> registerComputation(
         contract: C, data: () -> D?
     ): TestSuite {
         supplementaryTransformerSet += ComputationWithArgsTransformer(contract, data)
@@ -62,7 +62,7 @@ class TestSuite {
         transmission: Transmission,
         scope: suspend TransformerTestScope.(scope: TestScope) -> Unit
     ) {
-        router = TransmissionRouterBuilder.build {
+        router = TransmissionRouter {
             addDispatcher(UnconfinedTestDispatcher())
             this@TestSuite.transformer?.let {
                 addTransformerSet((listOf(it) + supplementaryTransformerSet).toSet())

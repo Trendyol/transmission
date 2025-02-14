@@ -1,13 +1,13 @@
 package com.trendyol.transmission.router
 
 import com.trendyol.transmission.Transmission
-import com.trendyol.transmission.effect.EffectWrapper
+import com.trendyol.transmission.effect.WrappedEffect
 import com.trendyol.transmission.router.builder.TransmissionRouterBuilderScope
 import com.trendyol.transmission.router.loader.TransformerSetLoader
 import com.trendyol.transmission.transformer.Transformer
 import com.trendyol.transmission.transformer.checkpoint.CheckpointTracker
 import com.trendyol.transmission.transformer.request.Contract
-import com.trendyol.transmission.transformer.request.RequestHandler
+import com.trendyol.transmission.transformer.request.QueryHandler
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineScope
@@ -40,7 +40,7 @@ class TransmissionRouter internal constructor(
 
     private val signalBroadcast = routerScope.createBroadcast<Transmission.Signal>()
     private val dataBroadcast = routerScope.createBroadcast<Transmission.Data>()
-    private val effectBroadcast = routerScope.createBroadcast<EffectWrapper>()
+    private val effectBroadcast = routerScope.createBroadcast<WrappedEffect>()
 
     private val checkpointTracker = CheckpointTracker()
 
@@ -52,12 +52,12 @@ class TransmissionRouter internal constructor(
         effectBroadcast.output.map { it.effect }
             .shareIn(routerScope, SharingStarted.WhileSubscribed())
 
-    private val _requestDelegate = RequestDelegate(
+    private val _queryManager = QueryManager(
         queryScope = routerScope,
         routerRef = this@TransmissionRouter,
     )
 
-    val requestHelper: RequestHandler = _requestDelegate
+    val queryHelper: QueryHandler = _queryManager.handler
 
     init {
         if (autoInitialization) {
@@ -86,7 +86,7 @@ class TransmissionRouter internal constructor(
 
     fun process(effect: Transmission.Effect) {
         routerScope.launch {
-            effectBroadcast.producer.send(EffectWrapper(effect))
+            effectBroadcast.producer.send(WrappedEffect(effect))
         }
     }
 
@@ -111,8 +111,8 @@ class TransmissionRouter internal constructor(
                     incoming = effectBroadcast.output
                 )
                 startQueryProcessing(
-                    incomingQuery = _requestDelegate.incomingQueryResponse,
-                    outGoingQuery = _requestDelegate.outGoingQuery
+                    incomingQuery = _queryManager.incomingQueryResponse,
+                    outGoingQuery = _queryManager.outGoingQuery
                 )
             }
         }
@@ -123,3 +123,4 @@ class TransmissionRouter internal constructor(
         routerScope.cancel()
     }
 }
+
