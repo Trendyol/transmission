@@ -8,15 +8,11 @@ import com.trendyol.transmission.transformer.request.QueryResult
 import com.trendyol.transmission.transformer.request.QueryType
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.async
-import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.consumeAsFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.receiveAsFlow
-import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.launch
 
 internal class QueryManager(
@@ -24,18 +20,19 @@ internal class QueryManager(
     private val routerRef: TransmissionRouter,
 ) {
 
-    private val routerQueryResultChannel: MutableSharedFlow<QueryResult> = MutableSharedFlow()
+    private val capacity = Capacity.Default
 
-    val outGoingQuery: Channel<QueryType> = Channel(capacity = Channel.BUFFERED)
+    private val routerQueryResultChannel =
+        MutableSharedFlow<QueryResult>(extraBufferCapacity = capacity.value)
+    val outGoingQuery = MutableSharedFlow<QueryType>(extraBufferCapacity = capacity.value)
 
-    private val queryResultChannel: Channel<QueryResult> = Channel(capacity = Channel.BUFFERED)
-
-    val incomingQueryResponse = queryResultChannel.receiveAsFlow()
-        .shareIn(queryScope, SharingStarted.Lazily)
+    private val queryResultChannel =
+        MutableSharedFlow<QueryResult>(extraBufferCapacity = capacity.value)
+    val incomingQueryResponse = queryResultChannel.asSharedFlow()
 
     init {
         queryScope.launch {
-            outGoingQuery.consumeAsFlow().collect { processQuery(it) }
+            outGoingQuery.collect { processQuery(it) }
         }
     }
 
@@ -43,7 +40,7 @@ internal class QueryManager(
 
         override suspend fun <C : Contract.DataHolder<D>, D : Transmission.Data> getData(contract: C): D? {
             val queryIdentifier = IdentifierGenerator.generateIdentifier()
-            outGoingQuery.send(
+            outGoingQuery.emit(
                 QueryType.Data(
                     sender = routerRef.routerName,
                     key = contract.key,
@@ -61,7 +58,7 @@ internal class QueryManager(
             invalidate: Boolean,
         ): D? {
             val queryIdentifier = IdentifierGenerator.generateIdentifier()
-            outGoingQuery.send(
+            outGoingQuery.emit(
                 QueryType.Computation(
                     sender = routerRef.routerName,
                     key = contract.key,
@@ -81,7 +78,7 @@ internal class QueryManager(
             invalidate: Boolean,
         ): D? {
             val queryIdentifier = IdentifierGenerator.generateIdentifier()
-            outGoingQuery.send(
+            outGoingQuery.emit(
                 QueryType.ComputationWithArgs(
                     sender = routerRef.routerName,
                     key = contract.key,
@@ -97,7 +94,7 @@ internal class QueryManager(
         }
 
         override suspend fun execute(contract: Contract.Execution) {
-            outGoingQuery.send(
+            outGoingQuery.emit(
                 QueryType.Execution(
                     key = contract.key,
                 )
@@ -108,7 +105,7 @@ internal class QueryManager(
             contract: C,
             args: A,
         ) {
-            outGoingQuery.send(
+            outGoingQuery.emit(
                 QueryType.ExecutionWithArgs(
                     key = contract.key,
                     args = args,
@@ -144,7 +141,7 @@ internal class QueryManager(
         if (query.sender == routerRef.routerName) {
             routerQueryResultChannel.emit(dataToSend)
         } else {
-            queryResultChannel.send(dataToSend)
+            queryResultChannel.emit(dataToSend)
         }
     }
 
@@ -171,7 +168,7 @@ internal class QueryManager(
         if (query.sender == routerRef.routerName) {
             routerQueryResultChannel.emit(computationToSend.await())
         } else {
-            queryResultChannel.send(computationToSend.await())
+            queryResultChannel.emit(computationToSend.await())
         }
     }
 
@@ -202,7 +199,7 @@ internal class QueryManager(
         if (query.sender == routerRef.routerName) {
             routerQueryResultChannel.emit(computationToSend.await())
         } else {
-            queryResultChannel.send(computationToSend.await())
+            queryResultChannel.emit(computationToSend.await())
         }
     }
 

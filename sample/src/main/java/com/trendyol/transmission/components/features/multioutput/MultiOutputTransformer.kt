@@ -9,7 +9,7 @@ import com.trendyol.transmission.transformer.Transformer
 import com.trendyol.transmission.transformer.dataholder.dataHolder
 import com.trendyol.transmission.transformer.handler.Handlers
 import com.trendyol.transmission.transformer.handler.handlers
-import com.trendyol.transmission.transformer.handler.register
+import com.trendyol.transmission.transformer.handler.onEffect
 import com.trendyol.transmission.transformer.request.Contract
 import kotlinx.coroutines.CoroutineDispatcher
 import javax.inject.Inject
@@ -23,17 +23,17 @@ class MultiOutputTransformer @Inject constructor(
     private val holder = dataHolder(MultiOutputUiState())
 
     override val handlers: Handlers = handlers {
-        register<InputEffect.InputUpdate> { effect ->
+        onEffect<InputEffect.InputUpdate> { effect ->
             holder.update { it.copy(writtenUppercaseText = effect.value.uppercase()) }
             val result = compute(OutputTransformer.outputCalculationContract)
             holder.update {
                 it.copy(writtenUppercaseText = it.writtenUppercaseText + " ${result?.result}")
             }
         }
-        register<ColorPickerEffect.BackgroundColorUpdate> { effect ->
+        onEffect<ColorPickerEffect.BackgroundColorUpdate> { effect ->
             holder.update { it.copy(backgroundColor = effect.color) }
         }
-        register<ColorPickerEffect.SelectedColorUpdate> { effect ->
+        onEffect<ColorPickerEffect.SelectedColorUpdate> { effect ->
             holder.update { it.copy(selectedColor = effect.color) }
         }
     }

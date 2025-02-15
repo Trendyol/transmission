@@ -1,10 +1,9 @@
 package com.trendyol.transmission
 
-import app.cash.turbine.test
 import app.cash.turbine.turbineScope
 import com.trendyol.transmission.effect.RouterEffect
 import com.trendyol.transmission.router.TransmissionRouter
-import com.trendyol.transmission.router.builder.TransmissionRouterBuilder
+import com.trendyol.transmission.router.builder.TransmissionRouter
 import com.trendyol.transmission.transformer.FakeTransformer
 import com.trendyol.transmission.transformer.TestTransformer1
 import com.trendyol.transmission.transformer.TestTransformer2
@@ -36,7 +35,7 @@ class TransmissionRouterTest {
             // Given
             try {
                 // When
-                sut = TransmissionRouterBuilder.build {
+                sut = TransmissionRouter {
                     addTransformerSet(setOf())
                     addDispatcher(testDispatcher)
                 }
@@ -52,7 +51,7 @@ class TransmissionRouterTest {
             // Given
             val exception = try {
                 // When
-                sut = TransmissionRouterBuilder.build {
+                sut = TransmissionRouter {
                     addTransformerSet(setOf(FakeTransformer(testDispatcher)))
                     addDispatcher(testDispatcher)
                 }
@@ -68,7 +67,7 @@ class TransmissionRouterTest {
     fun `GIVEN initialized Router with one Transformer, WHEN processSignal is called, THEN transformer should contain the signal`() {
         // Given
         val transformer = FakeTransformer(testDispatcher)
-        sut = TransmissionRouterBuilder.build {
+        sut = TransmissionRouter {
             addTransformerSet(setOf(transformer))
             addDispatcher(testDispatcher)
         }
@@ -85,7 +84,7 @@ class TransmissionRouterTest {
         val transformer1 = TestTransformer1(testDispatcher)
         val transformer2 = TestTransformer2(testDispatcher)
         val transformer3 = TestTransformer3(testDispatcher)
-        sut = TransmissionRouterBuilder.build {
+        sut = TransmissionRouter {
             addTransformerSet(setOf(transformer1, transformer2, transformer3))
             addDispatcher(testDispatcher)
         }
@@ -108,7 +107,7 @@ class TransmissionRouterTest {
         val transformer1 = TestTransformer1(testDispatcher)
         val transformer2 = TestTransformer2(testDispatcher)
         val transformer3 = TestTransformer3(testDispatcher)
-        sut = TransmissionRouterBuilder.build {
+        sut = TransmissionRouter {
             addTransformerSet(setOf(transformer1, transformer2, transformer3))
             addDispatcher(testDispatcher)
         }
@@ -129,7 +128,7 @@ class TransmissionRouterTest {
                 val transformer1 = TestTransformer1(testDispatcher)
                 val transformer2 = TestTransformer2(testDispatcher)
                 val transformer3 = TestTransformer3(testDispatcher)
-                sut = TransmissionRouterBuilder.build {
+                sut = TransmissionRouter {
                     addTransformerSet(setOf(transformer1, transformer2, transformer3))
                     addDispatcher(testDispatcher)
                 }
@@ -149,19 +148,18 @@ class TransmissionRouterTest {
                 val transformer1 = TestTransformer1(testDispatcher)
                 val transformer2 = TestTransformer2(testDispatcher)
                 val transformer3 = TestTransformer3(testDispatcher)
-                sut = TransmissionRouterBuilder.build {
+                sut = TransmissionRouter {
                     addTransformerSet(setOf(transformer1, transformer2, transformer3))
                     addDispatcher(testDispatcher)
                 }
                 // When
+                val collector = sut.dataStream.testIn(this@runTest.backgroundScope)
                 sut.process(TestSignal)
-                sut.dataStream.test {
-                    assertEquals(TestData("update with TestTransformer1"), awaitItem())
-                    assertEquals(TestData("update with TestTransformer2"), awaitItem())
-                    assertEquals(TestData("update with TestTransformer3"), awaitItem())
-                }
 
                 // Then
+                assertEquals(TestData("update with TestTransformer1"), collector.awaitItem())
+                assertEquals(TestData("update with TestTransformer2"), collector.awaitItem())
+                assertEquals(TestData("update with TestTransformer3"), collector.awaitItem())
             }
         }
 
@@ -171,7 +169,7 @@ class TransmissionRouterTest {
         val transformer1 = TestTransformer1(testDispatcher)
         val transformer2 = TestTransformer2(testDispatcher)
         val transformer3 = TestTransformer3(testDispatcher)
-        sut = TransmissionRouterBuilder.build {
+        sut = TransmissionRouter {
             addTransformerSet(setOf(transformer1, transformer2, transformer3))
             addDispatcher(testDispatcher)
         }

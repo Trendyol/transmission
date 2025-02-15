@@ -21,13 +21,13 @@ fun Handlers.extendHandlers(
     return Handlers()
 }
 
-inline fun <reified T : Transmission.Effect> HandlerScope.register(
+inline fun <reified T : Transmission.Effect> HandlerScope.onEffect(
     noinline lambda: suspend CommunicationScope.(effect: T) -> Unit
 ) {
     handlerRegistry.effect<T>(lambda)
 }
 
-inline fun <reified T : Transmission.Signal> HandlerScope.register(
+inline fun <reified T : Transmission.Signal> HandlerScope.onSignal(
     noinline lambda: suspend CommunicationScope.(signal: T) -> Unit
 ) {
     handlerRegistry.signal<T>(lambda)

@@ -13,6 +13,7 @@ fun TransmissionRouter(
         transformerSetLoader =
             builder.transformerSetLoader.takeIf { builder.autoInitialization },
         autoInitialization = builder.autoInitialization,
+        capacity = builder.capacity,
         dispatcher = builder.dispatcher,
     )
 }

@@ -10,7 +10,8 @@ import com.trendyol.transmission.transformer.Transformer
 import com.trendyol.transmission.transformer.dataholder.dataHolder
 import com.trendyol.transmission.transformer.handler.Handlers
 import com.trendyol.transmission.transformer.handler.handlers
-import com.trendyol.transmission.transformer.handler.register
+import com.trendyol.transmission.transformer.handler.onEffect
+import com.trendyol.transmission.transformer.handler.onSignal
 import com.trendyol.transmission.transformer.request.Contract
 import com.trendyol.transmission.transformer.request.computation.Computations
 import com.trendyol.transmission.transformer.request.computation.computations
@@ -39,7 +40,7 @@ class InputTransformer @Inject constructor(
 
     @OptIn(ExperimentalTransmissionApi::class)
     override val handlers: Handlers = handlers {
-        register<InputSignal.InputUpdate> { signal ->
+        onSignal<InputSignal.InputUpdate> { signal ->
             holder.update { it.copy(writtenText = signal.value) }
             val color = pauseOn(colorCheckpoint)
             send(
@@ -48,7 +49,7 @@ class InputTransformer @Inject constructor(
             )
             publish(effect = InputEffect.InputUpdate(signal.value))
         }
-        register<ColorPickerEffect.BackgroundColorUpdate> { effect ->
+        onEffect<ColorPickerEffect.BackgroundColorUpdate> { effect ->
             validate(colorCheckpoint, effect.color)
             holder.update { it.copy(backgroundColor = effect.color) }
         }

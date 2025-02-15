@@ -1,5 +1,6 @@
 package com.trendyol.transmission.router.builder
 
+import com.trendyol.transmission.router.Capacity
 import com.trendyol.transmission.router.loader.TransformerSetLoader
 import com.trendyol.transmission.transformer.Transformer
 import kotlinx.coroutines.CoroutineDispatcher
@@ -12,6 +13,7 @@ internal class TransmissionRouterBuilderScopeImpl internal constructor(
     internal var dispatcher: CoroutineDispatcher = Dispatchers.Default
     internal lateinit var transformerSetLoader: TransformerSetLoader
     internal var autoInitialization: Boolean = true
+    internal var capacity: Capacity = Capacity.Default
 
     private val scopeImpl = object : TransmissionRouterBuilderScope {
 
@@ -26,6 +28,10 @@ internal class TransmissionRouterBuilderScopeImpl internal constructor(
                 }
             }
             addLoader(loader)
+        }
+
+        override fun setCapacity(capacity: Capacity) {
+            this@TransmissionRouterBuilderScopeImpl.capacity = capacity
         }
 
         override fun addLoader(loader: TransformerSetLoader) {

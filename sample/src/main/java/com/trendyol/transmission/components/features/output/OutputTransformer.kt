@@ -14,7 +14,7 @@ import com.trendyol.transmission.transformer.Transformer
 import com.trendyol.transmission.transformer.dataholder.dataHolder
 import com.trendyol.transmission.transformer.handler.Handlers
 import com.trendyol.transmission.transformer.handler.handlers
-import com.trendyol.transmission.transformer.handler.register
+import com.trendyol.transmission.transformer.handler.onEffect
 import com.trendyol.transmission.transformer.request.Contract
 import com.trendyol.transmission.transformer.request.computation.Computations
 import com.trendyol.transmission.transformer.request.computation.computations
@@ -60,11 +60,11 @@ class OutputTransformer @Inject constructor(
     }
 
     override val handlers: Handlers = handlers {
-        register<InputEffect.InputUpdate> { effect ->
+        onEffect<InputEffect.InputUpdate> { effect ->
             holder.update { it.copy(outputText = effect.value) }
             delay(3.seconds)
             val selectedColor = getData(ColorPickerTransformer.holderContract)
-            selectedColor ?: return@register
+            selectedColor ?: return@onEffect
             holder.update {
                 it.copy(outputText = it.outputText + " and Selected color index is ${selectedColor.selectedColorIndex}")
             }
@@ -76,7 +76,7 @@ class OutputTransformer @Inject constructor(
             execute(outputExecutionContract)
             publish(effect = RouterEffect(holder.getValue()))
         }
-        register<ColorPickerEffect.BackgroundColorUpdate> { effect ->
+        onEffect<ColorPickerEffect.BackgroundColorUpdate> { effect ->
             holder.update { it.copy(backgroundColor = effect.color) }
         }
     }
