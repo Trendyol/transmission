@@ -7,13 +7,12 @@ typealias EffectLambda = suspend CommunicationScope.(effect: Transmission.Effect
 class EffectLambdaStack {
     private var stackedLambda: EffectLambda = { _ -> }
 
-    fun addOperation(operation: EffectLambda): EffectLambdaStack {
+    fun addOperation(operation: EffectLambda) {
         val previousLambda = stackedLambda
         stackedLambda = { effect ->
             previousLambda(this, effect)
             operation(this, effect)
         }
-        return this
     }
 
     suspend fun execute(scope: CommunicationScope, effect: Transmission.Effect) {

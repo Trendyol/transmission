@@ -25,7 +25,7 @@ class HandlerRegistry internal constructor() {
         noinline lambda: suspend CommunicationScope.(signal: T) -> Unit
     ) {
         signalHandlerRegistry[T::class] =
-            SignalLambdaStack().addOperation { lambda as SignalLambda }
+            SignalLambdaStack().also { it.addOperation(lambda as SignalLambda) }
     }
 
     @PublishedApi
@@ -33,7 +33,8 @@ class HandlerRegistry internal constructor() {
         noinline lambda: suspend CommunicationScope.(signal: T) -> Unit
     ) {
         signalHandlerRegistry[T::class] =
-            signalHandlerRegistry[T::class]?.addOperation { lambda as SignalLambda } ?: SignalLambdaStack()
+            signalHandlerRegistry[T::class]?.also { it.addOperation(lambda as SignalLambda) }
+                ?: SignalLambdaStack()
     }
 
     @PublishedApi
@@ -41,7 +42,7 @@ class HandlerRegistry internal constructor() {
         noinline lambda: suspend CommunicationScope.(effect: T) -> Unit
     ) {
         effectHandlerRegistry[T::class] =
-            EffectLambdaStack().addOperation { lambda as EffectLambda }
+            EffectLambdaStack().also { it.addOperation(lambda as EffectLambda) }
     }
 
     @PublishedApi
@@ -49,6 +50,7 @@ class HandlerRegistry internal constructor() {
         noinline lambda: suspend CommunicationScope.(effect: T) -> Unit
     ) {
         effectHandlerRegistry[T::class] =
-            effectHandlerRegistry[T::class]?.addOperation { lambda as EffectLambda } ?: EffectLambdaStack()
+            effectHandlerRegistry[T::class]?.also { it.addOperation(lambda as EffectLambda) }
+                ?: EffectLambdaStack()
     }
 }

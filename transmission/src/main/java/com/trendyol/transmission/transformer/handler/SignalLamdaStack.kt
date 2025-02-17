@@ -7,13 +7,12 @@ typealias SignalLambda = suspend CommunicationScope.(signal: Transmission.Signal
 class SignalLambdaStack {
     private var stackedLambda: SignalLambda = { _ -> }
 
-    fun addOperation(operation: SignalLambda): SignalLambdaStack {
+    fun addOperation(operation: SignalLambda) {
         val previousLambda = stackedLambda
         stackedLambda = { signal ->
             previousLambda(this, signal)
             operation(this, signal)
         }
-        return this
     }
 
     suspend fun execute(scope: CommunicationScope, signal: Transmission.Signal) {
