@@ -5,6 +5,9 @@ package com.trendyol.transmission.transformer.handler
 import com.trendyol.transmission.Transmission
 import kotlin.reflect.KClass
 
+typealias SignalLambda = TransmissionLambda<Transmission.Signal>
+typealias EffectLambda = TransmissionLambda<Transmission.Effect>
+
 class HandlerRegistry internal constructor() {
 
     internal fun clear() {
@@ -14,18 +17,18 @@ class HandlerRegistry internal constructor() {
 
     @PublishedApi
     internal val signalHandlerRegistry =
-        mutableMapOf<KClass<out Transmission.Signal>, SignalLambdaStack>()
+        mutableMapOf<KClass<out Transmission.Signal>, StackedLambda<Transmission.Signal>>()
 
     @PublishedApi
     internal val effectHandlerRegistry =
-        mutableMapOf<KClass<out Transmission.Effect>, EffectLambdaStack>()
+        mutableMapOf<KClass<out Transmission.Effect>, StackedLambda<Transmission.Effect>>()
 
     @PublishedApi
     internal inline fun <reified T : Transmission.Signal> signal(
         noinline lambda: suspend CommunicationScope.(signal: T) -> Unit
     ) {
-        signalHandlerRegistry[T::class] =
-            SignalLambdaStack().also { it.addOperation(lambda as SignalLambda) }
+        signalHandlerRegistry[T::class] = StackedLambda<Transmission.Signal>()
+            .also { it.addOperation(lambda as SignalLambda) }
     }
 
     @PublishedApi
@@ -34,7 +37,7 @@ class HandlerRegistry internal constructor() {
     ) {
         signalHandlerRegistry[T::class] =
             signalHandlerRegistry[T::class]?.also { it.addOperation(lambda as SignalLambda) }
-                ?: SignalLambdaStack()
+                ?: StackedLambda()
     }
 
     @PublishedApi
@@ -42,7 +45,7 @@ class HandlerRegistry internal constructor() {
         noinline lambda: suspend CommunicationScope.(effect: T) -> Unit
     ) {
         effectHandlerRegistry[T::class] =
-            EffectLambdaStack().also { it.addOperation(lambda as EffectLambda) }
+            StackedLambda<Transmission.Effect>().also { it.addOperation(lambda as EffectLambda) }
     }
 
     @PublishedApi
@@ -51,6 +54,6 @@ class HandlerRegistry internal constructor() {
     ) {
         effectHandlerRegistry[T::class] =
             effectHandlerRegistry[T::class]?.also { it.addOperation(lambda as EffectLambda) }
-                ?: EffectLambdaStack()
+                ?: StackedLambda()
     }
 }
