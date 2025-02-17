@@ -94,7 +94,7 @@ open class Transformer(
         transformerScope.launch {
             incoming.collect {
                 currentSignalProcessing = transformerScope.launch {
-                    handlerRegistry.signalHandlerRegistry[it::class]?.invoke(
+                    handlerRegistry.signalHandlerRegistry[it::class]?.execute(
                         communicationScope,
                         it
                     )
@@ -120,8 +120,10 @@ open class Transformer(
                         .map { it.effect }
                         .collect {
                             currentEffectProcessing = launch {
-                                handlerRegistry.effectHandlerRegistry[it::class]
-                                    ?.invoke(communicationScope, it)
+                                handlerRegistry.effectHandlerRegistry[it::class]?.execute(
+                                    communicationScope,
+                                    it
+                                )
                             }
                         }
                 }
