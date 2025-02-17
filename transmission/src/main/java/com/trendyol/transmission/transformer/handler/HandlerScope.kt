@@ -13,7 +13,7 @@ fun Transformer.handlers(scope: HandlerScope.() -> Unit = {}): Handlers {
     return Handlers()
 }
 
-fun Handlers.extendHandlers(
+fun Handlers.override(
     transformer: Transformer,
     scope: HandlerScope.() -> Unit = {}
 ): Handlers {
