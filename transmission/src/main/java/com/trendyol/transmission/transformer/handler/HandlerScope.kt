@@ -5,6 +5,7 @@ import com.trendyol.transmission.transformer.Transformer
 
 class HandlerScope internal constructor(val handlerRegistry: HandlerRegistry)
 
+
 class Handlers internal constructor()
 
 fun Transformer.handlers(scope: HandlerScope.() -> Unit = {}): Handlers {
@@ -13,13 +14,6 @@ fun Transformer.handlers(scope: HandlerScope.() -> Unit = {}): Handlers {
     return Handlers()
 }
 
-fun Handlers.override(
-    transformer: Transformer,
-    scope: HandlerScope.() -> Unit = {}
-): Handlers {
-    HandlerScope(transformer.handlerRegistry).apply(scope)
-    return Handlers()
-}
 
 inline fun <reified T : Transmission.Effect> HandlerScope.onEffect(
     noinline lambda: suspend CommunicationScope.(effect: T) -> Unit
