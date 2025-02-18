@@ -5,9 +5,9 @@ import com.trendyol.transmission.router.TransmissionRouter
 import com.trendyol.transmission.transformer.Transformer
 import com.trendyol.transmission.transformer.checkpoint.CheckpointHandler
 import com.trendyol.transmission.transformer.request.Contract
-import com.trendyol.transmission.transformer.request.RequestHandler
+import com.trendyol.transmission.transformer.request.QueryHandler
 
-interface CommunicationScope : RequestHandler, CheckpointHandler {
+interface CommunicationScope : QueryHandler, CheckpointHandler {
     /**
      * Sends data to [TransmissionRouter]
      * @param data of type [Transmission.Data]

@@ -6,15 +6,16 @@ class ExecutionScope internal constructor(internal val executionRegistry: Execut
 
 class Executions internal constructor()
 
-class ExtendedExecutions internal constructor()
-
-fun Transformer.createExecutions(scope: ExecutionScope.() -> Unit): Executions {
+fun Transformer.executions(scope: ExecutionScope.() -> Unit = {}): Executions {
     this.executionRegistry.clear()
     ExecutionScope(executionRegistry).apply(scope)
     return Executions()
 }
 
-fun Transformer.extendExecutions(scope: ExecutionScope.() -> Unit): ExtendedExecutions {
-    ExecutionScope(executionRegistry).apply(scope)
-    return ExtendedExecutions()
+fun Executions.extendExecutions(
+    transformer: Transformer,
+    scope: ExecutionScope.() -> Unit = {}
+): Executions {
+    ExecutionScope(transformer.executionRegistry).apply(scope)
+    return Executions()
 }

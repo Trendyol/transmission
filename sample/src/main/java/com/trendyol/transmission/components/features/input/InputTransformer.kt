@@ -9,17 +9,13 @@ import com.trendyol.transmission.components.features.multioutput.multiOutputTran
 import com.trendyol.transmission.transformer.Transformer
 import com.trendyol.transmission.transformer.dataholder.dataHolder
 import com.trendyol.transmission.transformer.handler.Handlers
-import com.trendyol.transmission.transformer.handler.createHandlers
+import com.trendyol.transmission.transformer.handler.handlers
 import com.trendyol.transmission.transformer.handler.onEffect
 import com.trendyol.transmission.transformer.handler.onSignal
-import com.trendyol.transmission.transformer.request.Contracts
-import com.trendyol.transmission.transformer.request.checkpointWithArgs
-import com.trendyol.transmission.transformer.request.computation
+import com.trendyol.transmission.transformer.request.Contract
 import com.trendyol.transmission.transformer.request.computation.Computations
-import com.trendyol.transmission.transformer.request.computation.createComputations
+import com.trendyol.transmission.transformer.request.computation.computations
 import com.trendyol.transmission.transformer.request.computation.register
-import com.trendyol.transmission.transformer.request.computationWithArgs
-import com.trendyol.transmission.transformer.request.dataHolder
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.delay
 import javax.inject.Inject
@@ -31,7 +27,7 @@ class InputTransformer @Inject constructor(
 
     private val holder = dataHolder(InputUiState(), holderContract)
 
-    override val computations: Computations = createComputations {
+    override val computations: Computations = computations {
         register(writtenInputContract) {
             delay(1.seconds)
             WrittenInput(holder.getValue().writtenText)
@@ -41,8 +37,9 @@ class InputTransformer @Inject constructor(
         }
     }
 
+
     @OptIn(ExperimentalTransmissionApi::class)
-    override val handlers: Handlers = createHandlers {
+    override val handlers: Handlers = handlers {
         onSignal<InputSignal.InputUpdate> { signal ->
             holder.update { it.copy(writtenText = signal.value) }
             val color = pauseOn(colorCheckpoint)
@@ -60,10 +57,10 @@ class InputTransformer @Inject constructor(
 
     @OptIn(ExperimentalTransmissionApi::class)
     companion object {
-        val writtenInputWithArgs = Contracts.computationWithArgs<String, WrittenInput>()
-        val writtenInputContract = Contracts.computation<WrittenInput>()
-        val holderContract = Contracts.dataHolder<InputUiState>()
-        val colorCheckpoint = Contracts.checkpointWithArgs<Color>()
+        val writtenInputWithArgs = Contract.computationWithArgs<String, WrittenInput>()
+        val writtenInputContract = Contract.computation<WrittenInput>()
+        val holderContract = Contract.dataHolder<InputUiState>()
+        val colorCheckpoint = Contract.checkpointWithArgs<Color>()
     }
 }
 

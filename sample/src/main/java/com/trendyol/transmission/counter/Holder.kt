@@ -3,13 +3,12 @@ package com.trendyol.transmission.counter
 import com.trendyol.transmission.Transmission
 import com.trendyol.transmission.transformer.Transformer
 import com.trendyol.transmission.transformer.dataholder.dataHolder
-import com.trendyol.transmission.transformer.request.Contracts
+import com.trendyol.transmission.transformer.request.Contract
 import com.trendyol.transmission.transformer.request.computation.Computations
-import com.trendyol.transmission.transformer.request.computation.createComputations
+import com.trendyol.transmission.transformer.request.computation.computations
 import com.trendyol.transmission.transformer.request.computation.register
-import com.trendyol.transmission.transformer.request.computationWithArgs
 
-val lookUpAndReturn = Contracts.computationWithArgs<String, Int>()
+val lookUpAndReturn = Contract.computationWithArgs<String, Int>()
 
 class Holder : Transformer() {
 
@@ -17,7 +16,7 @@ class Holder : Transformer() {
 
     val counterData = dataHolder(TestCounter(0))
 
-    override val computations: Computations = createComputations {
+    override val computations: Computations = computations {
         register(lookUpAndReturn) { id ->
             counterData.updateAndGet { it.copy(value = it.value.plus(1)) }.value
         }

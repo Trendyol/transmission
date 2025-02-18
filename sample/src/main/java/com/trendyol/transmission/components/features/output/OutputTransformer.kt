@@ -13,16 +13,14 @@ import com.trendyol.transmission.effect.RouterEffect
 import com.trendyol.transmission.transformer.Transformer
 import com.trendyol.transmission.transformer.dataholder.dataHolder
 import com.trendyol.transmission.transformer.handler.Handlers
-import com.trendyol.transmission.transformer.handler.createHandlers
+import com.trendyol.transmission.transformer.handler.handlers
 import com.trendyol.transmission.transformer.handler.onEffect
-import com.trendyol.transmission.transformer.request.Contracts
-import com.trendyol.transmission.transformer.request.computation
+import com.trendyol.transmission.transformer.request.Contract
 import com.trendyol.transmission.transformer.request.computation.Computations
-import com.trendyol.transmission.transformer.request.computation.createComputations
+import com.trendyol.transmission.transformer.request.computation.computations
 import com.trendyol.transmission.transformer.request.computation.register
-import com.trendyol.transmission.transformer.request.execution
 import com.trendyol.transmission.transformer.request.execution.Executions
-import com.trendyol.transmission.transformer.request.execution.createExecutions
+import com.trendyol.transmission.transformer.request.execution.executions
 import com.trendyol.transmission.transformer.request.execution.register
 import com.trendyol.transmission.ui.theme.Pink80
 import kotlinx.coroutines.CoroutineDispatcher
@@ -30,6 +28,7 @@ import kotlinx.coroutines.delay
 import javax.inject.Inject
 import kotlin.random.Random
 import kotlin.time.Duration.Companion.seconds
+
 
 class OutputTransformer @Inject constructor(
     @DefaultDispatcher private val defaultDispatcher: CoroutineDispatcher
@@ -39,7 +38,7 @@ class OutputTransformer @Inject constructor(
 
     private val holder2 = dataHolder(ColorPickerUiState(), publishUpdates = false)
 
-    override val computations: Computations = createComputations {
+    override val computations: Computations = computations {
         register(outputCalculationContract) {
             delay(2.seconds)
             val data = getData(ColorPickerTransformer.holderContract)?.selectedColorIndex
@@ -49,7 +48,7 @@ class OutputTransformer @Inject constructor(
         }
     }
 
-    override val executions: Executions = createExecutions {
+    override val executions: Executions = executions {
         register(outputExecutionContract) {
             delay(4.seconds)
             communicationScope.publish(ColorPickerEffect.BackgroundColorUpdate(Pink80))
@@ -60,7 +59,7 @@ class OutputTransformer @Inject constructor(
         }
     }
 
-    override val handlers: Handlers = createHandlers {
+    override val handlers: Handlers = handlers {
         onEffect<InputEffect.InputUpdate> { effect ->
             holder.update { it.copy(outputText = effect.value) }
             delay(3.seconds)
@@ -89,7 +88,7 @@ class OutputTransformer @Inject constructor(
 
     companion object {
         private const val TAG = "OutputTransformer"
-        val outputCalculationContract = Contracts.computation<OutputCalculationResult>()
-        val outputExecutionContract = Contracts.execution()
+        val outputCalculationContract = Contract.computation<OutputCalculationResult>()
+        val outputExecutionContract = Contract.execution()
     }
 }

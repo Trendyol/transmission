@@ -4,7 +4,8 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.trendyol.transmission.Transmission
-import com.trendyol.transmission.router.builder.TransmissionRouterBuilder
+import com.trendyol.transmission.router.Capacity
+import com.trendyol.transmission.router.builder.TransmissionRouter
 import com.trendyol.transmission.router.streamData
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
@@ -14,15 +15,17 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.util.concurrent.atomic.AtomicInteger
 import javax.inject.Inject
 
 @HiltViewModel
 class CounterViewModel @Inject constructor() : ViewModel() {
     private val master = Holder()
-    private val router = TransmissionRouterBuilder.build {
-        (1..120).map { Worker(id = it.toString()) }.plus(master).run {
-            this@build.addTransformerSet(this.toSet())
+    private val router = TransmissionRouter {
+        (1..200).map { Worker(id = it.toString()) }.plus(master).run {
+            this@TransmissionRouter.addTransformerSet(this.toSet())
+            this@TransmissionRouter.setCapacity(Capacity.Custom(256))
         }
     }
     private val counter = AtomicInteger(0)
@@ -73,8 +76,10 @@ class CounterViewModel @Inject constructor() : ViewModel() {
         }
     }
 
-    private fun onData(data: Transmission.Data) {
+    private suspend fun onData(data: Transmission.Data) {
         if (data !is CounterData) return
-        _transmissionList.update { it.plus("Data: ${data.id}" to false) }
+        withContext(Dispatchers.Default) {
+            _transmissionList.update { it.plus("Data: ${data.id}" to false) }
+        }
     }
 }

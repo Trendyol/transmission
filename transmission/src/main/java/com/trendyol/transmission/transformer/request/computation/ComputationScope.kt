@@ -6,15 +6,16 @@ class ComputationScope internal constructor(internal val computationRegistry: Co
 
 class Computations internal constructor()
 
-class ExtendedComputations internal constructor()
-
-fun Transformer.createComputations(scope: ComputationScope.() -> Unit): Computations {
+fun Transformer.computations(scope: ComputationScope.() -> Unit = {}): Computations {
     this.computationRegistry.clear()
     ComputationScope(computationRegistry).apply(scope)
     return Computations()
 }
 
-fun Transformer.extendComputations(scope: ComputationScope.() -> Unit): ExtendedComputations {
-    ComputationScope(computationRegistry).apply(scope)
-    return ExtendedComputations()
+fun Computations.extendComputations(
+    transformer: Transformer,
+    scope: ComputationScope.() -> Unit = {}
+): Computations {
+    ComputationScope(transformer.computationRegistry).apply(scope)
+    return Computations()
 }

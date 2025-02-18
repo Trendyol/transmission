@@ -8,14 +8,13 @@ import com.trendyol.transmission.components.features.output.OutputTransformer
 import com.trendyol.transmission.transformer.Transformer
 import com.trendyol.transmission.transformer.dataholder.dataHolder
 import com.trendyol.transmission.transformer.handler.Handlers
-import com.trendyol.transmission.transformer.handler.createHandlers
+import com.trendyol.transmission.transformer.handler.handlers
 import com.trendyol.transmission.transformer.handler.onEffect
-import com.trendyol.transmission.transformer.request.Contracts
-import com.trendyol.transmission.transformer.request.identity
+import com.trendyol.transmission.transformer.request.Contract
 import kotlinx.coroutines.CoroutineDispatcher
 import javax.inject.Inject
 
-val multiOutputTransformerIdentity = Contracts.identity()
+val multiOutputTransformerIdentity = Contract.identity()
 
 class MultiOutputTransformer @Inject constructor(
     @DefaultDispatcher private val defaultDispatcher: CoroutineDispatcher
@@ -23,7 +22,7 @@ class MultiOutputTransformer @Inject constructor(
 
     private val holder = dataHolder(MultiOutputUiState())
 
-    override val handlers: Handlers = createHandlers {
+    override val handlers: Handlers = handlers {
         onEffect<InputEffect.InputUpdate> { effect ->
             holder.update { it.copy(writtenUppercaseText = effect.value.uppercase()) }
             val result = compute(OutputTransformer.outputCalculationContract)

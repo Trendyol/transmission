@@ -1,14 +1,14 @@
 package com.trendyol.transmission.transformer.request.execution
 
-import com.trendyol.transmission.transformer.request.RequestHandler
+import com.trendyol.transmission.transformer.request.QueryHandler
 
 internal sealed interface ExecutionOwner {
 
     interface WithArgs<A : Any> : ExecutionOwner {
-        suspend fun execute(scope: RequestHandler, args: A)
+        suspend fun execute(scope: QueryHandler, args: A)
     }
 
     interface Default : ExecutionOwner {
-        suspend fun execute(scope: RequestHandler)
+        suspend fun execute(scope: QueryHandler)
     }
 }

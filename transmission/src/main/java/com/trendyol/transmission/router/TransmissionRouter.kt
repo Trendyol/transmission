@@ -1,21 +1,23 @@
 package com.trendyol.transmission.router
 
 import com.trendyol.transmission.Transmission
-import com.trendyol.transmission.effect.EffectWrapper
+import com.trendyol.transmission.effect.WrappedEffect
 import com.trendyol.transmission.router.builder.TransmissionRouterBuilderScope
 import com.trendyol.transmission.router.loader.TransformerSetLoader
 import com.trendyol.transmission.transformer.Transformer
 import com.trendyol.transmission.transformer.checkpoint.CheckpointTracker
 import com.trendyol.transmission.transformer.request.Contract
-import com.trendyol.transmission.transformer.request.RequestHandler
+import com.trendyol.transmission.transformer.request.QueryHandler
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.launch
@@ -27,6 +29,7 @@ class TransmissionRouter internal constructor(
     identity: Contract.Identity,
     internal val transformerSetLoader: TransformerSetLoader? = null,
     internal val autoInitialization: Boolean = true,
+    internal val capacity: Capacity = Capacity.Default,
     dispatcher: CoroutineDispatcher = Dispatchers.Default,
 ) {
 
@@ -38,26 +41,28 @@ class TransmissionRouter internal constructor(
 
     internal val routerName: String = identity.key
 
-    private val signalBroadcast = routerScope.createBroadcast<Transmission.Signal>()
-    private val dataBroadcast = routerScope.createBroadcast<Transmission.Data>()
-    private val effectBroadcast = routerScope.createBroadcast<EffectWrapper>()
+    private val _signalStream =
+        MutableSharedFlow<Transmission.Signal>(extraBufferCapacity = capacity.value)
+    private val _dataStream =
+        MutableSharedFlow<Transmission.Data>(extraBufferCapacity = capacity.value)
+    private val _effectStream =
+        MutableSharedFlow<WrappedEffect>(extraBufferCapacity = capacity.value)
 
     private val checkpointTracker = CheckpointTracker()
 
     @PublishedApi
-    internal val dataStream = dataBroadcast.output
+    internal val dataStream = _dataStream.asSharedFlow()
 
     @PublishedApi
-    internal val effectStream: SharedFlow<Transmission.Effect> =
-        effectBroadcast.output.map { it.effect }
-            .shareIn(routerScope, SharingStarted.WhileSubscribed())
+    internal val effectStream: SharedFlow<Transmission.Effect> = _effectStream
+        .map { it.effect }.shareIn(routerScope, SharingStarted.Lazily)
 
-    private val _requestDelegate = RequestDelegate(
+    private val _queryManager = QueryManager(
         queryScope = routerScope,
         routerRef = this@TransmissionRouter,
     )
 
-    val requestHelper: RequestHandler = _requestDelegate
+    val queryHelper: QueryHandler = _queryManager.handler
 
     init {
         if (autoInitialization) {
@@ -80,13 +85,13 @@ class TransmissionRouter internal constructor(
 
     fun process(signal: Transmission.Signal) {
         routerScope.launch {
-            signalBroadcast.producer.send(signal)
+            _signalStream.emit(signal)
         }
     }
 
     fun process(effect: Transmission.Effect) {
         routerScope.launch {
-            effectBroadcast.producer.send(EffectWrapper(effect))
+            _effectStream.emit(WrappedEffect(effect))
         }
     }
 
@@ -104,15 +109,15 @@ class TransmissionRouter internal constructor(
         transformerSet.forEach { transformer ->
             transformer.run {
                 bindCheckpointTracker(checkpointTracker)
-                startSignalCollection(incoming = signalBroadcast.output)
-                startDataPublishing(data = dataBroadcast.producer)
+                startSignalCollection(incoming = _signalStream)
+                startDataPublishing(data = _dataStream)
                 startEffectProcessing(
-                    producer = effectBroadcast.producer,
-                    incoming = effectBroadcast.output
+                    producer = _effectStream,
+                    incoming = _effectStream,
                 )
                 startQueryProcessing(
-                    incomingQuery = _requestDelegate.incomingQueryResponse,
-                    outGoingQuery = _requestDelegate.outGoingQuery
+                    incomingQuery = _queryManager.incomingQueryResponse,
+                    outGoingQuery = _queryManager.outGoingQuery
                 )
             }
         }
@@ -123,3 +128,4 @@ class TransmissionRouter internal constructor(
         routerScope.cancel()
     }
 }
+

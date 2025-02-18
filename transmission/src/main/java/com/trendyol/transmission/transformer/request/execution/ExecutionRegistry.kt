@@ -1,7 +1,7 @@
 package com.trendyol.transmission.transformer.request.execution
 
 import com.trendyol.transmission.transformer.Transformer
-import com.trendyol.transmission.transformer.request.RequestHandler
+import com.trendyol.transmission.transformer.request.QueryHandler
 
 class ExecutionRegistry internal constructor(private val transformer: Transformer) {
 
@@ -11,7 +11,7 @@ class ExecutionRegistry internal constructor(private val transformer: Transforme
 
     internal fun buildWith(
         key: String,
-        execution: suspend RequestHandler.() -> Unit
+        execution: suspend QueryHandler.() -> Unit
     ) {
         transformer.storage.registerExecution(
             key = key,
@@ -21,7 +21,7 @@ class ExecutionRegistry internal constructor(private val transformer: Transforme
 
     internal fun <A : Any> buildWith(
         key: String,
-        execution: suspend RequestHandler.(args: A) -> Unit
+        execution: suspend QueryHandler.(args: A) -> Unit
     ) {
         transformer.storage.registerExecution(
             key = key,

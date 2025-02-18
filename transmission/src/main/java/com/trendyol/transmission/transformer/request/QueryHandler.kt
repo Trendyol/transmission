@@ -3,7 +3,7 @@ package com.trendyol.transmission.transformer.request
 import com.trendyol.transmission.Transmission
 import com.trendyol.transmission.transformer.Transformer
 
-interface RequestHandler {
+interface QueryHandler {
 
     /**
      * Gets the data using the provided [Contract.DataHolder]

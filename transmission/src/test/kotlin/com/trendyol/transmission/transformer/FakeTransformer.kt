@@ -7,7 +7,7 @@ import com.trendyol.transmission.transformer.data.TestEffect
 import com.trendyol.transmission.transformer.data.TestSignal
 import com.trendyol.transmission.transformer.dataholder.dataHolder
 import com.trendyol.transmission.transformer.handler.Handlers
-import com.trendyol.transmission.transformer.handler.createHandlers
+import com.trendyol.transmission.transformer.handler.handlers
 import com.trendyol.transmission.transformer.handler.onEffect
 import com.trendyol.transmission.transformer.handler.onSignal
 import kotlinx.coroutines.CoroutineDispatcher
@@ -20,7 +20,7 @@ open class FakeTransformer(dispatcher: CoroutineDispatcher) :
 
     private val holder = dataHolder<TestData?>(null)
 
-    override val handlers: Handlers = createHandlers {
+    override val handlers: Handlers = handlers {
         onSignal<TestSignal> { signal ->
             signalList.add(signal)
             publish(TestEffect)
