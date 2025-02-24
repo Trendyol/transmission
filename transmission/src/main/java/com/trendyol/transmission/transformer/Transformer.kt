@@ -154,7 +154,10 @@ open class Transformer(
         }
     }
 
+    open fun onCleared() {}
+
     fun clear() {
+        onCleared()
         transformerScope.cancel()
         storage.clear()
     }
