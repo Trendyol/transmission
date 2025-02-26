@@ -8,12 +8,12 @@ plugins {
 
 android {
     namespace = "com.trendyol.transmission"
-    compileSdk = 34
+    compileSdk = 35
 
     defaultConfig {
         applicationId = "com.trendyol.transmission"
         minSdk = 24
-        targetSdk = 34
+        targetSdk = 35
         versionCode = 1
         versionName = "1.0"
 
@@ -26,7 +26,6 @@ android {
     buildTypes {
         release {
             isMinifyEnabled = true
-            isDebuggable = true
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro"
             )

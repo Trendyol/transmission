@@ -1,35 +1,42 @@
 [versions]
+
+android-minSdk = "24"
+android-compileSdk = "34"
+android-targetSdk = "34"
+
+compose-multiplatform = "1.7.0"
+
 # Library versions
 transmission-core = "1.5.0"
 transmission-test = "1.5.0"
 
 # Kotlin and build tools
-agp = "8.2.2"
-kotlin = "2.0.20"
+agp = "8.7.3"
+kotlin = "2.1.10"
 jetbrainsKotlinJvm = "2.0.20"
-org-jetbrains-kotlin-android = "1.9.0"
+org-jetbrains-kotlin-android = "2.1.10"
 
 # Coroutines
-kotlinxCoroutinesCore = "1.8.0"
-kotlinxCoroutinesTest = "1.8.0"
+kotlinxCoroutinesCore = "1.10.1"
+kotlinxCoroutinesTest = "1.10.1"
 
 # AndroidX
-coreKtx = "1.12.0"
-lifecycleRuntimeKtx = "2.7.0"
-lifecycleRuntimeCompose = "2.7.0"
-activityCompose = "1.8.2"
-composeBom = "2024.02.01"
+coreKtx = "1.15.0"
+lifecycleRuntimeKtx = "2.8.7"
+lifecycleRuntimeCompose = "2.8.7"
+activityCompose = "1.10.1"
+composeBom = "2025.03.00"
 
 # Testing
 junit = "4.13.2"
-junitVersion = "1.1.5"
+junitVersion = "1.2.1"
 espressoCore = "3.5.1"
 turbine = "1.1.0"
 
 # DI
 hilt = "2.50"
-hiltAndroid = "2.50"
-hiltAndroidCompiler = "2.50"
+hiltAndroid = "2.55"
+hiltAndroidCompiler = "2.55"
 
 [libraries]
 
