@@ -1,8 +1,10 @@
 package com.trendyol.transmission.components.features.colorpicker
 
 import com.trendyol.transmission.DefaultDispatcher
+import com.trendyol.transmission.components.LoggingModule
 import com.trendyol.transmission.components.features.ColorPickerUiState
 import com.trendyol.transmission.components.features.multioutput.multiOutputTransformerIdentity
+import com.trendyol.transmission.config.TransformerConfig
 import com.trendyol.transmission.transformer.Transformer
 import com.trendyol.transmission.transformer.dataholder.dataHolder
 import com.trendyol.transmission.transformer.handler.Handlers
@@ -17,9 +19,17 @@ val colorPickerIdentity = Contract.identity()
 
 class ColorPickerTransformer @Inject constructor(
     @DefaultDispatcher private val defaultDispatcher: CoroutineDispatcher
-) : Transformer(colorPickerIdentity, defaultDispatcher) {
+) : Transformer(
+    identity = colorPickerIdentity,
+    dispatcher = defaultDispatcher,
+    config = TransformerConfig.TypeAware
+) {
 
     private val holder = dataHolder(ColorPickerUiState(), holderContract)
+
+    init {
+        applyModule(LoggingModule("ColorPicker"))
+    }
 
     override val handlers: Handlers = handlers {
         onSignal<ColorPickerSignal.SelectColor> { signal ->
@@ -43,3 +53,4 @@ class ColorPickerTransformer @Inject constructor(
         val holderContract = Contract.dataHolder<ColorPickerUiState>()
     }
 }
+

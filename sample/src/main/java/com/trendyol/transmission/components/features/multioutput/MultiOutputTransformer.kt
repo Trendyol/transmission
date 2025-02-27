@@ -1,6 +1,7 @@
 package com.trendyol.transmission.components.features.multioutput
 
 import com.trendyol.transmission.DefaultDispatcher
+import com.trendyol.transmission.components.LoggingModule
 import com.trendyol.transmission.components.features.MultiOutputUiState
 import com.trendyol.transmission.components.features.colorpicker.ColorPickerEffect
 import com.trendyol.transmission.components.features.input.InputEffect
@@ -21,6 +22,10 @@ class MultiOutputTransformer @Inject constructor(
 ) : Transformer(multiOutputTransformerIdentity, defaultDispatcher) {
 
     private val holder = dataHolder(MultiOutputUiState())
+
+    init {
+        applyModule(LoggingModule("MultiOutput"))
+    }
 
     override val handlers: Handlers = handlers {
         onEffect<InputEffect.InputUpdate> { effect ->
