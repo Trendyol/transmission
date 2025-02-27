@@ -4,11 +4,13 @@ import com.trendyol.transmission.ExperimentalTransmissionApi
 import com.trendyol.transmission.Transmission
 import com.trendyol.transmission.effect.RouterEffect
 import com.trendyol.transmission.effect.WrappedEffect
+import com.trendyol.transmission.module.TransformerModule
 import com.trendyol.transmission.router.Capacity
 import com.trendyol.transmission.transformer.checkpoint.CheckpointTracker
 import com.trendyol.transmission.transformer.handler.CommunicationScope
 import com.trendyol.transmission.transformer.handler.HandlerRegistry
 import com.trendyol.transmission.transformer.handler.Handlers
+import com.trendyol.transmission.transformer.handler.addToHandlers
 import com.trendyol.transmission.transformer.request.Contract
 import com.trendyol.transmission.transformer.request.QueryResult
 import com.trendyol.transmission.transformer.request.QueryType
@@ -41,11 +43,13 @@ open class Transformer(
     private val capacity = Capacity.Default
 
     private val exceptionHandler = CoroutineExceptionHandler { _, throwable ->
-        onError(throwable)
+        onErrorInternal(throwable)
     }
 
     @PublishedApi
     internal val transformerScope = CoroutineScope(dispatcher + SupervisorJob() + exceptionHandler)
+
+    private val modules = mutableSetOf<TransformerModule>()
 
     private val _identity: Contract.Identity = identity
 
@@ -71,7 +75,7 @@ open class Transformer(
         ComputationRegistry(this)
     }
 
-    protected open val handlers: Handlers by lazy { Handlers() }
+    open val handlers: Handlers by lazy { Handlers() }
     protected open val computations: Computations by lazy { Computations() }
     protected open val executions: Executions by lazy { Executions() }
 
@@ -94,10 +98,7 @@ open class Transformer(
         transformerScope.launch {
             incoming.collect {
                 currentSignalProcessing = transformerScope.launch {
-                    handlerRegistry.signalHandlerRegistry[it::class]?.execute(
-                        communicationScope,
-                        it
-                    )
+                    handlerRegistry.executeSignalHandlers(communicationScope, it)
                 }
             }
         }
@@ -120,10 +121,7 @@ open class Transformer(
                         .map { it.effect }
                         .collect {
                             currentEffectProcessing = launch {
-                                handlerRegistry.effectHandlerRegistry[it::class]?.execute(
-                                    communicationScope,
-                                    it
-                                )
+                                handlerRegistry.executeEffectHandlers(communicationScope, it)
                             }
                         }
                 }
@@ -156,12 +154,41 @@ open class Transformer(
         }
     }
 
+    /**
+     * Apply a module to this transformer
+     */
+    protected fun applyModule(module: TransformerModule) {
+        // Store the module
+        modules.add(module)
+
+    }
+
+    internal fun initializeModules() {
+        modules.forEach { module ->
+            addToHandlers {
+                module.configureHandlers(this)
+            }
+        }
+    }
+
+    /**
+     * Apply multiple modules to this transformer
+     */
+    fun applyModules(vararg modules: TransformerModule) {
+        modules.forEach { applyModule(it) }
+    }
+
     open fun onCleared() {}
 
     fun clear() {
         onCleared()
         transformerScope.cancel()
         storage.clear()
+    }
+
+    private fun onErrorInternal(throwable: Throwable) {
+        modules.forEach { it.onError(throwable) }
+        onError(throwable)
     }
 
     open fun onError(throwable: Throwable) {
