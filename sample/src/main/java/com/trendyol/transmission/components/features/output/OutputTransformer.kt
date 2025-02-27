@@ -2,6 +2,7 @@ package com.trendyol.transmission.components.features.output
 
 import android.util.Log
 import com.trendyol.transmission.DefaultDispatcher
+import com.trendyol.transmission.components.LoggingModule
 import com.trendyol.transmission.components.features.ColorPickerUiState
 import com.trendyol.transmission.components.features.OutputUiState
 import com.trendyol.transmission.components.features.colorpicker.ColorPickerEffect
@@ -37,6 +38,10 @@ class OutputTransformer @Inject constructor(
     private val holder = dataHolder(OutputUiState())
 
     private val holder2 = dataHolder(ColorPickerUiState(), publishUpdates = false)
+
+    init {
+        applyModule(LoggingModule("Output"))
+    }
 
     override val computations: Computations = computations {
         register(outputCalculationContract) {

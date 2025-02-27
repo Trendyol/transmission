@@ -3,6 +3,7 @@ package com.trendyol.transmission.components.features.input
 import androidx.compose.ui.graphics.Color
 import com.trendyol.transmission.DefaultDispatcher
 import com.trendyol.transmission.ExperimentalTransmissionApi
+import com.trendyol.transmission.components.LoggingModule
 import com.trendyol.transmission.components.features.InputUiState
 import com.trendyol.transmission.components.features.colorpicker.ColorPickerEffect
 import com.trendyol.transmission.components.features.multioutput.multiOutputTransformerIdentity
@@ -26,6 +27,10 @@ class InputTransformer @Inject constructor(
 ) : Transformer(dispatcher = defaultDispatcher) {
 
     private val holder = dataHolder(InputUiState(), holderContract)
+
+    init {
+        applyModule(LoggingModule("Input"))
+    }
 
     override val computations: Computations = computations {
         register(writtenInputContract) {
