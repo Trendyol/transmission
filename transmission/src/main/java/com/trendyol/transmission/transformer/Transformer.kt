@@ -2,6 +2,7 @@ package com.trendyol.transmission.transformer
 
 import com.trendyol.transmission.ExperimentalTransmissionApi
 import com.trendyol.transmission.Transmission
+import com.trendyol.transmission.config.TransformerConfig
 import com.trendyol.transmission.effect.RouterEffect
 import com.trendyol.transmission.effect.WrappedEffect
 import com.trendyol.transmission.module.TransformerModule
@@ -38,6 +39,7 @@ import kotlinx.coroutines.supervisorScope
 open class Transformer(
     identity: Contract.Identity = Contract.identity(),
     dispatcher: CoroutineDispatcher = Dispatchers.Default,
+    val config: TransformerConfig = TransformerConfig.Default
 ) {
 
     private val capacity = Capacity.Default
@@ -69,7 +71,7 @@ open class Transformer(
 
     internal val storage = TransformerStorage()
 
-    internal val handlerRegistry by lazy { HandlerRegistry() }
+    internal val handlerRegistry by lazy { HandlerRegistry(config) }
     internal val executionRegistry: ExecutionRegistry by lazy { ExecutionRegistry(this) }
     internal val computationRegistry: ComputationRegistry by lazy {
         ComputationRegistry(this)

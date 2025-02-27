@@ -33,7 +33,7 @@ import kotlin.time.Duration.Companion.seconds
 
 class OutputTransformer @Inject constructor(
     @DefaultDispatcher private val defaultDispatcher: CoroutineDispatcher
-) : Transformer(dispatcher = defaultDispatcher) {
+) : Transformer(dispatcher = defaultDispatcher, ) {
 
     private val holder = dataHolder(OutputUiState())
 

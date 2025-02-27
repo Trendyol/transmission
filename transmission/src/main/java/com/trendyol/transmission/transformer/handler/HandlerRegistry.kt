@@ -1,20 +1,20 @@
 package com.trendyol.transmission.transformer.handler
 
 import com.trendyol.transmission.Transmission
+import com.trendyol.transmission.config.TransformerConfig
 import kotlin.reflect.KClass
 import kotlin.reflect.full.isSubclassOf
 
-typealias SignalLambda = suspend CommunicationScope.(signal: Transmission.Signal) -> Unit
-typealias EffectLambda = suspend CommunicationScope.(effect: Transmission.Effect) -> Unit
+typealias SignalLambda = TransmissionLambda<Transmission.Signal>
+typealias EffectLambda = TransmissionLambda<Transmission.Effect>
 
 /**
  * Registry for signal and effect handlers
  */
-class HandlerRegistry internal constructor() {
+class HandlerRegistry internal constructor(
+    private val config: TransformerConfig = TransformerConfig.Default
+) {
 
-    /**
-     * Clear all handlers
-     */
     internal fun clear() {
         signalHandlerRegistry.clear()
         effectHandlerRegistry.clear()
@@ -22,16 +22,12 @@ class HandlerRegistry internal constructor() {
 
     /**
      * Registry mapping signal classes to their handlers
-     * Each signal class can have multiple handlers
-     * (one per source class that added a handler for it)
      */
     internal val signalHandlerRegistry =
         mutableMapOf<KClass<out Transmission.Signal>, MutableList<IdentifiedHandler<Transmission.Signal>>>()
 
     /**
      * Registry mapping effect classes to their handlers
-     * Each effect class can have multiple handlers
-     * (one per source class that added a handler for it)
      */
     internal val effectHandlerRegistry =
         mutableMapOf<KClass<out Transmission.Effect>, MutableList<IdentifiedHandler<Transmission.Effect>>>()
@@ -67,21 +63,24 @@ class HandlerRegistry internal constructor() {
         // Register the handler for the specified signal class
         signalHandlerRegistry.getOrPut(signalClass) { mutableListOf() }.add(identifiedHandler)
 
-        // Find all registered subclasses of this signal class and register the handler for them too
-        // Only do this for supertypes, not for specific types
-        for (registeredClass in signalHandlerRegistry.keys.toList()) {
-            if (registeredClass != signalClass && registeredClass.isSubclassOf(signalClass)) {
-                // For each subclass, add this handler
-                val subclassHandlers =
-                    signalHandlerRegistry.getOrPut(registeredClass) { mutableListOf() }
+        // If type hierarchy awareness is enabled, register for subtypes too
+        if (config.typeHierarchyAwarenessEnabled) {
+            // Find all registered subclasses of this signal class and register the handler for them too
+            // Only do this for supertypes, not for specific types
+            for (registeredClass in signalHandlerRegistry.keys.toList()) {
+                if (registeredClass != signalClass && registeredClass.isSubclassOf(signalClass)) {
+                    // For each subclass, add this handler
+                    val subclassHandlers =
+                        signalHandlerRegistry.getOrPut(registeredClass) { mutableListOf() }
 
-                // Create a new stacked lambda with the same operation
-                val subclassStackedLambda = StackedLambda<Transmission.Signal>()
-                @Suppress("UNCHECKED_CAST")
-                subclassStackedLambda.addOperation(handler as SignalLambda)
+                    // Create a new stacked lambda with the same operation
+                    val subclassStackedLambda = StackedLambda<Transmission.Signal>()
+                    @Suppress("UNCHECKED_CAST")
+                    subclassStackedLambda.addOperation(handler as SignalLambda)
 
-                // Add as a new identified handler
-                subclassHandlers.add(IdentifiedHandler(sourceClass, subclassStackedLambda))
+                    // Add as a new identified handler
+                    subclassHandlers.add(IdentifiedHandler(sourceClass, subclassStackedLambda))
+                }
             }
         }
     }
@@ -109,21 +108,24 @@ class HandlerRegistry internal constructor() {
         // Register the handler for the specified effect class
         effectHandlerRegistry.getOrPut(effectClass) { mutableListOf() }.add(identifiedHandler)
 
-        // Find all registered subclasses of this effect class and register the handler for them too
-        // Only do this for supertypes, not for specific types
-        for (registeredClass in effectHandlerRegistry.keys.toList()) {
-            if (registeredClass != effectClass && registeredClass.isSubclassOf(effectClass)) {
-                // For each subclass, add this handler
-                val subclassHandlers =
-                    effectHandlerRegistry.getOrPut(registeredClass) { mutableListOf() }
+        // If type hierarchy awareness is enabled, register for subtypes too
+        if (config.typeHierarchyAwarenessEnabled) {
+            // Find all registered subclasses of this effect class and register the handler for them too
+            // Only do this for supertypes, not for specific types
+            for (registeredClass in effectHandlerRegistry.keys.toList()) {
+                if (registeredClass != effectClass && registeredClass.isSubclassOf(effectClass)) {
+                    // For each subclass, add this handler
+                    val subclassHandlers =
+                        effectHandlerRegistry.getOrPut(registeredClass) { mutableListOf() }
 
-                // Create a new stacked lambda with the same operation
-                val subclassStackedLambda = StackedLambda<Transmission.Effect>()
-                @Suppress("UNCHECKED_CAST")
-                subclassStackedLambda.addOperation(handler as EffectLambda)
+                    // Create a new stacked lambda with the same operation
+                    val subclassStackedLambda = StackedLambda<Transmission.Effect>()
+                    @Suppress("UNCHECKED_CAST")
+                    subclassStackedLambda.addOperation(handler as EffectLambda)
 
-                // Add as a new identified handler
-                subclassHandlers.add(IdentifiedHandler(sourceClass, subclassStackedLambda))
+                    // Add as a new identified handler
+                    subclassHandlers.add(IdentifiedHandler(sourceClass, subclassStackedLambda))
+                }
             }
         }
     }
@@ -172,16 +174,20 @@ class HandlerRegistry internal constructor() {
                 @Suppress("UNCHECKED_CAST")
                 sourceHandler.handler.addOperation(handler as SignalLambda)
 
-                // Now extend this for all subclasses too
-                for ((subClass, subHandlers) in signalHandlerRegistry) {
-                    if (subClass != signalClass && subClass.isSubclassOf(signalClass)) {
-                        // Find the handler for the same source class
-                        val subSourceHandler = subHandlers.find { it.sourceClass == sourceClass }
+                // If type hierarchy awareness is enabled, extend for subtypes too
+                if (config.typeHierarchyAwarenessEnabled) {
+                    // Now extend this for all subclasses too
+                    for ((subClass, subHandlers) in signalHandlerRegistry) {
+                        if (subClass != signalClass && subClass.isSubclassOf(signalClass)) {
+                            // Find the handler for the same source class
+                            val subSourceHandler =
+                                subHandlers.find { it.sourceClass == sourceClass }
 
-                        if (subSourceHandler != null) {
-                            // Add the operation to the existing handler
-                            @Suppress("UNCHECKED_CAST")
-                            subSourceHandler.handler.addOperation(handler as SignalLambda)
+                            if (subSourceHandler != null) {
+                                // Add the operation to the existing handler
+                                @Suppress("UNCHECKED_CAST")
+                                subSourceHandler.handler.addOperation(handler as SignalLambda)
+                            }
                         }
                     }
                 }
@@ -219,16 +225,20 @@ class HandlerRegistry internal constructor() {
                 @Suppress("UNCHECKED_CAST")
                 sourceHandler.handler.addOperation(handler as EffectLambda)
 
-                // Now extend this for all subclasses too
-                for ((subClass, subHandlers) in effectHandlerRegistry) {
-                    if (subClass != effectClass && subClass.isSubclassOf(effectClass)) {
-                        // Find the handler for the same source class
-                        val subSourceHandler = subHandlers.find { it.sourceClass == sourceClass }
+                // If type hierarchy awareness is enabled, extend for subtypes too
+                if (config.typeHierarchyAwarenessEnabled) {
+                    // Now extend this for all subclasses too
+                    for ((subClass, subHandlers) in effectHandlerRegistry) {
+                        if (subClass != effectClass && subClass.isSubclassOf(effectClass)) {
+                            // Find the handler for the same source class
+                            val subSourceHandler =
+                                subHandlers.find { it.sourceClass == sourceClass }
 
-                        if (subSourceHandler != null) {
-                            // Add the operation to the existing handler
-                            @Suppress("UNCHECKED_CAST")
-                            subSourceHandler.handler.addOperation(handler as EffectLambda)
+                            if (subSourceHandler != null) {
+                                // Add the operation to the existing handler
+                                @Suppress("UNCHECKED_CAST")
+                                subSourceHandler.handler.addOperation(handler as EffectLambda)
+                            }
                         }
                     }
                 }
@@ -264,6 +274,9 @@ class HandlerRegistry internal constructor() {
 
     /**
      * Execute all handlers for a specific signal
+     *
+     * If type hierarchy awareness is enabled, this will use instance checks.
+     * Otherwise, it will only execute handlers registered for the exact class.
      */
     internal suspend fun executeSignalHandlers(
         scope: CommunicationScope,
@@ -271,17 +284,37 @@ class HandlerRegistry internal constructor() {
     ) {
         val signalClass = signal::class
 
-        // Get the handlers for this exact class
-        val handlers = signalHandlerRegistry[signalClass]
+        if (config.typeHierarchyAwarenessEnabled) {
+            // Find all handlers that apply to this signal type using 'is' checks
+            for ((handlerClass, handlers) in signalHandlerRegistry) {
+                try {
+                    // Use 'isInstance' to check if the signal is of the handler's type
+                    if (handlerClass.isInstance(signal)) {
+                        // Execute all the handlers for this class
+                        handlers.forEach { identifiedHandler ->
+                            identifiedHandler.handler.execute(scope, signal)
+                        }
+                    }
+                } catch (e: Exception) {
+                    // Safely handle any errors in instance checking
+                }
+            }
+        } else {
+            // Standard behavior - only get handlers for the exact class
+            val handlers = signalHandlerRegistry[signalClass]
 
-        // Execute all handlers if present
-        handlers?.forEach { identifiedHandler ->
-            identifiedHandler.handler.execute(scope, signal)
+            // Execute all handlers if present
+            handlers?.forEach { identifiedHandler ->
+                identifiedHandler.handler.execute(scope, signal)
+            }
         }
     }
 
     /**
      * Execute all handlers for a specific effect
+     *
+     * If type hierarchy awareness is enabled, this will use instance checks.
+     * Otherwise, it will only execute handlers registered for the exact class.
      */
     internal suspend fun executeEffectHandlers(
         scope: CommunicationScope,
@@ -289,12 +322,29 @@ class HandlerRegistry internal constructor() {
     ) {
         val effectClass = effect::class
 
-        // Get the handlers for this exact class
-        val handlers = effectHandlerRegistry[effectClass]
+        if (config.typeHierarchyAwarenessEnabled) {
+            // Find all handlers that apply to this effect type using 'is' checks
+            for ((handlerClass, handlers) in effectHandlerRegistry) {
+                try {
+                    // Use 'isInstance' to check if the effect is of the handler's type
+                    if (handlerClass.isInstance(effect)) {
+                        // Execute all the handlers for this class
+                        handlers.forEach { identifiedHandler ->
+                            identifiedHandler.handler.execute(scope, effect)
+                        }
+                    }
+                } catch (e: Exception) {
+                    // Safely handle any errors in instance checking
+                }
+            }
+        } else {
+            // Standard behavior - only get handlers for the exact class
+            val handlers = effectHandlerRegistry[effectClass]
 
-        // Execute all handlers if present
-        handlers?.forEach { identifiedHandler ->
-            identifiedHandler.handler.execute(scope, effect)
+            // Execute all handlers if present
+            handlers?.forEach { identifiedHandler ->
+                identifiedHandler.handler.execute(scope, effect)
+            }
         }
     }
 }
