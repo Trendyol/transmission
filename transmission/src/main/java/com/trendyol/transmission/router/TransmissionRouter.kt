@@ -58,6 +58,7 @@ class TransmissionRouter internal constructor(
     private val _queryManager = QueryManager(
         queryScope = routerScope,
         routerRef = this@TransmissionRouter,
+        capacity = capacity,
     )
 
     val queryHelper: QueryHandler = _queryManager.handler

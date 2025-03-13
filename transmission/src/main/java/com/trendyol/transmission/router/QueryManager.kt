@@ -24,18 +24,16 @@ import javax.management.Query
 internal class QueryManager(
     private val queryScope: CoroutineScope,
     private val routerRef: TransmissionRouter,
+    private val capacity: Capacity = Capacity.Default,
 ) {
 
-    private val capacity = Capacity.Default
     private val routerQueryResultChannel: MutableSharedFlow<QueryResult> = MutableSharedFlow()
 
-    val outGoingQuery: Channel<QueryType> = Channel(capacity = Channel.BUFFERED)
-
-    private val queryResultChannel: Channel<QueryResult> = Channel(capacity = Channel.BUFFERED)
+    val outGoingQuery: Channel<QueryType> = Channel(capacity = capacity.value)
+    private val queryResultChannel: Channel<QueryResult> = Channel(capacity = capacity.value)
 
     val incomingQueryResponse = queryResultChannel.receiveAsFlow()
         .shareIn(queryScope, SharingStarted.Lazily)
-
 
     init {
         queryScope.launch {

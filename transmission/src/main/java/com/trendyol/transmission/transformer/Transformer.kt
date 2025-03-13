@@ -39,9 +39,8 @@ import kotlinx.coroutines.supervisorScope
 open class Transformer(
     identity: Contract.Identity = Contract.identity(),
     dispatcher: CoroutineDispatcher = Dispatchers.Default,
+    private val capacity: Capacity = Capacity.Default
 ) {
-
-    private val capacity = Capacity.Default
 
     private val exceptionHandler = CoroutineExceptionHandler { _, throwable ->
         onError(throwable)
