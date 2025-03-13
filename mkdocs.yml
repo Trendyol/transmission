@@ -7,6 +7,26 @@ remote_branch: gh-pages
 
 copyright: 'Copyright &copy; 2024 Trendyol'
 
+markdown_extensions:
+  - pymdownx.highlight
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - pymdownx.tabbed:
+      alternate_style: true
+  - attr_list
+  - md_in_html
+  - admonition
+  - abbr
+  - tables
+
+plugins:
+  - search
+
 theme:
   name: material
   palette:
