@@ -1,5 +1,6 @@
 package com.trendyol.transmissiontest
 
+import com.trendyol.transmission.ExperimentalTransmissionApi
 import com.trendyol.transmission.Transmission
 import com.trendyol.transmission.router.TransmissionRouter
 import com.trendyol.transmission.router.builder.TransmissionRouter
@@ -7,6 +8,10 @@ import com.trendyol.transmission.router.streamData
 import com.trendyol.transmission.router.streamEffect
 import com.trendyol.transmission.transformer.Transformer
 import com.trendyol.transmission.transformer.request.Contract
+import com.trendyol.transmissiontest.checkpoint.CheckpointTransformer
+import com.trendyol.transmissiontest.checkpoint.CheckpointWithArgs
+import com.trendyol.transmissiontest.checkpoint.CheckpointWithArgsTransformer
+import com.trendyol.transmissiontest.checkpoint.DefaultCheckPoint
 import com.trendyol.transmissiontest.computation.ComputationTransformer
 import com.trendyol.transmissiontest.computation.ComputationWithArgsTransformer
 import com.trendyol.transmissiontest.data.DataTransformer
@@ -31,6 +36,7 @@ private constructor(
     private var router: TransmissionRouter? = null
     private val mockTransformers: MutableList<Transformer> = mutableListOf()
     private val initialTransmissions: MutableList<Transmission> = mutableListOf()
+    private val orderedCheckpoints: MutableList<Contract.Checkpoint> = mutableListOf()
 
     /** Adds a mock for a data contract that will be provided during testing */
     fun <D : Transmission.Data?> withData(
@@ -59,6 +65,25 @@ private constructor(
         return this
     }
 
+    /** Adds a checkpoint with args that will be validated during testing */
+    @ExperimentalTransmissionApi
+    fun <C : Contract.Checkpoint.WithArgs<A>, A : Any> withCheckpoint(
+            checkpoint: C,
+            args: A
+    ): TransmissionTest {
+        mockTransformers += CheckpointWithArgsTransformer<C, A>(checkpoint, { args })
+        orderedCheckpoints.plusAssign(checkpoint)
+        return this
+    }
+
+    /** Adds a default checkpoint that will be validated during testing */
+    @ExperimentalTransmissionApi
+    fun withCheckpoint(checkpoint: Contract.Checkpoint.Default): TransmissionTest {
+        mockTransformers += CheckpointTransformer({ checkpoint })
+        orderedCheckpoints.plusAssign(checkpoint)
+        return this
+    }
+
     /** Sets up initial transmissions that should be processed before the test transmission */
     fun withInitialProcessing(vararg transmissions: Transmission): TransmissionTest {
         initialTransmissions.addAll(transmissions)
@@ -78,11 +103,10 @@ private constructor(
     /** Internal method to run the actual test with any transmission type */
     @OptIn(ExperimentalCoroutinesApi::class)
     private fun runTest(transmission: Transmission, assertions: suspend TestResult.() -> Unit) {
-        router =
-                TransmissionRouter {
-                    addDispatcher(dispatcher)
-                    addTransformerSet((listOf(transformer) + mockTransformers).toSet())
-                }
+        router = TransmissionRouter {
+            addDispatcher(dispatcher)
+            addTransformerSet((listOf(transformer) + mockTransformers).toSet())
+        }
 
         runTest {
             val dataStream: MutableList<Transmission.Data> = mutableListOf()
@@ -117,6 +141,15 @@ private constructor(
                             throw IllegalArgumentException(
                                     "Only Signal or Effect transmissions are supported for testing"
                             )
+                }
+
+                // Process checkpoints
+                orderedCheckpoints.forEach {
+                    when (it) {
+                        is Contract.Checkpoint.Default -> router!!.process(DefaultCheckPoint)
+                        is Contract.Checkpoint.WithArgs<*> ->
+                                router!!.process(CheckpointWithArgs(it))
+                    }
                 }
 
                 transformer.waitProcessingToFinish()
