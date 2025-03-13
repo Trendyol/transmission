@@ -41,20 +41,18 @@ class TransmissionRouter internal constructor(
 
     internal val routerName: String = identity.key
 
-    private val _signalStream =
-        MutableSharedFlow<Transmission.Signal>(extraBufferCapacity = capacity.value)
-    private val _dataStream =
-        MutableSharedFlow<Transmission.Data>(extraBufferCapacity = capacity.value)
-    private val _effectStream =
-        MutableSharedFlow<WrappedEffect>(extraBufferCapacity = capacity.value)
+    private val signalBroadcast =
+        routerScope.createBroadcast<Transmission.Signal>(capacity = capacity)
+    private val dataBroadcast = routerScope.createBroadcast<Transmission.Data>(capacity = capacity)
+    private val effectBroadcast = routerScope.createBroadcast<WrappedEffect>(capacity = capacity)
 
     private val checkpointTracker = CheckpointTracker()
 
     @PublishedApi
-    internal val dataStream = _dataStream.asSharedFlow()
+    internal val dataStream = dataBroadcast.output
 
     @PublishedApi
-    internal val effectStream: SharedFlow<Transmission.Effect> = _effectStream
+    internal val effectStream: SharedFlow<Transmission.Effect> = effectBroadcast.output
         .map { it.effect }.shareIn(routerScope, SharingStarted.Lazily)
 
     private val _queryManager = QueryManager(
@@ -85,13 +83,13 @@ class TransmissionRouter internal constructor(
 
     fun process(signal: Transmission.Signal) {
         routerScope.launch {
-            _signalStream.emit(signal)
+            signalBroadcast.producer.send(signal)
         }
     }
 
     fun process(effect: Transmission.Effect) {
         routerScope.launch {
-            _effectStream.emit(WrappedEffect(effect))
+            effectBroadcast.producer.send(WrappedEffect(effect))
         }
     }
 
@@ -109,11 +107,11 @@ class TransmissionRouter internal constructor(
         transformerSet.forEach { transformer ->
             transformer.run {
                 bindCheckpointTracker(checkpointTracker)
-                startSignalCollection(incoming = _signalStream)
-                startDataPublishing(data = _dataStream)
+                startSignalCollection(incoming = signalBroadcast.output)
+                startDataPublishing(data = dataBroadcast.producer)
                 startEffectProcessing(
-                    producer = _effectStream,
-                    incoming = _effectStream,
+                    producer = effectBroadcast.producer,
+                    incoming = effectBroadcast.output,
                 )
                 startQueryProcessing(
                     incomingQuery = _queryManager.incomingQueryResponse,

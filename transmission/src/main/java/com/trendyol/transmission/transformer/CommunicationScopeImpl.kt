@@ -6,28 +6,29 @@ import com.trendyol.transmission.effect.WrappedEffect
 import com.trendyol.transmission.transformer.handler.CommunicationScope
 import com.trendyol.transmission.transformer.request.Contract
 import com.trendyol.transmission.transformer.request.TransformerQueryDelegate
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableSharedFlow
 
 @OptIn(ExperimentalTransmissionApi::class)
 internal class CommunicationScopeImpl(
-    private val effectChannel: MutableSharedFlow<WrappedEffect>,
-    private val dataChannel: MutableSharedFlow<Transmission.Data>,
+    private val effectChannel: Channel<WrappedEffect>,
+    private val dataChannel: Channel<Transmission.Data>,
     private val queryDelegate: TransformerQueryDelegate
 ) : CommunicationScope {
 
     override suspend fun <D : Transmission.Data> send(data: D?) {
-        data?.let { dataChannel.emit(it) }
+        data?.let { dataChannel.send(it) }
     }
 
     override suspend fun <E : Transmission.Effect> send(
         effect: E,
         identity: Contract.Identity
     ) {
-        effectChannel.emit(WrappedEffect(effect, identity))
+        effectChannel.send(WrappedEffect(effect, identity))
     }
 
     override suspend fun <E : Transmission.Effect> publish(effect: E) {
-        effectChannel.emit(WrappedEffect(effect))
+        effectChannel.send(WrappedEffect(effect))
     }
 
     override suspend fun <C : Contract.DataHolder<D>, D : Transmission.Data> getData(contract: C): D? {

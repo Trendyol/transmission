@@ -5,11 +5,13 @@ import com.trendyol.transmission.InternalTransmissionApi
 import com.trendyol.transmission.Transmission
 import com.trendyol.transmission.identifier.IdentifierGenerator
 import com.trendyol.transmission.router.Capacity
+import com.trendyol.transmission.router.createBroadcast
 import com.trendyol.transmission.transformer.checkpoint.CheckpointHandler
 import com.trendyol.transmission.transformer.checkpoint.CheckpointTracker
 import com.trendyol.transmission.transformer.checkpoint.CheckpointValidator
 import com.trendyol.transmission.transformer.handler.CommunicationScope
-import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.first
@@ -24,11 +26,11 @@ import kotlin.coroutines.resume
 internal class TransformerQueryDelegate(
     checkpointTrackerProvider: () -> CheckpointTracker?,
     identity: Contract.Identity,
-    capacity: Capacity
+    capacity: Capacity,
+    scope: CoroutineScope,
 ) {
-
-    val outGoingQuery = MutableSharedFlow<QueryType>(extraBufferCapacity = capacity.value)
-    val resultBroadcast = MutableSharedFlow<QueryResult>(extraBufferCapacity = capacity.value)
+    val outGoingQuery: Channel<QueryType> = Channel(capacity = capacity.value)
+    val resultBroadcast = scope.createBroadcast<QueryResult>(capacity = capacity)
 
     val checkpointHandler: CheckpointHandler by lazy {
         object : CheckpointHandler {
@@ -139,14 +141,14 @@ internal class TransformerQueryDelegate(
 
         override suspend fun <C : Contract.DataHolder<D>, D : Transmission.Data> getData(contract: C): D? {
             val queryIdentifier = IdentifierGenerator.generateIdentifier()
-            outGoingQuery.emit(
+            outGoingQuery.send(
                 QueryType.Data(
                     sender = identity.key,
                     key = contract.key,
                     queryIdentifier = queryIdentifier
                 )
             )
-            return resultBroadcast.filterIsInstance<QueryResult.Data<D>>()
+            return resultBroadcast.output.filterIsInstance<QueryResult.Data<D>>()
                 .filter { it.resultIdentifier == queryIdentifier && it.key == contract.key }
                 .first().data
         }
@@ -155,7 +157,7 @@ internal class TransformerQueryDelegate(
             contract: C, invalidate: Boolean
         ): D? {
             val queryIdentifier = IdentifierGenerator.generateIdentifier()
-            outGoingQuery.emit(
+            outGoingQuery.send(
                 QueryType.Computation(
                     sender = identity.key,
                     key = contract.key,
@@ -163,7 +165,7 @@ internal class TransformerQueryDelegate(
                     queryIdentifier = queryIdentifier
                 )
             )
-            return resultBroadcast.filterIsInstance<QueryResult.Computation<D>>()
+            return resultBroadcast.output.filterIsInstance<QueryResult.Computation<D>>()
                 .filter { it.resultIdentifier == queryIdentifier && it.key == contract.key }
                 .first().data
         }
@@ -172,7 +174,7 @@ internal class TransformerQueryDelegate(
             contract: C, args: A, invalidate: Boolean
         ): D? {
             val queryIdentifier = IdentifierGenerator.generateIdentifier()
-            outGoingQuery.emit(
+            outGoingQuery.send(
                 QueryType.ComputationWithArgs(
                     sender = identity.key,
                     key = contract.key,
@@ -181,13 +183,13 @@ internal class TransformerQueryDelegate(
                     queryIdentifier = queryIdentifier
                 )
             )
-            return resultBroadcast.filterIsInstance<QueryResult.Computation<D>>()
+            return resultBroadcast.output.filterIsInstance<QueryResult.Computation<D>>()
                 .filter { it.resultIdentifier == queryIdentifier && it.key == contract.key }
                 .first().data
         }
 
         override suspend fun execute(contract: Contract.Execution) {
-            outGoingQuery.emit(
+            outGoingQuery.send(
                 QueryType.Execution(key = contract.key)
             )
         }
@@ -195,7 +197,7 @@ internal class TransformerQueryDelegate(
         override suspend fun <C : Contract.ExecutionWithArgs<A>, A : Any> execute(
             contract: C, args: A
         ) {
-            outGoingQuery.emit(
+            outGoingQuery.send(
                 QueryType.ExecutionWithArgs(key = contract.key, args = args)
             )
         }

@@ -45,7 +45,7 @@ internal class TransmissionDataHolderImpl<T : Transmission.Data?>(
                     it?.let { holderData ->
                         storage.updateHolderData(holderData, contract.key)
                         if (publishUpdates) {
-                            transformer.dataChannel.emit(it)
+                            transformer.dataChannel.send(it)
                         }
                     }
                 }
