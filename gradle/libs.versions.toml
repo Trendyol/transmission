@@ -32,9 +32,6 @@ hiltAndroid = "2.50"
 hiltAndroidCompiler = "2.50"
 
 [libraries]
-# Transmission libraries
-transmission-core = { group = "com.trendyol", name = "transmission", version.ref = "transmission" }
-transmission-test = { group = "com.trendyol", name = "transmission-test", version.ref = "transmission-test" }
 
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
 hilt-android = { module = "com.google.dagger:hilt-android", version.ref = "hiltAndroid" }
