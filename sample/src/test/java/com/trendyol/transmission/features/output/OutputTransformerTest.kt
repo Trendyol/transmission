@@ -51,7 +51,7 @@ class OutputTransformerTest {
             }
             .testEffect(InputEffect.InputUpdate("test")) {
                 assertEquals(OutputUiState(outputText = "test"), nthData(1))
-                assertTrue(lastEffect<RouterEffect>() != null )
+                assertTrue(lastEffect() is RouterEffect )
             }
     }
 }
