@@ -1,5 +1,8 @@
 # TransmissionRouter
 
+!!! warning "Work in Progress"
+    This documentation is a work in progress. Content may change or be incomplete.
+
 The **TransmissionRouter** is the central component of the Transmission library that manages the flow of transmissions between transformers. It acts as a message broker, ensuring that transmissions are delivered to the appropriate transformers.
 
 ## Responsibilities

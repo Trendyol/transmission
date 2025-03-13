@@ -1,5 +1,8 @@
 # Changelog
 
+!!! warning "Work in Progress"
+    This documentation is a work in progress. Content may change or be incomplete.
+
 This document lists the changes made to the Transmission library in each release.
 
 ## [Unreleased]

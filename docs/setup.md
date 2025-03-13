@@ -1,5 +1,8 @@
 # Setting Up
 
+!!! warning "Work in Progress"
+    This documentation is a work in progress. Content may change or be incomplete.
+
 This guide provides instructions for adding the Transmission library to your Android project.
 
 ## Gradle Setup

@@ -1,5 +1,8 @@
 # Transmission
 
+!!! warning "Work in Progress"
+    This documentation is a work in progress. Content may change or be incomplete.
+
 Transmission is an experimental library designed to create a communication network between different business logic blocks for Android projects. It establishes a structured way for these components to communicate asynchronously.
 
 ## Core Concepts

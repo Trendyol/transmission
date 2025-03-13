@@ -1,5 +1,8 @@
 # Transmissions
 
+!!! warning "Work in Progress"
+    This documentation is a work in progress. Content may change or be incomplete.
+
 In the Transmission library, a **Transmission** is the basic unit of information being transferred through the system. It is the fundamental concept upon which the entire library is built.
 
 There are three types of Transmissions:
