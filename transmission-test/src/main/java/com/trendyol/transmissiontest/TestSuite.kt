@@ -25,12 +25,12 @@ import kotlinx.coroutines.test.runTest
 
 @OptIn(ExperimentalCoroutinesApi::class)
 @Deprecated(
-        message = "Use TransmissionTest instead. See Transformer.test() extension function.",
-        replaceWith =
-                ReplaceWith(
-                        "TransmissionTest.forTransformer(transformer)",
-                        "com.trendyol.transmissiontest.TransmissionTest"
-                )
+    message = "Use TransmissionTest instead. See Transformer.test() extension function.",
+    replaceWith =
+        ReplaceWith(
+            "TransmissionTest.forTransformer(transformer)",
+            "com.trendyol.transmissiontest.TransmissionTest"
+        )
 )
 class TestSuite {
     private var orderedInitialProcessing: MutableList<Transmission> = mutableListOf()
@@ -40,12 +40,12 @@ class TestSuite {
     private val supplementaryTransformerSet: MutableList<Transformer> = mutableListOf()
 
     @Deprecated(
-            message = "Use TransmissionTest.forTransformer() instead",
-            replaceWith =
-                    ReplaceWith(
-                            "TransmissionTest.forTransformer(transformer)",
-                            "com.trendyol.transmissiontest.TransmissionTest"
-                    )
+        message = "Use TransmissionTest.forTransformer() instead",
+        replaceWith =
+            ReplaceWith(
+                "TransmissionTest.forTransformer(transformer)",
+                "com.trendyol.transmissiontest.TransmissionTest"
+            )
     )
     fun initialize(transformer: Transformer): TestSuite {
         this.transformer = transformer
@@ -53,48 +53,48 @@ class TestSuite {
     }
 
     @Deprecated(
-            message = "Use TransmissionTest.withData() instead",
-            replaceWith =
-                    ReplaceWith(
-                            "withData(contract, data)",
-                            "com.trendyol.transmissiontest.TransmissionTest"
-                    )
+        message = "Use TransmissionTest.withData() instead",
+        replaceWith =
+            ReplaceWith(
+                "withData(contract, data)",
+                "com.trendyol.transmissiontest.TransmissionTest"
+            )
     )
     fun <D : Transmission.Data?> registerData(
-            contract: Contract.DataHolder<D>,
-            data: () -> D
+        contract: Contract.DataHolder<D>,
+        data: () -> D
     ): TestSuite {
         supplementaryTransformerSet += DataTransformer(contract, data)
         return this
     }
 
     @Deprecated(
-            message = "Use TransmissionTest.withComputation() instead",
-            replaceWith =
-                    ReplaceWith(
-                            "withComputation(contract, data)",
-                            "com.trendyol.transmissiontest.TransmissionTest"
-                    )
+        message = "Use TransmissionTest.withComputation() instead",
+        replaceWith =
+            ReplaceWith(
+                "withComputation(contract, data)",
+                "com.trendyol.transmissiontest.TransmissionTest"
+            )
     )
     fun <C : Contract.Computation<D?>, D : Any> registerComputation(
-            contract: C,
-            data: () -> D?
+        contract: C,
+        data: () -> D?
     ): TestSuite {
         supplementaryTransformerSet += ComputationTransformer(contract, data)
         return this
     }
 
     @Deprecated(
-            message = "Use TransmissionTest.withComputation() instead",
-            replaceWith =
-                    ReplaceWith(
-                            "withComputation(contract, data)",
-                            "com.trendyol.transmissiontest.TransmissionTest"
-                    )
+        message = "Use TransmissionTest.withComputation() instead",
+        replaceWith =
+            ReplaceWith(
+                "withComputation(contract, data)",
+                "com.trendyol.transmissiontest.TransmissionTest"
+            )
     )
     fun <C : Contract.ComputationWithArgs<A, D?>, D : Any, A : Any> registerComputation(
-            contract: C,
-            data: () -> D?
+        contract: C,
+        data: () -> D?
     ): TestSuite {
         supplementaryTransformerSet += ComputationWithArgsTransformer(contract, data)
         return this
@@ -102,16 +102,16 @@ class TestSuite {
 
     @ExperimentalTransmissionApi
     @Deprecated(
-            message = "Use TransmissionTest.withCheckpoint() instead",
-            replaceWith =
-                    ReplaceWith(
-                            "withCheckpoint(checkpoint, args)",
-                            "com.trendyol.transmissiontest.TransmissionTest"
-                    )
+        message = "Use TransmissionTest.withCheckpoint() instead",
+        replaceWith =
+            ReplaceWith(
+                "withCheckpoint(checkpoint, args)",
+                "com.trendyol.transmissiontest.TransmissionTest"
+            )
     )
     fun <C : Contract.Checkpoint.WithArgs<A>, A : Any> registerCheckpoint(
-            checkpoint: C,
-            args: A
+        checkpoint: C,
+        args: A
     ): TestSuite {
         supplementaryTransformerSet += CheckpointWithArgsTransformer<C, A>(checkpoint, { args })
         orderedCheckpoints.plusAssign(checkpoint)
@@ -120,12 +120,12 @@ class TestSuite {
 
     @ExperimentalTransmissionApi
     @Deprecated(
-            message = "Use TransmissionTest.withCheckpoint() instead",
-            replaceWith =
-                    ReplaceWith(
-                            "withCheckpoint(checkpoint)",
-                            "com.trendyol.transmissiontest.TransmissionTest"
-                    )
+        message = "Use TransmissionTest.withCheckpoint() instead",
+        replaceWith =
+            ReplaceWith(
+                "withCheckpoint(checkpoint)",
+                "com.trendyol.transmissiontest.TransmissionTest"
+            )
     )
     fun registerCheckpoint(checkpoint: Contract.Checkpoint.Default): TestSuite {
         supplementaryTransformerSet += CheckpointTransformer({ checkpoint })
@@ -134,12 +134,12 @@ class TestSuite {
     }
 
     @Deprecated(
-            message = "Use TransmissionTest.withInitialProcessing() instead",
-            replaceWith =
-                    ReplaceWith(
-                            "withInitialProcessing(*transmissions)",
-                            "com.trendyol.transmissiontest.TransmissionTest"
-                    )
+        message = "Use TransmissionTest.withInitialProcessing() instead",
+        replaceWith =
+            ReplaceWith(
+                "withInitialProcessing(*transmissions)",
+                "com.trendyol.transmissiontest.TransmissionTest"
+            )
     )
     fun processBeforeTesting(vararg transmissions: Transmission): TestSuite {
         orderedInitialProcessing += transmissions.toList()
@@ -149,8 +149,8 @@ class TestSuite {
     @PublishedApi
     @OptIn(ExperimentalCoroutinesApi::class)
     internal fun runTest(
-            transmission: Transmission,
-            scope: suspend TransformerTestScope.(scope: TestScope) -> Unit
+        transmission: Transmission,
+        scope: suspend TransformerTestScope.(scope: TestScope) -> Unit
     ) {
         router = TransmissionRouter {
             addDispatcher(UnconfinedTestDispatcher())
@@ -170,16 +170,17 @@ class TestSuite {
                     router.streamEffect().toList(effectStream)
                 }
                 val testScope =
-                        object : TransformerTestScope {
-                            override val dataStream: List<Transmission.Data> = dataStream
-                            override val effectStream: List<Transmission.Effect> = effectStream
-                        }
+                    object : TransformerTestScope {
+                        override val dataStream: List<Transmission.Data> = dataStream
+                        override val effectStream: List<Transmission.Effect> = effectStream
+                    }
                 orderedInitialProcessing.forEach {
                     when (it) {
                         is Transmission.Data ->
-                                throw IllegalArgumentException(
-                                        "Transmission.Data should not be sent for processing"
-                                )
+                            throw IllegalArgumentException(
+                                "Transmission.Data should not be sent for processing"
+                            )
+
                         is Transmission.Effect -> router.process(it)
                         is Transmission.Signal -> router.process(it)
                     }
