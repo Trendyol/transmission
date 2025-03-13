@@ -28,18 +28,18 @@ class InputTransformerTest {
 
     @Test
     fun `GIVEN inputTransformer, WHEN inputUpdate signal is sent, THEN inputUpdate effect is published`() {
-        sut.attachToRouter()
-            .test(signal = InputSignal.InputUpdate("test")) {
-                assertEquals(InputEffect.InputUpdate("test"), effectStream.first())
-                assertEquals(InputUiState("test"), dataStream.last())
+        sut.test()
+            .testSignal(InputSignal.InputUpdate("test")) {
+                assertEquals(InputEffect.InputUpdate("test"), allEffects<InputEffect.InputUpdate>().first())
+                assertEquals(InputUiState("test"), lastData<InputUiState>())
             }
     }
 
     @Test
     fun `GIVEN inputTransformer, WHEN BackgroundColorUpdate effect is received, THEN color should be changed`() {
-        sut.attachToRouter()
-            .test(effect = ColorPickerEffect.BackgroundColorUpdate(Color.Gray)) {
-                assertEquals(InputUiState(backgroundColor = Color.Gray), dataStream.last())
+        sut.test()
+            .testEffect(ColorPickerEffect.BackgroundColorUpdate(Color.Gray)) {
+                assertEquals(InputUiState(backgroundColor = Color.Gray), lastData())
             }
     }
 }
