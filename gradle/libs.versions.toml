@@ -1,24 +1,41 @@
 [versions]
+# Library versions
+transmission-core = "1.4.2"
+transmission-test = "1.4.2"
+
+# Kotlin and build tools
 agp = "8.2.2"
-hiltAndroid = "2.50"
-hiltAndroidCompiler = "2.50"
 kotlin = "2.0.20"
+jetbrainsKotlinJvm = "2.0.20"
+org-jetbrains-kotlin-android = "1.9.0"
+
+# Coroutines
+kotlinxCoroutinesCore = "1.8.0"
+kotlinxCoroutinesTest = "1.8.0"
+
+# AndroidX
 coreKtx = "1.12.0"
+lifecycleRuntimeKtx = "2.7.0"
+lifecycleRuntimeCompose = "2.7.0"
+activityCompose = "1.8.2"
+composeBom = "2024.02.01"
+
+# Testing
 junit = "4.13.2"
 junitVersion = "1.1.5"
 espressoCore = "3.5.1"
-kotlinxCoroutinesCore = "1.8.0"
-kotlinxCoroutinesTest = "1.8.0"
-lifecycleRuntimeKtx = "2.7.0"
-activityCompose = "1.8.2"
-composeBom = "2024.02.01"
-jetbrainsKotlinJvm = "2.0.20"
-lifecycleRuntimeCompose = "2.7.0"
-hilt = "2.50"
-org-jetbrains-kotlin-android = "1.9.0"
 turbine = "1.1.0"
 
+# DI
+hilt = "2.50"
+hiltAndroid = "2.50"
+hiltAndroidCompiler = "2.50"
+
 [libraries]
+# Transmission libraries
+transmission-core = { group = "com.trendyol", name = "transmission", version.ref = "transmission" }
+transmission-test = { group = "com.trendyol", name = "transmission-test", version.ref = "transmission-test" }
+
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
 hilt-android = { module = "com.google.dagger:hilt-android", version.ref = "hiltAndroid" }
 hilt-android-compiler = { module = "com.google.dagger:hilt-android-compiler", version.ref = "hiltAndroidCompiler" }
