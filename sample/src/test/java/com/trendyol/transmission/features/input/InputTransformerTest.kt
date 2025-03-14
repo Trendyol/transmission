@@ -30,19 +30,19 @@ class InputTransformerTest {
     @OptIn(ExperimentalTransmissionApi::class)
     @Test
     fun `GIVEN inputTransformer, WHEN inputUpdate signal is sent, THEN inputUpdate effect is published`() {
-        sut.attachToRouter()
-            .registerCheckpoint(InputTransformer.colorCheckpoint, Color.Gray)
-            .test(signal = InputSignal.InputUpdate("test")) {
-                assertEquals(InputEffect.InputUpdate("test"), effectStream.last())
-                assertEquals(InputUiState("test"), dataStream.last())
+        sut.test()
+            .withCheckpoint(InputTransformer.colorCheckpoint, Color.Gray)
+            .testSignal(InputSignal.InputUpdate("test")) {
+                assertEquals(InputEffect.InputUpdate("test"), lastEffect())
+                assertEquals(InputUiState("test"), lastData())
             }
     }
 
     @Test
     fun `GIVEN inputTransformer, WHEN BackgroundColorUpdate effect is received, THEN color should be changed`() {
-        sut.attachToRouter()
-            .test(effect = ColorPickerEffect.BackgroundColorUpdate(Color.Gray)) {
-                assertEquals(InputUiState(backgroundColor = Color.Gray), dataStream.last())
+        sut.test()
+            .testEffect(ColorPickerEffect.BackgroundColorUpdate(Color.Gray)) {
+                assertEquals(InputUiState(backgroundColor = Color.Gray), lastData())
             }
     }
 }

@@ -24,11 +24,14 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.channels.SendChannel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.filterNot
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.supervisorScope
 
@@ -36,9 +39,8 @@ import kotlinx.coroutines.supervisorScope
 open class Transformer(
     identity: Contract.Identity = Contract.identity(),
     dispatcher: CoroutineDispatcher = Dispatchers.Default,
+    private val capacity: Capacity = Capacity.Default
 ) {
-
-    private val capacity = Capacity.Default
 
     private val exceptionHandler = CoroutineExceptionHandler { _, throwable ->
         onError(throwable)
@@ -49,10 +51,8 @@ open class Transformer(
 
     private val _identity: Contract.Identity = identity
 
-    private val effectChannel =
-        MutableSharedFlow<WrappedEffect>(extraBufferCapacity = capacity.value)
-    internal val dataChannel =
-        MutableSharedFlow<Transmission.Data>(extraBufferCapacity = capacity.value)
+    private val effectChannel: Channel<WrappedEffect> = Channel(capacity = capacity.value)
+    internal val dataChannel: Channel<Transmission.Data> = Channel(capacity = capacity.value)
 
     private var checkpointProvider: () -> CheckpointTracker? = { null }
     private val requestDelegate by lazy {
@@ -60,6 +60,7 @@ open class Transformer(
             checkpointTrackerProvider = checkpointProvider,
             identity = _identity,
             capacity = capacity,
+            scope = transformerScope,
         )
     }
 
@@ -103,12 +104,12 @@ open class Transformer(
         }
     }
 
-    internal fun startDataPublishing(data: MutableSharedFlow<Transmission.Data>) {
-        transformerScope.launch { dataChannel.collect { data.emit(it) } }
+    internal fun startDataPublishing(data: SendChannel<Transmission.Data>) {
+        transformerScope.launch { dataChannel.receiveAsFlow().collect { data.send(it) } }
     }
 
     internal fun startEffectProcessing(
-        producer: MutableSharedFlow<WrappedEffect>,
+        producer: SendChannel<WrappedEffect>,
         incoming: SharedFlow<WrappedEffect>
     ) {
         transformerScope.launch {
@@ -128,7 +129,7 @@ open class Transformer(
                         }
                 }
                 launch {
-                    effectChannel.collect { producer.emit(it) }
+                    effectChannel.receiveAsFlow().collect { producer.send(it) }
                 }
             }
         }
@@ -136,7 +137,7 @@ open class Transformer(
 
     internal fun startQueryProcessing(
         incomingQuery: SharedFlow<QueryResult>,
-        outGoingQuery: MutableSharedFlow<QueryType>
+        outGoingQuery: SendChannel<QueryType>
     ) {
         transformerScope.launch {
             supervisorScope {
@@ -144,12 +145,12 @@ open class Transformer(
                     incomingQuery
                         .filter { it.owner == _identity.key }
                         .collect {
-                            this@Transformer.requestDelegate.resultBroadcast.emit(it)
+                            this@Transformer.requestDelegate.resultBroadcast.producer.send(it)
                         }
                 }
                 launch {
-                    this@Transformer.requestDelegate.outGoingQuery.collect {
-                        outGoingQuery.emit(it)
+                    this@Transformer.requestDelegate.outGoingQuery.receiveAsFlow().collect {
+                        outGoingQuery.send(it)
                     }
                 }
             }

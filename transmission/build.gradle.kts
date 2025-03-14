@@ -19,20 +19,15 @@ dependencies {
     testImplementation(libs.turbine)
 }
 
-tasks.test {
-    useJUnitPlatform()
-}
+tasks.test { useJUnitPlatform() }
 
 publishing {
-
     publications {
         create<MavenPublication>("release") {
             groupId = "com.trendyol"
             artifactId = "transmission"
-            version = "1.4.1"
-            afterEvaluate {
-                from(components["java"])
-            }
+            version = libs.versions.transmission.core.get()
+            afterEvaluate { from(components["java"]) }
         }
     }
 }

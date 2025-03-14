@@ -29,29 +29,29 @@ class OutputTransformerTest {
 
     @Test
     fun `GIVEN sut, WHEN inputUpdate effect comes, THEN, holder should be updated with correct value`() {
-        sut.attachToRouter()
-            .test(effect = InputEffect.InputUpdate("test")) {
-                assertEquals(OutputUiState(outputText = "test"), dataStream.last())
+        sut.test()
+            .testEffect(InputEffect.InputUpdate("test")) {
+                assertEquals(OutputUiState(outputText = "test"), lastData<OutputUiState>())
             }
     }
 
     @Test
     fun `GIVEN sut, WHEN inputUpdate effect comes and no ColorPickerUIState data is present, THEN data should not be updated further`() {
-        sut.attachToRouter()
-            .test(effect = InputEffect.InputUpdate("test")) {
-                assertEquals(OutputUiState(outputText = "test"), dataStream.last())
+        sut.test()
+            .testEffect(InputEffect.InputUpdate("test")) {
+                assertEquals(OutputUiState(outputText = "test"), lastData<OutputUiState>())
             }
     }
 
     @Test
     fun `GIVEN sut, WHEN inputUpdate effect comes and ColorPickerUIState exists, THEN RouterPayloadEffect should be published`() {
-        sut.attachToRouter()
-            .registerData(ColorPickerTransformer.holderContract) {
+        sut.test()
+            .withData(ColorPickerTransformer.holderContract) {
                 ColorPickerUiState()
             }
-            .test(effect = InputEffect.InputUpdate("test")) {
-                assertEquals(OutputUiState(outputText = "test"), dataStream[1])
-                assertTrue(effectStream.last() is RouterEffect)
+            .testEffect(InputEffect.InputUpdate("test")) {
+                assertEquals(OutputUiState(outputText = "test"), nthData(1))
+                assertTrue(lastEffect() is RouterEffect )
             }
     }
 }

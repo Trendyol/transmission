@@ -1,5 +1,7 @@
 package com.trendyol.transmission.router
 
+import kotlinx.coroutines.channels.Channel
+
 @JvmInline
 value class Capacity private constructor(val value: Int) {
     companion object {
@@ -9,5 +11,7 @@ value class Capacity private constructor(val value: Int) {
             require(value in 0..256) { "bufferCapacity should be between 0 and 256" }
             return Capacity(value)
         }
+
+        val Unlimited = Capacity(Channel.UNLIMITED)
     }
 }
