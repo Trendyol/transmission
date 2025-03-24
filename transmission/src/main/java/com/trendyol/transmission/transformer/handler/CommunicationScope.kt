@@ -1,5 +1,6 @@
 package com.trendyol.transmission.transformer.handler
 
+import com.trendyol.transmission.ExperimentalTransmissionApi
 import com.trendyol.transmission.Transmission
 import com.trendyol.transmission.router.TransmissionRouter
 import com.trendyol.transmission.transformer.Transformer
@@ -25,6 +26,7 @@ interface CommunicationScope : QueryHandler, CheckpointHandler {
      * These can be observed via one-shot payload observers
      * @param payload Arbitrary data to send
      */
+    @ExperimentalTransmissionApi
     suspend fun <D: Any> sendPayload(payload: D)
 
     /**
