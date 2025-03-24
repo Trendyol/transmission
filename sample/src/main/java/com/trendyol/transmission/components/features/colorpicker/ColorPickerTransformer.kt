@@ -6,8 +6,6 @@ import com.trendyol.transmission.components.features.multioutput.multiOutputTran
 import com.trendyol.transmission.transformer.Transformer
 import com.trendyol.transmission.transformer.addHandlers
 import com.trendyol.transmission.transformer.dataholder.dataHolder
-import com.trendyol.transmission.transformer.handler.Handlers
-import com.trendyol.transmission.transformer.handler.handlers
 import com.trendyol.transmission.transformer.handler.onEffect
 import com.trendyol.transmission.transformer.handler.onSignal
 import com.trendyol.transmission.transformer.request.Contract

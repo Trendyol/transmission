@@ -8,7 +8,6 @@ import com.trendyol.transmission.components.features.colorpicker.ColorPickerEffe
 import com.trendyol.transmission.transformer.util.TestCoroutineRule
 import com.trendyol.transmission.components.features.InputUiState
 import com.trendyol.transmission.components.features.input.InputTransformer
-import com.trendyol.transmissiontest.attachToRouter
 import com.trendyol.transmissiontest.test
 import org.junit.Before
 import org.junit.Rule

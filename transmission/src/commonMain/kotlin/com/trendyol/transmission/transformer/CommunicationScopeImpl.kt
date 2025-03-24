@@ -8,7 +8,6 @@ import com.trendyol.transmission.transformer.handler.CommunicationScope
 import com.trendyol.transmission.transformer.request.Contract
 import com.trendyol.transmission.transformer.request.TransformerQueryDelegate
 import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.flow.MutableSharedFlow
 
 @OptIn(ExperimentalTransmissionApi::class)
 internal class CommunicationScopeImpl(
