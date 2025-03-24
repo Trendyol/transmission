@@ -22,6 +22,17 @@ kotlin {
             jvmTarget.set(JvmTarget.JVM_17)
         }
     }
+    sourceSets {
+        applyDefaultHierarchyTemplate()
+        commonMain.dependencies {
+            api(project(":transmission"))
+            implementation(libs.kotlinx.coroutines.core)
+            implementation(libs.kotlinx.coroutines.test)
+            implementation(libs.junit)
+            implementation(kotlin("test"))
+            implementation(libs.turbine)
+        }
+    }
 }
 
 android {
@@ -36,14 +47,6 @@ android {
     }
 }
 
-//dependencies {
-//    api(project(":transmission"))
-//    implementation(libs.kotlinx.coroutines.core)
-//    implementation(libs.kotlinx.coroutines.test)
-//    implementation(libs.junit)
-//    implementation(kotlin("test"))
-//    implementation(libs.turbine)
-//}
 //publishing {
 //    publications {
 //        create<MavenPublication>("release") {

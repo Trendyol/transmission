@@ -21,6 +21,20 @@ kotlin {
             jvmTarget.set(JvmTarget.JVM_17)
         }
     }
+    sourceSets {
+        applyDefaultHierarchyTemplate()
+        commonMain.dependencies {
+            implementation(libs.kotlinx.coroutines.core)
+            implementation(libs.kotlin.stdlib)
+        }
+        commonTest.dependencies {
+            implementation(libs.kotlinx.coroutines.test)
+            implementation(libs.junit)
+
+            implementation(kotlin("test"))
+            implementation(libs.turbine)
+        }
+    }
 }
 
 android {
@@ -34,18 +48,6 @@ android {
         targetCompatibility = JavaVersion.VERSION_17
     }
 }
-
-//
-//dependencies {
-//    implementation(libs.kotlinx.coroutines.core)
-//    implementation(libs.kotlin.stdlib)
-//    testImplementation(libs.kotlinx.coroutines.test)
-//    testImplementation(libs.junit)
-//
-//    testImplementation(kotlin("test"))
-//    testImplementation(libs.turbine)
-//}
-//
 
 //publishing {
 //    publications {
