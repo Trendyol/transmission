@@ -21,6 +21,13 @@ interface CommunicationScope : QueryHandler, CheckpointHandler {
     suspend fun <E : Transmission.Effect> publish(effect: E)
 
     /**
+     * Sends arbitrary payload to [TransmissionRouter] via [Transmission.Effect] internally.
+     * These can be observed via one-shot payload observers
+     * @param payload Arbitrary data to send
+     */
+    suspend fun <D: Any> sendPayload(payload: D)
+
+    /**
      * Sends [Transmission.Effect] to a specific [Transformer]
      * @param effect of type [Transmission.Effect]
      * @param to Target [Transformer] identity Contract

@@ -3,6 +3,7 @@ package com.trendyol.transmission.transformer
 import com.trendyol.transmission.ExperimentalTransmissionApi
 import com.trendyol.transmission.Transmission
 import com.trendyol.transmission.effect.RouterEffect
+import com.trendyol.transmission.effect.RouterEffectWithType
 import com.trendyol.transmission.effect.WrappedEffect
 import com.trendyol.transmission.router.Capacity
 import com.trendyol.transmission.transformer.checkpoint.CheckpointTracker
@@ -117,6 +118,7 @@ open class Transformer(
                 launch {
                     incoming
                         .filterNot { it.effect is RouterEffect }
+                        .filterNot { it.effect is RouterEffectWithType<*> }
                         .filter { it.identity == null || it.identity == _identity }
                         .map { it.effect }
                         .collect {
