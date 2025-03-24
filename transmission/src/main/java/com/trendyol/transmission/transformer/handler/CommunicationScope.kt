@@ -1,5 +1,6 @@
 package com.trendyol.transmission.transformer.handler
 
+import com.trendyol.transmission.ExperimentalTransmissionApi
 import com.trendyol.transmission.Transmission
 import com.trendyol.transmission.router.TransmissionRouter
 import com.trendyol.transmission.transformer.Transformer
@@ -19,6 +20,14 @@ interface CommunicationScope : QueryHandler, CheckpointHandler {
      * @param effect of type [Transmission.Effect]
      */
     suspend fun <E : Transmission.Effect> publish(effect: E)
+
+    /**
+     * Sends arbitrary payload to [TransmissionRouter] via [Transmission.Effect] internally.
+     * These can be observed via one-shot payload observers
+     * @param payload Arbitrary data to send
+     */
+    @ExperimentalTransmissionApi
+    suspend fun <D: Any> sendPayload(payload: D)
 
     /**
      * Sends [Transmission.Effect] to a specific [Transformer]

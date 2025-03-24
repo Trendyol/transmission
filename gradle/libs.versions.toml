@@ -1,7 +1,7 @@
 [versions]
 # Library versions
-transmission-core = "1.4.2"
-transmission-test = "1.4.2"
+transmission-core = "1.5.0"
+transmission-test = "1.5.0"
 
 # Kotlin and build tools
 agp = "8.2.2"

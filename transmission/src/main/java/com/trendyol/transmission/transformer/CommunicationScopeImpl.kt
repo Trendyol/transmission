@@ -2,6 +2,7 @@ package com.trendyol.transmission.transformer
 
 import com.trendyol.transmission.ExperimentalTransmissionApi
 import com.trendyol.transmission.Transmission
+import com.trendyol.transmission.effect.RouterEffectWithType
 import com.trendyol.transmission.effect.WrappedEffect
 import com.trendyol.transmission.transformer.handler.CommunicationScope
 import com.trendyol.transmission.transformer.request.Contract
@@ -18,6 +19,10 @@ internal class CommunicationScopeImpl(
 
     override suspend fun <D : Transmission.Data> send(data: D?) {
         data?.let { dataChannel.send(it) }
+    }
+
+    override suspend fun <D : Any> sendPayload(payload: D) {
+        effectChannel.send(WrappedEffect(RouterEffectWithType<D>(payload)))
     }
 
     override suspend fun <E : Transmission.Effect> send(
