@@ -1,15 +1,12 @@
 package com.trendyol.transmission.router
 
 import com.trendyol.transmission.ExperimentalTransmissionApi
-import com.trendyol.transmission.InternalTransmissionApi
 import com.trendyol.transmission.Transmission
 import com.trendyol.transmission.effect.RouterEffectWithType
-import com.trendyol.transmission.effect.WrappedEffect
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
@@ -65,8 +62,7 @@ inline fun <reified T : Transmission.Data> Flow<T>.asState(
     return this.filterIsInstance<T>().stateIn(scope, sharingStarted, initialValue)
 }
 
-@OptIn(InternalTransmissionApi::class)
 @ExperimentalTransmissionApi
-inline fun <reified D: Any> TransmissionRouter.oneShotPayloadStream(): Flow<D> {
+inline fun <reified D : Any> TransmissionRouter.oneShotPayloadStream(): Flow<D> {
     return this.effectStream.filterIsInstance<RouterEffectWithType<D>>().map { it.payload }
 }
