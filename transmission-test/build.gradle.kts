@@ -3,21 +3,25 @@ plugins {
 //    id("maven-publish")
 }
 
-java {
-    sourceCompatibility = JavaVersion.VERSION_17
-    targetCompatibility = JavaVersion.VERSION_17
+kotlin {
+    jvm()
 }
 
-dependencies {
-    api(project(":transmission"))
-    implementation(libs.kotlinx.coroutines.core)
-    implementation(libs.kotlinx.coroutines.test)
-    implementation(libs.junit)
-    implementation(kotlin("test"))
-    implementation(libs.turbine)
-}
-
-tasks.test { useJUnitPlatform() }
+//java {
+//    sourceCompatibility = JavaVersion.VERSION_17
+//    targetCompatibility = JavaVersion.VERSION_17
+//}
+//
+//dependencies {
+//    api(project(":transmission"))
+//    implementation(libs.kotlinx.coroutines.core)
+//    implementation(libs.kotlinx.coroutines.test)
+//    implementation(libs.junit)
+//    implementation(kotlin("test"))
+//    implementation(libs.turbine)
+//}
+//
+//tasks.test { useJUnitPlatform() }
 
 //publishing {
 //    publications {
