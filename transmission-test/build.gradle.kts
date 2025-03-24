@@ -1,7 +1,6 @@
 plugins {
-    id("java-library")
-    alias(libs.plugins.jetbrainsKotlinJvm)
-    id("maven-publish")
+    alias(libs.plugins.kotlinMultiplatform)
+//    id("maven-publish")
 }
 
 java {
@@ -20,13 +19,13 @@ dependencies {
 
 tasks.test { useJUnitPlatform() }
 
-publishing {
-    publications {
-        create<MavenPublication>("release") {
-            groupId = "com.trendyol"
-            artifactId = "transmission-test"
-            version = libs.versions.transmission.test.get()
-            afterEvaluate { from(components["java"]) }
-        }
-    }
-}
+//publishing {
+//    publications {
+//        create<MavenPublication>("release") {
+//            groupId = "com.trendyol"
+//            artifactId = "transmission-test"
+//            version = libs.versions.transmission.test.get()
+//            afterEvaluate { from(components["java"]) }
+//        }
+//    }
+//}
