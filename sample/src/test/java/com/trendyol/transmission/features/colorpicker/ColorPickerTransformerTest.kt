@@ -6,7 +6,6 @@ import com.trendyol.transmission.components.features.colorpicker.ColorPickerEffe
 import com.trendyol.transmission.components.features.colorpicker.ColorPickerSignal
 import com.trendyol.transmission.components.features.colorpicker.ColorPickerTransformer
 import com.trendyol.transmission.transformer.util.TestCoroutineRule
-import com.trendyol.transmissiontest.attachToRouter
 import com.trendyol.transmissiontest.test
 import org.junit.Before
 import org.junit.Rule
