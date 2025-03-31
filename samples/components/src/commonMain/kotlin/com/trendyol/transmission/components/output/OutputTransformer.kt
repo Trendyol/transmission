@@ -1,6 +1,5 @@
 package com.trendyol.transmission.components.output
 
-import android.util.Log
 import androidx.compose.ui.graphics.Color
 import com.trendyol.transmission.components.ColorPickerUiState
 import com.trendyol.transmission.components.OutputUiState
@@ -9,6 +8,7 @@ import com.trendyol.transmission.components.colorpicker.ColorPickerTransformer
 import com.trendyol.transmission.components.colorpicker.colorPickerIdentity
 import com.trendyol.transmission.components.input.InputEffect
 import com.trendyol.transmission.components.input.InputTransformer
+import com.trendyol.transmission.components.util.Logger
 import com.trendyol.transmission.effect.RouterEffect
 import com.trendyol.transmission.transformer.Transformer
 import com.trendyol.transmission.transformer.addComputations
@@ -83,7 +83,7 @@ class OutputTransformer constructor(
 
     override fun onError(throwable: Throwable) {
         super.onError(throwable)
-        Log.e(TAG, "onError: ${throwable.localizedMessage}")
+        Logger.d(TAG, "onError: ${throwable.localizedMessage}")
     }
 
     companion object {
