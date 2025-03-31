@@ -13,6 +13,37 @@ kotlin {
             jvmTarget.set(JvmTarget.JVM_17)
         }
     }
+
+    sourceSets {
+        applyDefaultHierarchyTemplate()
+        androidMain.dependencies {
+            implementation(compose.preview)
+            implementation(libs.androidx.activity.compose)
+            implementation(libs.androidx.lifecycle.runtime.compose)
+            implementation(libs.koin.android)
+        }
+        commonMain.dependencies {
+            implementation(project.dependencies.platform(libs.koin.bom))
+            implementation(libs.koin.core)
+            implementation(libs.koin.compose)
+            implementation(libs.koin.compose.viewmodel)
+            implementation(libs.lifecycle.viewmodel.compose)
+            implementation(compose.runtime)
+            implementation(project(":transmission"))
+            implementation(compose.foundation)
+            implementation(compose.material3)
+            implementation(compose.ui)
+            implementation(compose.components.resources)
+            implementation(compose.components.uiToolingPreview)
+        }
+        commonTest.dependencies {
+            implementation(kotlin("test"))
+            implementation(project(":transmission-test"))
+            implementation(libs.turbine)
+            implementation(libs.junit)
+            implementation(libs.kotlinx.coroutines.test)
+        }
+    }
 }
 
 android {
