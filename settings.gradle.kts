@@ -23,3 +23,4 @@ rootProject.name = "transmission"
 include(":sample")
 include(":transmission")
 include(":transmission-test")
+include(":samples:components")
