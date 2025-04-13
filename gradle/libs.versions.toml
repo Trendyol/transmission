@@ -40,8 +40,10 @@ hiltAndroid = "2.55"
 hiltAndroidCompiler = "2.55"
 koin-bom = "4.0.2"
 
-[libraries]
+atomicfu = "0.27.0"
 
+[libraries]
+atomicfu = { module = "org.jetbrains.kotlinx:atomicfu", version.ref = "atomicfu" }
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
 hilt-android = { module = "com.google.dagger:hilt-android", version.ref = "hiltAndroid" }
 hilt-android-compiler = { module = "com.google.dagger:hilt-android-compiler", version.ref = "hiltAndroidCompiler" }
