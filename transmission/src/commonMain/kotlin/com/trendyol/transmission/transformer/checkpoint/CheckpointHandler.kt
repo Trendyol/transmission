@@ -36,8 +36,8 @@ interface CheckpointHandler {
      * @return the type of argument depicted in [contract] after the checkpoint is validated
      */
     @ExperimentalTransmissionApi
-    suspend fun <C : Contract.Checkpoint.WithArgs<A>, A : Any> CommunicationScope.pauseOn(
-        contract: C,
+    suspend fun <A : Any> CommunicationScope.pauseOn(
+        contract: Contract.Checkpoint.WithArgs<A>,
     ): A
 
     /**
@@ -50,5 +50,5 @@ interface CheckpointHandler {
      * Validates the given [Contract.CheckpointWithArgs] and resumes the execution added with [pauseOn]
      */
     @ExperimentalTransmissionApi
-    suspend fun <C : Contract.Checkpoint.WithArgs<A>, A : Any> validate(contract: C, args: A)
+    suspend fun <A : Any> validate(contract: Contract.Checkpoint.WithArgs<A>, args: A)
 }

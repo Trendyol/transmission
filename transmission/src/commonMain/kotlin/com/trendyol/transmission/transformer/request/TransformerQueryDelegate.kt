@@ -95,13 +95,13 @@ internal class TransformerQueryDelegate(
             }
 
             @ExperimentalTransmissionApi
-            override suspend fun <C : Contract.Checkpoint.WithArgs<A>, A : Any> CommunicationScope.pauseOn(
-                contract: C
+            override suspend fun <A : Any> CommunicationScope.pauseOn(
+                contract: Contract.Checkpoint.WithArgs<A>
             ): A {
                 val queryIdentifier = IdentifierGenerator.generateIdentifier()
                 return suspendCancellableCoroutine<A> { continuation ->
-                    val validator = object : CheckpointValidator<C, A> {
-                        override suspend fun validate(contract: C, args: A): Boolean {
+                    val validator = object : CheckpointValidator<Contract.Checkpoint.WithArgs<A>, A> {
+                        override suspend fun validate(contract: Contract.Checkpoint.WithArgs<A>, args: A): Boolean {
                             continuation.resume(args)
                             return true
                         }
@@ -122,12 +122,12 @@ internal class TransformerQueryDelegate(
                 }
             }
 
-            override suspend fun <C : Contract.Checkpoint.WithArgs<A>, A : Any> validate(
-                contract: C,
+            override suspend fun <A : Any> validate(
+                contract: Contract.Checkpoint.WithArgs<A>,
                 args: A
             ) {
                 val validator = checkpointTrackerProvider()
-                    ?.useValidator<C, A>(contract)
+                    ?.useValidator<Contract.Checkpoint.WithArgs<A>, A>(contract)
                 if (validator?.validate(contract, args) == true) {
                     checkpointTrackerProvider()
                         ?.removeValidator(contract)
@@ -138,7 +138,7 @@ internal class TransformerQueryDelegate(
 
     val queryHandler: QueryHandler = object : QueryHandler {
 
-        override suspend fun <C : Contract.DataHolder<D>, D : Transmission.Data> getData(contract: C): D? {
+        override suspend fun <D : Transmission.Data> getData(contract: Contract.DataHolder<D>): D? {
             val queryIdentifier = IdentifierGenerator.generateIdentifier()
             outGoingQuery.send(
                 QueryType.Data(
@@ -152,8 +152,8 @@ internal class TransformerQueryDelegate(
                 .first().data
         }
 
-        override suspend fun <C : Contract.Computation<D>, D : Any> compute(
-            contract: C, invalidate: Boolean
+        override suspend fun <D : Any> compute(
+            contract: Contract.Computation<D>, invalidate: Boolean
         ): D? {
             val queryIdentifier = IdentifierGenerator.generateIdentifier()
             outGoingQuery.send(
@@ -169,8 +169,8 @@ internal class TransformerQueryDelegate(
                 .first().data
         }
 
-        override suspend fun <C : Contract.ComputationWithArgs<A, D>, A : Any, D : Any> compute(
-            contract: C, args: A, invalidate: Boolean
+        override suspend fun <A : Any, D : Any> compute(
+            contract: Contract.ComputationWithArgs<A,D>, args: A, invalidate: Boolean
         ): D? {
             val queryIdentifier = IdentifierGenerator.generateIdentifier()
             outGoingQuery.send(
@@ -193,8 +193,8 @@ internal class TransformerQueryDelegate(
             )
         }
 
-        override suspend fun <C : Contract.ExecutionWithArgs<A>, A : Any> execute(
-            contract: C, args: A
+        override suspend fun <A : Any> execute(
+            contract: Contract.ExecutionWithArgs<A>, args: A
         ) {
             outGoingQuery.send(
                 QueryType.ExecutionWithArgs(key = contract.key, args = args)

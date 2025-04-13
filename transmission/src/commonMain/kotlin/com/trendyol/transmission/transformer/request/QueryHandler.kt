@@ -9,7 +9,7 @@ interface QueryHandler {
      * Gets the data using the provided [Contract.DataHolder]
      * @param contract DataHolder Contract to be sent
      */
-    suspend fun <C : Contract.DataHolder<D>, D : Transmission.Data> getData(contract: C): D?
+    suspend fun <D : Transmission.Data> getData(contract: Contract.DataHolder<D>): D?
 
     /**
      * Starts computation in the target [Transformer] and returns the result data.
@@ -17,10 +17,7 @@ interface QueryHandler {
      * @param invalidate if the Computation is cached, this invalidates the result make it compute
      * again. If it is not cached, it doesn't have any effect.
      */
-    suspend fun <C : Contract.Computation<D>, D : Any> compute(
-        contract: C,
-        invalidate: Boolean = false,
-    ): D?
+    suspend fun <D : Any> compute(contract: Contract.Computation<D>, invalidate: Boolean = false): D?
 
     /**
      * Starts computation in the target [Transformer] and returns the result data.
@@ -29,8 +26,8 @@ interface QueryHandler {
      * @param invalidate if the Computation is cached, this invalidates the result make it compute
      * again. If it is not cached, it doesn't have any effect.
      */
-    suspend fun <C : Contract.ComputationWithArgs<A, D>, A : Any, D : Any> compute(
-        contract: C,
+    suspend fun <A : Any, D : Any> compute(
+        contract: Contract.ComputationWithArgs<A, D>,
         args: A,
         invalidate: Boolean = false,
     ): D?
@@ -46,5 +43,5 @@ interface QueryHandler {
      * @param contract Execution Contract to be sent
      * @param args data required by Execution
      */
-    suspend fun <C : Contract.ExecutionWithArgs<A>, A : Any> execute(contract: C, args: A)
+    suspend fun <A : Any> execute(contract: Contract.ExecutionWithArgs<A>, args: A)
 }

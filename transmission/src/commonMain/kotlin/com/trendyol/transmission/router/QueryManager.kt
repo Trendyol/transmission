@@ -41,7 +41,7 @@ internal class QueryManager(
 
     val handler = object : QueryHandler {
 
-        override suspend fun <C : Contract.DataHolder<D>, D : Transmission.Data> getData(contract: C): D? {
+        override suspend fun <D : Transmission.Data> getData(contract: Contract.DataHolder<D>): D? {
             val queryIdentifier = IdentifierGenerator.generateIdentifier()
             outGoingQuery.send(
                 QueryType.Data(
@@ -56,8 +56,8 @@ internal class QueryManager(
                 .first().data
         }
 
-        override suspend fun <C : Contract.Computation<D>, D : Any> compute(
-            contract: C,
+        override suspend fun <D : Any> compute(
+            contract: Contract.Computation<D>,
             invalidate: Boolean,
         ): D? {
             val queryIdentifier = IdentifierGenerator.generateIdentifier()
@@ -75,8 +75,8 @@ internal class QueryManager(
                 .first().data
         }
 
-        override suspend fun <C : Contract.ComputationWithArgs<A, D>, A : Any, D : Any> compute(
-            contract: C,
+        override suspend fun <A : Any, D : Any> compute(
+            contract: Contract.ComputationWithArgs<A,D>,
             args: A,
             invalidate: Boolean,
         ): D? {
@@ -104,8 +104,8 @@ internal class QueryManager(
             )
         }
 
-        override suspend fun <C : Contract.ExecutionWithArgs<A>, A : Any> execute(
-            contract: C,
+        override suspend fun <A : Any> execute(
+            contract: Contract.ExecutionWithArgs<A>,
             args: A,
         ) {
             outGoingQuery.send(
