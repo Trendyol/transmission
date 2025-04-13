@@ -6,28 +6,26 @@ import com.trendyol.transmission.components.colorpicker.ColorPickerTransformer
 import com.trendyol.transmission.components.input.InputEffect
 import com.trendyol.transmission.components.output.OutputTransformer
 import com.trendyol.transmission.effect.RouterEffect
-import transmission.util.TestCoroutineRule
 import com.trendyol.transmissiontest.test
-import org.junit.Before
-import org.junit.Rule
-import org.junit.Test
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
+import kotlin.test.Test
+import kotlin.test.BeforeTest
 
 class OutputTransformerTest {
 
-    @get:Rule
-    val testCoroutineRule = TestCoroutineRule()
-
     private lateinit var sut: OutputTransformer
 
-    @Before
+    private val testDispatcher = UnconfinedTestDispatcher()
+
+    @BeforeTest
     fun setUp() {
-        sut = OutputTransformer(testCoroutineRule.testDispatcher)
+        sut = OutputTransformer(testDispatcher)
     }
 
     @Test
-    fun `GIVEN sut, WHEN inputUpdate effect comes, THEN, holder should be updated with correct value`() {
+    fun `GIVEN sut WHEN inputUpdate effect comes THEN holder should be updated with correct value`() {
         sut.test()
             .testEffect(InputEffect.InputUpdate("test")) {
                 assertEquals(OutputUiState(outputText = "test"), lastData<OutputUiState>())
@@ -35,7 +33,7 @@ class OutputTransformerTest {
     }
 
     @Test
-    fun `GIVEN sut, WHEN inputUpdate effect comes and no ColorPickerUIState data is present, THEN data should not be updated further`() {
+    fun `GIVEN sut WHEN inputUpdate effect comes and no ColorPickerUIState data is present THEN data should not be updated further`() {
         sut.test()
             .testEffect(InputEffect.InputUpdate("test")) {
                 assertEquals(OutputUiState(outputText = "test"), lastData<OutputUiState>())
@@ -43,7 +41,7 @@ class OutputTransformerTest {
     }
 
     @Test
-    fun `GIVEN sut, WHEN inputUpdate effect comes and ColorPickerUIState exists, THEN RouterPayloadEffect should be published`() {
+    fun `GIVEN sut WHEN inputUpdate effect comes and ColorPickerUIState exists THEN RouterPayloadEffect should be published`() {
         sut.test()
             .withData(ColorPickerTransformer.holderContract) {
                 ColorPickerUiState()

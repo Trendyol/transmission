@@ -25,7 +25,7 @@ open class FakeTransformer(dispatcher: CoroutineDispatcher) :
             signalList.add(signal)
             publish(TestEffect)
             publish(RouterEffect(""))
-            holder.update { TestData("update with ${this@FakeTransformer.javaClass.simpleName}") }
+            holder.update { TestData("update with ${this@FakeTransformer::class.simpleName}") }
         }
         onEffect<TestEffect> { effect ->
             effectList.add(effect)

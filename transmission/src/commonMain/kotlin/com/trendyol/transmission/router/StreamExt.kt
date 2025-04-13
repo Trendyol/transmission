@@ -11,6 +11,7 @@ import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.stateIn
+import kotlin.jvm.JvmName
 
 @JvmName("streamData")
 fun TransmissionRouter.streamData(): Flow<Transmission.Data> {

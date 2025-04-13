@@ -1,6 +1,7 @@
 package com.trendyol.transmission.router
 
 import kotlinx.coroutines.channels.Channel
+import kotlin.jvm.JvmInline
 
 @JvmInline
 value class Capacity private constructor(val value: Int) {

@@ -2,14 +2,11 @@ package com.trendyol.transmission.transformer.checkpoint
 
 import com.trendyol.transmission.InternalTransmissionApi
 import com.trendyol.transmission.transformer.request.Contract
-import java.util.concurrent.ConcurrentHashMap
-import java.util.concurrent.ConcurrentMap
 
 @OptIn(InternalTransmissionApi::class)
 internal class CheckpointTracker {
-    private val tracker: ConcurrentMap<String, ArrayDeque<CheckpointValidator<*, *>>> =
-        ConcurrentHashMap()
-    private val contractTracker: ConcurrentMap<Contract.Checkpoint, String> = ConcurrentHashMap()
+    private val tracker: MutableMap<String, ArrayDeque<CheckpointValidator<*, *>>> = mutableMapOf()
+    private val contractTracker: MutableMap<Contract.Checkpoint, String> = mutableMapOf()
 
     fun registerContract(contract: Contract.Checkpoint, identifier: String) {
         contractTracker.put(contract, identifier)
@@ -19,10 +16,9 @@ internal class CheckpointTracker {
         identifier: String,
         validator: CheckpointValidator<C, A>
     ) {
-        tracker
-            .putIfAbsent(identifier, ArrayDeque<CheckpointValidator<*, *>>().apply {
-                addLast(validator)
-            })?.addLast(validator)
+        val value = tracker.get(identifier) ?: ArrayDeque<CheckpointValidator<*, *>>()
+        value.addLast(validator)
+        tracker[identifier] = value
     }
 
     fun <C : Contract.Checkpoint, A : Any> useValidator(contract: Contract.Checkpoint): CheckpointValidator<C, A>? {

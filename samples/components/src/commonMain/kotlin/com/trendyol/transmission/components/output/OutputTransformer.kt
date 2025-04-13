@@ -83,7 +83,7 @@ class OutputTransformer constructor(
 
     override fun onError(throwable: Throwable) {
         super.onError(throwable)
-        Logger.d(TAG, "onError: ${throwable.localizedMessage}")
+        Logger.d(TAG, "onError: ${throwable.message}")
     }
 
     companion object {

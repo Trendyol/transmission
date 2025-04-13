@@ -18,7 +18,6 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
-import java.util.concurrent.ConcurrentHashMap
 import kotlin.coroutines.resume
 
 @OptIn(InternalTransmissionApi::class)
@@ -74,7 +73,7 @@ internal class TransformerQueryDelegate(
                         object : CheckpointValidator<Contract.Checkpoint.Default, Unit> {
                             private val lock = Mutex()
                             private val contractMap =
-                                ConcurrentHashMap<Contract.Checkpoint.Default, Boolean>()
+                                mutableMapOf<Contract.Checkpoint.Default, Boolean>()
                                     .apply { putAll(contractList.map { it to false }) }
 
                             override suspend fun validate(

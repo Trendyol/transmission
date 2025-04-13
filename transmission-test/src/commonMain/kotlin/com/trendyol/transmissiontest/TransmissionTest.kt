@@ -22,6 +22,7 @@ import kotlinx.coroutines.test.TestDispatcher
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
+import kotlin.jvm.JvmName
 
 /**
  * Main entry point for testing Transmission components. Provides a DSL for setting up and testing

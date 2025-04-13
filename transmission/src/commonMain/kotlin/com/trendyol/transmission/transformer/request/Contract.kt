@@ -3,6 +3,7 @@ package com.trendyol.transmission.transformer.request
 import com.trendyol.transmission.ExperimentalTransmissionApi
 import com.trendyol.transmission.Transmission
 import com.trendyol.transmission.identifier.IdentifierGenerator
+import kotlin.jvm.JvmInline
 
 sealed interface Contract {
 

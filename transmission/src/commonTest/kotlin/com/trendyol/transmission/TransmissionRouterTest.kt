@@ -11,26 +11,21 @@ import com.trendyol.transmission.transformer.TestTransformer3
 import com.trendyol.transmission.transformer.data.TestData
 import com.trendyol.transmission.transformer.data.TestEffect
 import com.trendyol.transmission.transformer.data.TestSignal
-import com.trendyol.transmission.transformer.util.TestCoroutineRule
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
-import org.junit.Rule
-import org.junit.Test
 import kotlin.test.assertEquals
+import kotlin.test.Test
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class TransmissionRouterTest {
 
     private lateinit var sut: TransmissionRouter
 
-    @get:Rule
-    val testCoroutineRule = TestCoroutineRule()
-
     private val testDispatcher = UnconfinedTestDispatcher()
 
     @Test
-    fun `GIVEN Router with no transformers, WHEN initialize is called, THEN router should throw IllegalStateException`() =
+    fun `GIVEN Router with no transformers WHEN initialize is called THEN router should throw IllegalStateException`() =
         runTest {
             // Given
             try {
@@ -46,7 +41,7 @@ class TransmissionRouterTest {
         }
 
     @Test
-    fun `GIVEN Router with one transformer, WHEN initialize is called, THEN router should not throw IllegalStateException`() =
+    fun `GIVEN Router with one transformer WHEN initialize is called THEN router should not throw IllegalStateException`() =
         runTest {
             // Given
             val exception = try {
@@ -64,7 +59,7 @@ class TransmissionRouterTest {
         }
 
     @Test
-    fun `GIVEN initialized Router with one Transformer, WHEN processSignal is called, THEN transformer should contain the signal`() {
+    fun `GIVEN initialized Router with one Transformer WHEN processSignal is called THEN transformer should contain the signal`() {
         // Given
         val transformer = FakeTransformer(testDispatcher)
         sut = TransmissionRouter {
@@ -79,7 +74,7 @@ class TransmissionRouterTest {
     }
 
     @Test
-    fun `GIVEN initialized Router with multiple Transformers, WHEN processSignal is called, THEN all transformers should contain the signal`() {
+    fun `GIVEN initialized Router with multiple Transformers WHEN processSignal is called THEN all transformers should contain the signal`() {
         // Given
         val transformer1 = TestTransformer1(testDispatcher)
         val transformer2 = TestTransformer2(testDispatcher)
@@ -102,7 +97,7 @@ class TransmissionRouterTest {
      * the effect broadcast.
      */
     @Test
-    fun `GIVEN initialized Router with multiple Transformers, WHEN processSignal is called, THEN all transformers should contain the FakeTransformer's Signal`() {
+    fun `GIVEN initialized Router with multiple Transformers WHEN processSignal is called THEN all transformers should contain the FakeTransformer's Signal`() {
         // Given
         val transformer1 = TestTransformer1(testDispatcher)
         val transformer2 = TestTransformer2(testDispatcher)
@@ -121,7 +116,7 @@ class TransmissionRouterTest {
     }
 
     @Test
-    fun `GIVEN initialized Router with multiple Transformers, WHEN processSignal is called, THEN all effects should be sent through onEffect`() =
+    fun `GIVEN initialized Router with multiple Transformers WHEN processSignal is called THEN all effects should be sent through onEffect`() =
         runTest {
             turbineScope {
                 // Given
@@ -141,7 +136,7 @@ class TransmissionRouterTest {
         }
 
     @Test
-    fun `GIVEN initialized Router with multiple Transformers, WHEN processSignal is called, THEN all transformers should send the correct TestData`() =
+    fun `GIVEN initialized Router with multiple Transformers WHEN processSignal is called THEN all transformers should send the correct TestData`() =
         runTest {
             turbineScope {
                 // Given
@@ -164,7 +159,7 @@ class TransmissionRouterTest {
         }
 
     @Test
-    fun `GIVEN initialized Router with multiple Transformers, WHEN processSignal is called, THEN all transformers should not contain the RouterPayloadEffect`() {
+    fun `GIVEN initialized Router with multiple Transformers WHEN processSignal is called THEN all transformers should not contain the RouterPayloadEffect`() {
         // Given
         val transformer1 = TestTransformer1(testDispatcher)
         val transformer2 = TestTransformer2(testDispatcher)
