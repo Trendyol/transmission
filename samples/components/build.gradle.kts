@@ -1,5 +1,6 @@
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
 
 plugins {
     alias(libs.plugins.kotlinMultiplatform)
@@ -16,6 +17,10 @@ kotlin {
     }
 
     jvm("desktop")
+
+    iosX64()
+    iosArm64()
+    iosSimulatorArm64()
 
     sourceSets {
         applyDefaultHierarchyTemplate()
@@ -90,5 +95,12 @@ compose.desktop {
             packageName = "Components Sample"
             packageVersion = "1.0.0"
         }
+    }
+}
+
+kotlin.targets.withType<KotlinNativeTarget>().configureEach {
+    binaries.framework {
+        baseName = "Components"
+        isStatic = true
     }
 }
