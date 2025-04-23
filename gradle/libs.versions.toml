@@ -7,8 +7,7 @@ android-targetSdk = "35"
 compose-multiplatform = "1.7.0"
 
 # Library versions
-transmission-core = "1.5.0"
-transmission-test = "1.5.0"
+gradleMavenPublishPlugin = "0.30.0"
 
 # Kotlin and build tools
 agp = "8.7.3"
@@ -36,6 +35,7 @@ atomicfu = "0.27.0"
 
 [libraries]
 atomicfu = { module = "org.jetbrains.kotlinx:atomicfu", version.ref = "atomicfu" }
+gradle-maven-publish-plugin = { module = "com.vanniktech:gradle-maven-publish-plugin", version.ref = "gradleMavenPublishPlugin" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 androidx-activity-compose = { group = "androidx.activity", name = "activity-compose", version.ref = "activityCompose" }
 kotlinx-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "kotlinxCoroutinesCore" }

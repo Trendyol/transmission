@@ -4,7 +4,7 @@ import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 plugins {
     alias(libs.plugins.kotlinMultiplatform)
     alias(libs.plugins.androidLibrary)
-//    id("maven-publish")
+    id("com.trendyol.transmission.publish")
 }
 
 kotlin {
@@ -51,14 +51,3 @@ android {
         targetCompatibility = JavaVersion.VERSION_17
     }
 }
-
-//publishing {
-//    publications {
-//        create<MavenPublication>("release") {
-//            groupId = "com.trendyol"
-//            artifactId = "transmission-test"
-//            version = libs.versions.transmission.test.get()
-//            afterEvaluate { from(components["java"]) }
-//        }
-//    }
-//}
