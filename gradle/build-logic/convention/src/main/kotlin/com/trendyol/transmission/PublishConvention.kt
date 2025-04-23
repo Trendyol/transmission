@@ -33,7 +33,7 @@ class PublishConvention : Plugin<Project> {
                     developer {
                         id.set("yigitozgumus")
                         name.set("Yiğit Özgümüş")
-                        url.set("mailto:yigitozgumus1@gmail.com")
+                        url.set("yigitozgumus1@gmail.com")
                     }
                 }
                 scm {
@@ -43,7 +43,7 @@ class PublishConvention : Plugin<Project> {
                 }
             }
 
-//            signAllPublications()
+            signAllPublications()
         }
     }
 }
