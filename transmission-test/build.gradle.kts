@@ -8,19 +8,9 @@ plugins {
 }
 
 kotlin {
-    jvm {
-        compilerOptions {
-            jvmTarget.set(JvmTarget.JVM_17)
-        }
-        testRuns["test"].executionTask.configure {
-            useJUnitPlatform()
-        }
-    }
+    jvm()
     androidTarget {
         publishLibraryVariants("release")
-        compilerOptions {
-            jvmTarget.set(JvmTarget.JVM_17)
-        }
     }
 
     iosX64()
