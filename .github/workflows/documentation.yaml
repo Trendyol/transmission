@@ -2,8 +2,7 @@ name: documentation
 on:
   push:
     branches:
-      - master 
-      - main
+      - documentation
 permissions:
   contents: write
 jobs:
