@@ -1,41 +1,34 @@
 [versions]
 
-android-minSdk = "24"
-android-compileSdk = "35"
-android-targetSdk = "35"
-
+gradleMavenPublishPlugin = "0.30.0"
 compose-multiplatform = "1.7.0"
-
-# Library versions
-transmission-core = "1.5.0"
-transmission-test = "1.5.0"
-
-# Kotlin and build tools
 agp = "8.7.3"
 kotlin = "2.1.10"
 jetbrainsKotlinJvm = "2.0.20"
-org-jetbrains-kotlin-android = "2.1.10"
-
-# Coroutines
 kotlinxCoroutinesCore = "1.10.1"
 kotlinxCoroutinesTest = "1.10.1"
-
-# AndroidX
 lifecycleRuntimeCompose = "2.8.7"
 activityCompose = "1.10.1"
 lifecycleViewmodelCompose = "2.8.2"
-
-# Testing
 junit = "4.13.2"
 turbine = "1.1.0"
-
-# DI
 koin-bom = "4.0.2"
-
 atomicfu = "0.27.0"
+
+[plugins]
+android-application = { id = "com.android.application", version.ref = "agp" }
+androidLibrary = { id = "com.android.library", version.ref = "agp" }
+
+jetbrains-kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
+jetbrainsKotlinJvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "jetbrainsKotlinJvm" }
+
+compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
+kotlinMultiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
+composeMultiplatform = { id = "org.jetbrains.compose", version.ref = "compose-multiplatform" }
 
 [libraries]
 atomicfu = { module = "org.jetbrains.kotlinx:atomicfu", version.ref = "atomicfu" }
+gradle-maven-publish-plugin = { module = "com.vanniktech:gradle-maven-publish-plugin", version.ref = "gradleMavenPublishPlugin" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 androidx-activity-compose = { group = "androidx.activity", name = "activity-compose", version.ref = "activityCompose" }
 kotlinx-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "kotlinxCoroutinesCore" }
@@ -52,13 +45,7 @@ koin-compose = { module = "io.insert-koin:koin-compose" }
 koin-compose-viewmodel = { module = "io.insert-koin:koin-compose-viewmodel" }
 koin-android = { module = "io.insert-koin:koin-android" }
 
-[plugins]
-android-application = { id = "com.android.application", version.ref = "agp" }
-androidLibrary = { id = "com.android.library", version.ref = "agp" }
+# Build logic dependencies
+android-gradlePlugin = { module = "com.android.tools.build:gradle", version.ref = "agp" }
+kotlin-gradlePlugin = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlin" }
 
-jetbrains-kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
-jetbrainsKotlinJvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "jetbrainsKotlinJvm" }
-
-compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
-kotlinMultiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
-composeMultiplatform = { id = "org.jetbrains.compose", version.ref = "compose-multiplatform" }
