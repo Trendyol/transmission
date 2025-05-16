@@ -14,7 +14,8 @@ class PublishConvention : Plugin<Project> {
 
         extensions.configure<MavenPublishBaseExtension>("mavenPublishing") {
             publishToMavenCentral(SonatypeHost.CENTRAL_PORTAL)
-//            coordinates(group.toString(), project.name, version.toString())
+
+            signAllPublications()
 
             pom {
                 name.set(project.name.replaceFirstChar { it.uppercase() })
@@ -43,7 +44,6 @@ class PublishConvention : Plugin<Project> {
                 }
             }
 
-            signAllPublications()
         }
     }
 }
