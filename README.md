@@ -2,7 +2,7 @@
 [![OpenSSF Scorecard](https://api.scorecard.dev/projects/github.com/Trendyol/transmission/badge)](https://scorecard.dev/viewer/?uri=github.com/Trendyol/transmission)
 
 
-[![](https://jitpack.io/v/Trendyol/transmission.svg)](https://jitpack.io/#Trendyol/transmission)
+![Maven Central Version](https://img.shields.io/maven-central/v/com.trendyol/transmission)
 
 # Transmission
 
