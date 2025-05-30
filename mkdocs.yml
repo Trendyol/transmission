@@ -1,8 +1,56 @@
 site_name: Transmission
+repo_name: Transmission
+site_description: "Experimental asynchronous communication for Business Logic"
+site_author: Trendyol
 repo_url: https://github.com/trendyol/transmission
+remote_branch: gh-pages
+
+copyright: 'Copyright &copy; 2024 Trendyol'
+
+markdown_extensions:
+  - pymdownx.highlight
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - pymdownx.tabbed:
+      alternate_style: true
+  - attr_list
+  - md_in_html
+  - admonition
+  - abbr
+  - tables
+
+plugins:
+  - search
+
 theme:
   name: material
+  palette:
+    - media: '(prefers-color-scheme: light)'
+      scheme: default
+      primary: 'white'
+      accent: 'orange'
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+    - media: '(prefers-color-scheme: dark)'
+      scheme: slate
+      primary: 'black'
+      accent: 'yellow'
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+  font:
+    text: 'Lato'
+    code: 'Fira Code'
+  
   features:
+  - content.code.copy
+  - content.code.select
   - content.code.annotate
   - content.tabs.link
   - content.tooltips
@@ -16,3 +64,18 @@ theme:
   - search.share
   - search.suggest
   - toc.integrate
+
+nav:
+  - 'Introduction': index.md
+  - 'How To Use': 'how_to_use.md'
+  - 'Setting Up': 'setup.md'
+  - 'Transmissions': 'transmissions.md'
+  - 'Transformer': 'transformer.md'
+  - 'TransmissionRouter': 'router.md'
+  - 'DataHolder': 'dataholder.md'
+  - 'Handlers': 'handlers.md'
+  - 'Contracts': 'contracts.md'
+  - 'Transformer Communication': 'transformer_communication.md'
+  - 'Testing': 'testing.md'
+  - 'Changelog': 'changelog.md'
+  # - 'Roadmap': 'roadmap.md'
