@@ -124,7 +124,7 @@ Data is sent to the router's data stream for UI consumption:
 ```kotlin
 onSignal<LoadUserSignal> { signal ->
     val user = loadUser(signal.userId)
-    send(UserData(user)) // Available to UI via router.dataStream
+    send(UserData(user)) // Available to UI via router.streamData()
 }
 ```
 

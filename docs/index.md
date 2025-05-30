@@ -87,8 +87,7 @@ val router = TransmissionRouter {
 router.process(CounterSignal.Increment)
 
 // Observe data
-router.dataStream
-    .filterIsInstance<CounterData>()
+router.streamData<CounterData>()
     .collect { data ->
         // Update UI with data.count
     }
