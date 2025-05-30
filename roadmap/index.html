@@ -1,0 +1,860 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Experimental asynchronous communication for Business Logic">
+      
+      
+        <meta name="author" content="Trendyol">
+      
+      
+      
+      
+      
+      <link rel="icon" href="../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.6.14">
+    
+    
+      
+        <title>Roadmap - Transmission</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.342714a4.min.css">
+      
+        
+        <link rel="stylesheet" href="../assets/stylesheets/palette.06af60db.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato:300,300i,400,400i,700,700i%7CFira+Code:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Lato";--md-code-font:"Fira Code"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="white" data-md-color-accent="orange">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#roadmap" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href=".." title="Transmission" class="md-header__button md-logo" aria-label="Transmission" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Transmission
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Roadmap
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="white" data-md-color-accent="orange"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="black" data-md-color-accent="yellow"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12s-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+          <a href="javascript:void(0)" class="md-search__icon md-icon" title="Share" aria-label="Share" data-clipboard data-clipboard-text="" data-md-component="search-share" tabindex="-1">
+            
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9a3 3 0 0 0-3 3 3 3 0 0 0 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.15c-.05.21-.08.43-.08.66 0 1.61 1.31 2.91 2.92 2.91s2.92-1.3 2.92-2.91A2.92 2.92 0 0 0 18 16.08"/></svg>
+          </a>
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/trendyol/transmission" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.7.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81"/></svg>
+  </div>
+  <div class="md-source__repository">
+    Transmission
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+  
+
+<nav class="md-nav md-nav--primary md-nav--integrated" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href=".." title="Transmission" class="md-nav__button md-logo" aria-label="Transmission" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    Transmission
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/trendyol/transmission" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.7.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81"/></svg>
+  </div>
+  <div class="md-source__repository">
+    Transmission
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href=".." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Introduction
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../how_to_use/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    How To Use
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../setup/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Setting Up
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../transmissions/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Transmissions
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../transformer/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Transformer
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../router/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    TransmissionRouter
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../dataholder/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    DataHolder
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../handlers/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Handlers
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../contracts/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Contracts
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../transformer_communication/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Transformer Communication
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../testing/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Testing
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../changelog/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Changelog
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+<h1 id="roadmap">Roadmap</h1>
+<p>This roadmap outlines the planned development direction for the Transmission library. Please note that priorities and timelines may change based on community feedback and project needs.</p>
+<h2 id="current-status">Current Status</h2>
+<p>✅ <strong>Core Library (v0.1.0)</strong>
+- Basic transmission types (Signal, Effect, Data)
+- Transformer implementation with handlers
+- TransmissionRouter for communication management
+- DataHolder for state management
+- Contract system for inter-transformer communication
+- Testing framework and utilities
+- Comprehensive documentation</p>
+<h2 id="upcoming-releases">Upcoming Releases</h2>
+<h3 id="v020-enhanced-developer-experience-q2-2024">v0.2.0 - Enhanced Developer Experience (Q2 2024)</h3>
+<h4 id="focus-tooling-and-developer-productivity">🎯 Focus: Tooling and Developer Productivity</h4>
+<p><strong>New Features:</strong>
+- <strong>Debugging Tools</strong>
+  - Transmission flow visualization
+  - Router state inspection utilities
+  - Performance monitoring hooks
+  - Development-time flow validation</p>
+<ul>
+<li><strong>IDE Integration</strong></li>
+<li>IntelliJ/Android Studio plugin for transmission flow visualization</li>
+<li>Code generation templates for common patterns</li>
+<li>
+<p>Live templates for transformers and contracts</p>
+</li>
+<li>
+<p><strong>Enhanced Testing</strong></p>
+</li>
+<li>Time-travel debugging for transformers</li>
+<li>Mock transformer generation utilities</li>
+<li>Integration test helpers for multi-transformer scenarios</li>
+<li>Performance testing utilities</li>
+</ul>
+<p><strong>Improvements:</strong>
+- Better error messages with stack trace correlation
+- Improved documentation with interactive examples
+- Performance optimizations for high-throughput scenarios</p>
+<h3 id="v030-advanced-communication-patterns-q3-2024">v0.3.0 - Advanced Communication Patterns (Q3 2024)</h3>
+<h4 id="focus-complex-business-logic-support">🎯 Focus: Complex Business Logic Support</h4>
+<p><strong>New Features:</strong>
+- <strong>Saga Pattern Support</strong>
+  - Long-running transaction management
+  - Compensation action handling
+  - State persistence for saga steps</p>
+<ul>
+<li><strong>Distributed Communication</strong></li>
+<li>Multi-router communication</li>
+<li>Router federation for microservice architectures</li>
+<li>
+<p>Event sourcing integration</p>
+</li>
+<li>
+<p><strong>Advanced Checkpoints</strong></p>
+</li>
+<li>Checkpoint persistence</li>
+<li>Complex flow orchestration</li>
+<li>Conditional checkpoint validation</li>
+</ul>
+<p><strong>Improvements:</strong>
+- Enhanced contract system with versioning
+- Better memory management for long-running transformers
+- Improved error recovery mechanisms</p>
+<h3 id="v100-stable-api-q4-2024">v1.0.0 - Stable API (Q4 2024)</h3>
+<h4 id="focus-production-readiness-and-stability">🎯 Focus: Production Readiness and Stability</h4>
+<p><strong>Stabilization:</strong>
+- API freeze with backward compatibility guarantees
+- Comprehensive migration guides from experimental features
+- Production-ready performance characteristics
+- Enterprise-grade security considerations</p>
+<p><strong>Final Features:</strong>
+- Complete tooling ecosystem
+- Advanced monitoring and observability
+- Integration with popular frameworks
+- Comprehensive example applications</p>
+<h2 id="long-term-vision-2025">Long-term Vision (2025+)</h2>
+<h3 id="v110-ecosystem-expansion">v1.1.0+ - Ecosystem Expansion</h3>
+<p><strong>Platform Support:</strong>
+- <strong>Web Support</strong>
+  - JavaScript/WASM compilation targets
+  - Browser-specific optimizations
+  - Integration with web frameworks</p>
+<ul>
+<li><strong>Native Enhancements</strong></li>
+<li>Platform-specific optimizations</li>
+<li>Native UI framework integrations</li>
+<li>Background processing capabilities</li>
+</ul>
+<p><strong>Framework Integrations:</strong>
+- <strong>Android</strong>
+  - Jetpack Compose integration
+  - WorkManager integration
+  - Room database integration</p>
+<ul>
+<li><strong>iOS</strong></li>
+<li>SwiftUI bridge utilities</li>
+<li>Core Data integration</li>
+<li>
+<p>Background app refresh support</p>
+</li>
+<li>
+<p><strong>Desktop</strong></p>
+</li>
+<li>Compose Desktop optimizations</li>
+<li>Native file system integration</li>
+</ul>
+<h3 id="v200-next-generation-architecture">v2.0.0 - Next Generation Architecture</h3>
+<p><strong>Revolutionary Features:</strong>
+- <strong>AI-Powered Development</strong>
+  - Automatic transformer generation from business requirements
+  - Intelligent flow optimization suggestions
+  - Automated testing scenario generation</p>
+<ul>
+<li><strong>Code Generation</strong></li>
+<li>Compile-time transformer validation</li>
+<li>Automatic contract generation from interfaces</li>
+<li>
+<p>Type-safe configuration DSL</p>
+</li>
+<li>
+<p><strong>Advanced Runtime</strong></p>
+</li>
+<li>Hot-swappable transformers in development</li>
+<li>Runtime transformer composition</li>
+<li>Dynamic flow reconfiguration</li>
+</ul>
+<h2 id="community-contributions">Community Contributions</h2>
+<p>We actively encourage community contributions in the following areas:</p>
+<h3 id="high-priority-needs">High Priority Needs</h3>
+<p><strong>Documentation:</strong>
+- Additional real-world examples
+- Platform-specific guides
+- Performance optimization tutorials
+- Architecture pattern documentation</p>
+<p><strong>Testing:</strong>
+- Test case contributions for edge scenarios
+- Performance benchmarking
+- Integration test examples
+- Testing pattern documentation</p>
+<p><strong>Tooling:</strong>
+- IDE plugins and extensions
+- Build system integrations
+- Debugging utilities
+- Code generation tools</p>
+<h3 id="feature-requests">Feature Requests</h3>
+<p><strong>Most Requested Features:</strong>
+1. Visual flow designer for complex business logic
+2. Real-time monitoring dashboard
+3. Automatic API documentation generation
+4. Migration tools from other architectures
+5. Performance profiling integration</p>
+<h3 id="platform-specific-enhancements">Platform-Specific Enhancements</h3>
+<p><strong>Android:</strong>
+- Lifecycle-aware transformers
+- Integration with Android Architecture Components
+- Background processing optimizations
+- ProGuard/R8 optimization rules</p>
+<p><strong>iOS:</strong>
+- Swift-friendly API surface
+- UIKit and SwiftUI integration helpers
+- Background processing support
+- Memory management optimizations</p>
+<p><strong>Web:</strong>
+- Service Worker integration
+- IndexedDB state persistence
+- WebAssembly optimizations
+- Framework-specific adapters</p>
+<h2 id="research-and-exploration">Research and Exploration</h2>
+<h3 id="experimental-areas">Experimental Areas</h3>
+<p><strong>Performance Research:</strong>
+- Zero-copy message passing
+- Lock-free data structures
+- Memory pool optimization
+- Garbage collection optimization</p>
+<p><strong>Architecture Patterns:</strong>
+- Event sourcing integration
+- CQRS pattern support
+- Domain-driven design alignment
+- Microservice communication patterns</p>
+<p><strong>Developer Experience:</strong>
+- Visual programming interfaces
+- Low-code/no-code transformer creation
+- AI-assisted debugging
+- Automatic performance optimization</p>
+<h2 id="contributing-to-the-roadmap">Contributing to the Roadmap</h2>
+<p>We welcome community input on our roadmap! Here's how you can contribute:</p>
+<h3 id="feedback-channels">Feedback Channels</h3>
+<ol>
+<li><strong>GitHub Discussions</strong>: Share your use cases and requirements</li>
+<li><strong>Feature Requests</strong>: Submit detailed proposals for new features</li>
+<li><strong>RFC Process</strong>: Participate in design discussions for major features</li>
+<li><strong>Community Surveys</strong>: Provide feedback on priorities and directions</li>
+</ol>
+<h3 id="contribution-guidelines">Contribution Guidelines</h3>
+<p><strong>For New Features:</strong>
+- Start with a discussion or RFC
+- Provide clear use cases and benefits
+- Consider backward compatibility
+- Include testing and documentation plans</p>
+<p><strong>For Performance Improvements:</strong>
+- Include benchmarks and metrics
+- Demonstrate real-world impact
+- Consider different platform requirements
+- Provide before/after comparisons</p>
+<h2 id="timeline-considerations">Timeline Considerations</h2>
+<h3 id="factors-affecting-timeline">Factors Affecting Timeline</h3>
+<p><strong>Community Engagement:</strong>
+- User adoption rate and feedback
+- Community contribution volume
+- Enterprise customer requirements</p>
+<p><strong>Technical Challenges:</strong>
+- Platform-specific implementation complexity
+- Performance optimization requirements
+- Integration complexity with existing ecosystems</p>
+<p><strong>Resource Availability:</strong>
+- Core team capacity
+- Community contributor availability
+- Testing and validation resources</p>
+<h3 id="flexibility-and-adaptation">Flexibility and Adaptation</h3>
+<p>This roadmap is a living document that evolves based on:
+- Community feedback and needs
+- Technical discoveries and challenges
+- Market changes and new platform capabilities
+- Ecosystem evolution (Kotlin, Coroutines, etc.)</p>
+<h2 id="success-metrics">Success Metrics</h2>
+<p>We measure our progress using the following metrics:</p>
+<p><strong>Adoption Metrics:</strong>
+- Download/usage statistics
+- Community size and engagement
+- Number of production deployments
+- Framework integration adoption</p>
+<p><strong>Quality Metrics:</strong>
+- Bug report frequency and resolution time
+- Performance benchmark improvements
+- Documentation completeness and clarity
+- Test coverage and reliability</p>
+<p><strong>Developer Experience:</strong>
+- Setup time for new projects
+- Learning curve feedback
+- IDE integration effectiveness
+- Debugging and troubleshooting efficiency</p>
+<hr />
+<p><strong>Stay Updated:</strong>
+- Watch our <a href="https://github.com/Trendyol/transmission">GitHub repository</a> for updates
+- Join our community discussions
+- Follow our release announcements
+- Participate in beta testing programs</p>
+<p><em>This roadmap is updated quarterly based on community feedback and development progress.</em></p>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+  <script>var tabs=__md_get("__tabs");if(Array.isArray(tabs))e:for(var set of document.querySelectorAll(".tabbed-set")){var labels=set.querySelector(".tabbed-labels");for(var tab of tabs)for(var label of labels.getElementsByTagName("label"))if(label.innerText.trim()===tab){var input=document.getElementById(label.htmlFor);input.checked=!0;continue e}}</script>
+
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+    
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+    <div class="md-copyright__highlight">
+      Copyright &copy; 2024 Trendyol
+    </div>
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      <script id="__config" type="application/json">{"base": "..", "features": ["content.code.copy", "content.code.select", "content.code.annotate", "content.tabs.link", "content.tooltips", "header.autohide", "navigation.top", "navigation.tracking", "navigation.sections", "navigation.indexes", "navigation.footer", "search.highlight", "search.share", "search.suggest", "toc.integrate"], "search": "../assets/javascripts/workers/search.d50fe291.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.13a4f30d.min.js"></script>
+      
+    
+  </body>
+</html>

@@ -1,0 +1,1573 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Experimental asynchronous communication for Business Logic">
+      
+      
+        <meta name="author" content="Trendyol">
+      
+      
+      
+        <link rel="prev" href="../contracts/">
+      
+      
+        <link rel="next" href="../testing/">
+      
+      
+      <link rel="icon" href="../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.6.14">
+    
+    
+      
+        <title>Transformer Communication - Transmission</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.342714a4.min.css">
+      
+        
+        <link rel="stylesheet" href="../assets/stylesheets/palette.06af60db.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato:300,300i,400,400i,700,700i%7CFira+Code:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Lato";--md-code-font:"Fira Code"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="white" data-md-color-accent="orange">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#transformer-communication" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href=".." title="Transmission" class="md-header__button md-logo" aria-label="Transmission" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Transmission
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Transformer Communication
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="white" data-md-color-accent="orange"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="black" data-md-color-accent="yellow"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12s-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+          <a href="javascript:void(0)" class="md-search__icon md-icon" title="Share" aria-label="Share" data-clipboard data-clipboard-text="" data-md-component="search-share" tabindex="-1">
+            
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9a3 3 0 0 0-3 3 3 3 0 0 0 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.15c-.05.21-.08.43-.08.66 0 1.61 1.31 2.91 2.92 2.91s2.92-1.3 2.92-2.91A2.92 2.92 0 0 0 18 16.08"/></svg>
+          </a>
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/trendyol/transmission" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.7.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81"/></svg>
+  </div>
+  <div class="md-source__repository">
+    Transmission
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+  
+
+<nav class="md-nav md-nav--primary md-nav--integrated" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href=".." title="Transmission" class="md-nav__button md-logo" aria-label="Transmission" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    Transmission
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/trendyol/transmission" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.7.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81"/></svg>
+  </div>
+  <div class="md-source__repository">
+    Transmission
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href=".." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Introduction
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../how_to_use/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    How To Use
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../setup/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Setting Up
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../transmissions/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Transmissions
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../transformer/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Transformer
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../router/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    TransmissionRouter
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../dataholder/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    DataHolder
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../handlers/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Handlers
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../contracts/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Contracts
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    Transformer Communication
+    
+  </span>
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    Transformer Communication
+    
+  </span>
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#communication-methods" class="md-nav__link">
+    <span class="md-ellipsis">
+      Communication Methods
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Communication Methods">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1-effects-asynchronous-communication" class="md-nav__link">
+    <span class="md-ellipsis">
+      1. Effects (Asynchronous Communication)
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="1. Effects (Asynchronous Communication)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#publishing-effects" class="md-nav__link">
+    <span class="md-ellipsis">
+      Publishing Effects
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#targeted-effects" class="md-nav__link">
+    <span class="md-ellipsis">
+      Targeted Effects
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2-computations-synchronous-queries" class="md-nav__link">
+    <span class="md-ellipsis">
+      2. Computations (Synchronous Queries)
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="2. Computations (Synchronous Queries)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#simple-computations" class="md-nav__link">
+    <span class="md-ellipsis">
+      Simple Computations
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#computations-with-arguments" class="md-nav__link">
+    <span class="md-ellipsis">
+      Computations with Arguments
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#3-executions-fire-and-forget-operations" class="md-nav__link">
+    <span class="md-ellipsis">
+      3. Executions (Fire-and-Forget Operations)
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#complex-communication-patterns" class="md-nav__link">
+    <span class="md-ellipsis">
+      Complex Communication Patterns
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Complex Communication Patterns">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#chain-of-responsibility" class="md-nav__link">
+    <span class="md-ellipsis">
+      Chain of Responsibility
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#observer-pattern" class="md-nav__link">
+    <span class="md-ellipsis">
+      Observer Pattern
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#state-machine-communication" class="md-nav__link">
+    <span class="md-ellipsis">
+      State Machine Communication
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#examples-from-samples" class="md-nav__link">
+    <span class="md-ellipsis">
+      Examples from Samples
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Examples from Samples">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#components-sample-communication" class="md-nav__link">
+    <span class="md-ellipsis">
+      Components Sample Communication
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#advanced-communication-patterns" class="md-nav__link">
+    <span class="md-ellipsis">
+      Advanced Communication Patterns
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Advanced Communication Patterns">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#request-response-pattern" class="md-nav__link">
+    <span class="md-ellipsis">
+      Request-Response Pattern
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pipeline-pattern" class="md-nav__link">
+    <span class="md-ellipsis">
+      Pipeline Pattern
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#mediator-pattern" class="md-nav__link">
+    <span class="md-ellipsis">
+      Mediator Pattern
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#error-handling-in-communication" class="md-nav__link">
+    <span class="md-ellipsis">
+      Error Handling in Communication
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Error Handling in Communication">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#safe-computation-calls" class="md-nav__link">
+    <span class="md-ellipsis">
+      Safe Computation Calls
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#circuit-breaker-pattern" class="md-nav__link">
+    <span class="md-ellipsis">
+      Circuit Breaker Pattern
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#best-practices" class="md-nav__link">
+    <span class="md-ellipsis">
+      Best Practices
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Best Practices">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1-use-appropriate-communication-methods" class="md-nav__link">
+    <span class="md-ellipsis">
+      1. Use Appropriate Communication Methods
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2-design-clear-interfaces" class="md-nav__link">
+    <span class="md-ellipsis">
+      2. Design Clear Interfaces
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#3-handle-communication-failures" class="md-nav__link">
+    <span class="md-ellipsis">
+      3. Handle Communication Failures
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#4-maintain-loose-coupling" class="md-nav__link">
+    <span class="md-ellipsis">
+      4. Maintain Loose Coupling
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#5-document-communication-flows" class="md-nav__link">
+    <span class="md-ellipsis">
+      5. Document Communication Flows
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../testing/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Testing
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../changelog/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Changelog
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+<h1 id="transformer-communication">Transformer Communication</h1>
+<p>Transformers in the Transmission library can communicate with each other through several mechanisms: Effects, Computations, Executions, and Checkpoints. This enables complex business logic flows while maintaining loose coupling between components.</p>
+<h2 id="communication-methods">Communication Methods</h2>
+<h3 id="1-effects-asynchronous-communication">1. Effects (Asynchronous Communication)</h3>
+<p>Effects are the primary way for Transformers to communicate asynchronously.</p>
+<h4 id="publishing-effects">Publishing Effects</h4>
+<div class="highlight"><pre><span></span><code><span class="kd">class</span><span class="w"> </span><span class="nc">SourceTransformer</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="n">Transformer</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">override</span><span class="w"> </span><span class="kd">val</span><span class="w"> </span><span class="nv">handlers</span><span class="p">:</span><span class="w"> </span><span class="n">Handlers</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">handlers</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">onSignal</span><span class="o">&lt;</span><span class="n">TriggerActionSignal</span><span class="o">&gt;</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">signal</span><span class="w"> </span><span class="o">-&gt;</span>
+<span class="w">            </span><span class="c1">// Publish effect to all listening transformers</span>
+<span class="w">            </span><span class="n">publish</span><span class="p">(</span><span class="n">DataProcessingEffect</span><span class="p">(</span><span class="n">signal</span><span class="p">.</span><span class="na">data</span><span class="p">))</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+
+<span class="kd">class</span><span class="w"> </span><span class="nc">TargetTransformer</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="n">Transformer</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">override</span><span class="w"> </span><span class="kd">val</span><span class="w"> </span><span class="nv">handlers</span><span class="p">:</span><span class="w"> </span><span class="n">Handlers</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">handlers</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">onEffect</span><span class="o">&lt;</span><span class="n">DataProcessingEffect</span><span class="o">&gt;</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">effect</span><span class="w"> </span><span class="o">-&gt;</span>
+<span class="w">            </span><span class="c1">// Handle the effect</span>
+<span class="w">            </span><span class="kd">val</span><span class="w"> </span><span class="nv">processedData</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">processData</span><span class="p">(</span><span class="n">effect</span><span class="p">.</span><span class="na">data</span><span class="p">)</span>
+<span class="w">            </span><span class="n">send</span><span class="p">(</span><span class="n">ProcessedData</span><span class="p">(</span><span class="n">processedData</span><span class="p">))</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div>
+<h4 id="targeted-effects">Targeted Effects</h4>
+<div class="highlight"><pre><span></span><code><span class="kd">class</span><span class="w"> </span><span class="nc">SpecificTransformer</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="n">Transformer</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">override</span><span class="w"> </span><span class="kd">val</span><span class="w"> </span><span class="nv">handlers</span><span class="p">:</span><span class="w"> </span><span class="n">Handlers</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">handlers</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">onSignal</span><span class="o">&lt;</span><span class="n">SendToSpecificSignal</span><span class="o">&gt;</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">signal</span><span class="w"> </span><span class="o">-&gt;</span>
+<span class="w">            </span><span class="c1">// Send effect to a specific transformer</span>
+<span class="w">            </span><span class="n">publish</span><span class="p">(</span>
+<span class="w">                </span><span class="n">effect</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">SpecificEffect</span><span class="p">(</span><span class="n">signal</span><span class="p">.</span><span class="na">data</span><span class="p">),</span>
+<span class="w">                </span><span class="n">identity</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">targetTransformerIdentity</span>
+<span class="w">            </span><span class="p">)</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div>
+<h3 id="2-computations-synchronous-queries">2. Computations (Synchronous Queries)</h3>
+<p>Computations allow one Transformer to query data from another synchronously.</p>
+<h4 id="simple-computations">Simple Computations</h4>
+<div class="highlight"><pre><span></span><code><span class="kd">class</span><span class="w"> </span><span class="nc">DataProviderTransformer</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="n">Transformer</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="kd">var</span><span class="w"> </span><span class="nv">currentData</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;Initial State&quot;</span>
+
+<span class="w">    </span><span class="kd">override</span><span class="w"> </span><span class="kd">val</span><span class="w"> </span><span class="nv">computations</span><span class="p">:</span><span class="w"> </span><span class="n">Computations</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">computations</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">register</span><span class="p">(</span><span class="n">getCurrentDataContract</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="n">currentData</span>
+<span class="w">        </span><span class="p">}</span>
+
+<span class="w">        </span><span class="n">register</span><span class="p">(</span><span class="n">getDataStatusContract</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="n">DataStatus</span><span class="p">(</span>
+<span class="w">                </span><span class="n">value</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">currentData</span><span class="p">,</span>
+<span class="w">                </span><span class="n">lastUpdated</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">System</span><span class="p">.</span><span class="na">currentTimeMillis</span><span class="p">(),</span>
+<span class="w">                </span><span class="n">isValid</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">currentData</span><span class="p">.</span><span class="na">isNotEmpty</span><span class="p">()</span>
+<span class="w">            </span><span class="p">)</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="kd">override</span><span class="w"> </span><span class="kd">val</span><span class="w"> </span><span class="nv">handlers</span><span class="p">:</span><span class="w"> </span><span class="n">Handlers</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">handlers</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">onSignal</span><span class="o">&lt;</span><span class="n">UpdateDataSignal</span><span class="o">&gt;</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">signal</span><span class="w"> </span><span class="o">-&gt;</span>
+<span class="w">            </span><span class="n">currentData</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">signal</span><span class="p">.</span><span class="na">newData</span>
+<span class="w">            </span><span class="n">send</span><span class="p">(</span><span class="n">DataUpdated</span><span class="p">(</span><span class="n">currentData</span><span class="p">))</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="kd">companion</span><span class="w"> </span><span class="kd">object</span><span class="w"> </span><span class="err">{</span>
+<span class="w">        </span><span class="kd">val</span><span class="w"> </span><span class="nv">getCurrentDataContract</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Contract</span><span class="p">.</span><span class="na">computation</span><span class="o">&lt;</span><span class="kt">String</span><span class="o">&gt;</span><span class="p">()</span>
+<span class="w">        </span><span class="kd">val</span><span class="w"> </span><span class="nv">getDataStatusContract</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Contract</span><span class="p">.</span><span class="na">computation</span><span class="o">&lt;</span><span class="n">DataStatus</span><span class="o">&gt;</span><span class="p">()</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+
+<span class="kd">class</span><span class="w"> </span><span class="nc">DataConsumerTransformer</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="n">Transformer</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">override</span><span class="w"> </span><span class="kd">val</span><span class="w"> </span><span class="nv">handlers</span><span class="p">:</span><span class="w"> </span><span class="n">Handlers</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">handlers</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">onSignal</span><span class="o">&lt;</span><span class="n">ProcessDataSignal</span><span class="o">&gt;</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="c1">// Query data from another transformer</span>
+<span class="w">            </span><span class="kd">val</span><span class="w"> </span><span class="nv">currentData</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">compute</span><span class="p">(</span><span class="n">DataProviderTransformer</span><span class="p">.</span><span class="na">getCurrentDataContract</span><span class="p">)</span>
+<span class="w">            </span><span class="kd">val</span><span class="w"> </span><span class="nv">status</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">compute</span><span class="p">(</span><span class="n">DataProviderTransformer</span><span class="p">.</span><span class="na">getDataStatusContract</span><span class="p">)</span>
+
+<span class="w">            </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">status</span><span class="p">.</span><span class="na">isValid</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">                </span><span class="kd">val</span><span class="w"> </span><span class="nv">result</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">processData</span><span class="p">(</span><span class="n">currentData</span><span class="p">)</span>
+<span class="w">                </span><span class="n">send</span><span class="p">(</span><span class="n">ProcessingResult</span><span class="p">(</span><span class="n">result</span><span class="p">))</span>
+<span class="w">            </span><span class="p">}</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="p">{</span>
+<span class="w">                </span><span class="n">send</span><span class="p">(</span><span class="n">ProcessingError</span><span class="p">(</span><span class="s">&quot;Invalid data state&quot;</span><span class="p">))</span>
+<span class="w">            </span><span class="p">}</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div>
+<h4 id="computations-with-arguments">Computations with Arguments</h4>
+<div class="highlight"><pre><span></span><code><span class="kd">class</span><span class="w"> </span><span class="nc">CalculationTransformer</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="n">Transformer</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">override</span><span class="w"> </span><span class="kd">val</span><span class="w"> </span><span class="nv">computations</span><span class="p">:</span><span class="w"> </span><span class="n">Computations</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">computations</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">register</span><span class="p">(</span><span class="n">calculateSumContract</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">numbers</span><span class="p">:</span><span class="w"> </span><span class="n">List</span><span class="o">&lt;</span><span class="kt">Int</span><span class="o">&gt;</span><span class="w"> </span><span class="o">-&gt;</span>
+<span class="w">            </span><span class="n">numbers</span><span class="p">.</span><span class="na">sum</span><span class="p">()</span>
+<span class="w">        </span><span class="p">}</span>
+
+<span class="w">        </span><span class="n">register</span><span class="p">(</span><span class="n">formatCurrencyContract</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">amount</span><span class="p">:</span><span class="w"> </span><span class="kt">Double</span><span class="w"> </span><span class="o">-&gt;</span>
+<span class="w">            </span><span class="s">&quot;%.2f USD&quot;</span><span class="p">.</span><span class="na">format</span><span class="p">(</span><span class="n">amount</span><span class="p">)</span>
+<span class="w">        </span><span class="p">}</span>
+
+<span class="w">        </span><span class="n">register</span><span class="p">(</span><span class="n">validateDataContract</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">data</span><span class="p">:</span><span class="w"> </span><span class="n">InputData</span><span class="w"> </span><span class="o">-&gt;</span>
+<span class="w">            </span><span class="n">ValidationResult</span><span class="p">(</span>
+<span class="w">                </span><span class="n">isValid</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">data</span><span class="p">.</span><span class="na">isNotEmpty</span><span class="p">()</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="n">data</span><span class="p">.</span><span class="na">isNumeric</span><span class="p">(),</span>
+<span class="w">                </span><span class="n">errors</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">validateInput</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+<span class="w">            </span><span class="p">)</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="kd">companion</span><span class="w"> </span><span class="kd">object</span><span class="w"> </span><span class="err">{</span>
+<span class="w">        </span><span class="kd">val</span><span class="w"> </span><span class="nv">calculateSumContract</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Contract</span><span class="p">.</span><span class="na">computationWithArgs</span><span class="o">&lt;</span><span class="n">List</span><span class="o">&lt;</span><span class="kt">Int</span><span class="o">&gt;</span><span class="p">,</span><span class="w"> </span><span class="kt">Int</span><span class="o">&gt;</span><span class="p">()</span>
+<span class="w">        </span><span class="kd">val</span><span class="w"> </span><span class="nv">formatCurrencyContract</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Contract</span><span class="p">.</span><span class="na">computationWithArgs</span><span class="o">&lt;</span><span class="kt">Double</span><span class="p">,</span><span class="w"> </span><span class="kt">String</span><span class="o">&gt;</span><span class="p">()</span>
+<span class="w">        </span><span class="kd">val</span><span class="w"> </span><span class="nv">validateDataContract</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Contract</span><span class="p">.</span><span class="na">computationWithArgs</span><span class="o">&lt;</span><span class="n">InputData</span><span class="p">,</span><span class="w"> </span><span class="n">ValidationResult</span><span class="o">&gt;</span><span class="p">()</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+
+<span class="kd">class</span><span class="w"> </span><span class="nc">BusinessLogicTransformer</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="n">Transformer</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">override</span><span class="w"> </span><span class="kd">val</span><span class="w"> </span><span class="nv">handlers</span><span class="p">:</span><span class="w"> </span><span class="n">Handlers</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">handlers</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">onSignal</span><span class="o">&lt;</span><span class="n">ProcessOrderSignal</span><span class="o">&gt;</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">signal</span><span class="w"> </span><span class="o">-&gt;</span>
+<span class="w">            </span><span class="c1">// Validate input data</span>
+<span class="w">            </span><span class="kd">val</span><span class="w"> </span><span class="nv">validation</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">compute</span><span class="p">(</span><span class="n">CalculationTransformer</span><span class="p">.</span><span class="na">validateDataContract</span><span class="p">,</span><span class="w"> </span><span class="n">signal</span><span class="p">.</span><span class="na">orderData</span><span class="p">)</span>
+
+<span class="w">            </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">!</span><span class="n">validation</span><span class="p">.</span><span class="na">isValid</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">                </span><span class="n">send</span><span class="p">(</span><span class="n">OrderValidationFailed</span><span class="p">(</span><span class="n">validation</span><span class="p">.</span><span class="na">errors</span><span class="p">))</span>
+<span class="w">                </span><span class="k">return</span><span class="nd">@onSignal</span>
+<span class="w">            </span><span class="p">}</span>
+
+<span class="w">            </span><span class="c1">// Calculate totals</span>
+<span class="w">            </span><span class="kd">val</span><span class="w"> </span><span class="nv">itemPrices</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">signal</span><span class="p">.</span><span class="na">orderData</span><span class="p">.</span><span class="na">items</span><span class="p">.</span><span class="na">map</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nb">it</span><span class="p">.</span><span class="na">price</span><span class="w"> </span><span class="p">}</span>
+<span class="w">            </span><span class="kd">val</span><span class="w"> </span><span class="nv">total</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">compute</span><span class="p">(</span><span class="n">CalculationTransformer</span><span class="p">.</span><span class="na">calculateSumContract</span><span class="p">,</span><span class="w"> </span><span class="n">itemPrices</span><span class="p">)</span>
+
+<span class="w">            </span><span class="c1">// Format for display</span>
+<span class="w">            </span><span class="kd">val</span><span class="w"> </span><span class="nv">formattedTotal</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">compute</span><span class="p">(</span><span class="n">CalculationTransformer</span><span class="p">.</span><span class="na">formatCurrencyContract</span><span class="p">,</span><span class="w"> </span><span class="n">total</span><span class="p">.</span><span class="na">toDouble</span><span class="p">())</span>
+
+<span class="w">            </span><span class="n">send</span><span class="p">(</span><span class="n">OrderProcessed</span><span class="p">(</span><span class="n">signal</span><span class="p">.</span><span class="na">orderData</span><span class="p">.</span><span class="na">id</span><span class="p">,</span><span class="w"> </span><span class="n">formattedTotal</span><span class="p">))</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div>
+<h3 id="3-executions-fire-and-forget-operations">3. Executions (Fire-and-Forget Operations)</h3>
+<p>Executions are used for side effects that don't return values.</p>
+<div class="highlight"><pre><span></span><code><span class="kd">class</span><span class="w"> </span><span class="nc">AuditTransformer</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="n">Transformer</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">override</span><span class="w"> </span><span class="kd">val</span><span class="w"> </span><span class="nv">executions</span><span class="p">:</span><span class="w"> </span><span class="n">Executions</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">executions</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">register</span><span class="p">(</span><span class="n">logUserActionContract</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">action</span><span class="p">:</span><span class="w"> </span><span class="n">UserAction</span><span class="w"> </span><span class="o">-&gt;</span>
+<span class="w">            </span><span class="n">writeAuditLog</span><span class="p">(</span><span class="n">action</span><span class="p">.</span><span class="na">userId</span><span class="p">,</span><span class="w"> </span><span class="n">action</span><span class="p">.</span><span class="na">action</span><span class="p">,</span><span class="w"> </span><span class="n">action</span><span class="p">.</span><span class="na">timestamp</span><span class="p">)</span>
+<span class="w">        </span><span class="p">}</span>
+
+<span class="w">        </span><span class="n">register</span><span class="p">(</span><span class="n">sendNotificationContract</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">notification</span><span class="p">:</span><span class="w"> </span><span class="n">Notification</span><span class="w"> </span><span class="o">-&gt;</span>
+<span class="w">            </span><span class="n">sendPushNotification</span><span class="p">(</span><span class="n">notification</span><span class="p">.</span><span class="na">userId</span><span class="p">,</span><span class="w"> </span><span class="n">notification</span><span class="p">.</span><span class="na">message</span><span class="p">)</span>
+<span class="w">        </span><span class="p">}</span>
+
+<span class="w">        </span><span class="n">register</span><span class="p">(</span><span class="n">updateAnalyticsContract</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">event</span><span class="p">:</span><span class="w"> </span><span class="n">AnalyticsEvent</span><span class="w"> </span><span class="o">-&gt;</span>
+<span class="w">            </span><span class="n">analyticsService</span><span class="p">.</span><span class="na">track</span><span class="p">(</span><span class="n">event</span><span class="p">.</span><span class="na">name</span><span class="p">,</span><span class="w"> </span><span class="n">event</span><span class="p">.</span><span class="na">properties</span><span class="p">)</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="kd">companion</span><span class="w"> </span><span class="kd">object</span><span class="w"> </span><span class="err">{</span>
+<span class="w">        </span><span class="kd">val</span><span class="w"> </span><span class="nv">logUserActionContract</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Contract</span><span class="p">.</span><span class="na">executionWithArgs</span><span class="o">&lt;</span><span class="n">UserAction</span><span class="o">&gt;</span><span class="p">()</span>
+<span class="w">        </span><span class="kd">val</span><span class="w"> </span><span class="nv">sendNotificationContract</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Contract</span><span class="p">.</span><span class="na">executionWithArgs</span><span class="o">&lt;</span><span class="n">Notification</span><span class="o">&gt;</span><span class="p">()</span>
+<span class="w">        </span><span class="kd">val</span><span class="w"> </span><span class="nv">updateAnalyticsContract</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Contract</span><span class="p">.</span><span class="na">executionWithArgs</span><span class="o">&lt;</span><span class="n">AnalyticsEvent</span><span class="o">&gt;</span><span class="p">()</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+
+<span class="kd">class</span><span class="w"> </span><span class="nc">UserInteractionTransformer</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="n">Transformer</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">override</span><span class="w"> </span><span class="kd">val</span><span class="w"> </span><span class="nv">handlers</span><span class="p">:</span><span class="w"> </span><span class="n">Handlers</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">handlers</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">onSignal</span><span class="o">&lt;</span><span class="n">UserClickedButtonSignal</span><span class="o">&gt;</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">signal</span><span class="w"> </span><span class="o">-&gt;</span>
+<span class="w">            </span><span class="c1">// Fire-and-forget operations</span>
+<span class="w">            </span><span class="n">execute</span><span class="p">(</span><span class="n">AuditTransformer</span><span class="p">.</span><span class="na">logUserActionContract</span><span class="p">,</span><span class="w"> </span><span class="n">UserAction</span><span class="p">(</span>
+<span class="w">                </span><span class="n">userId</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">signal</span><span class="p">.</span><span class="na">userId</span><span class="p">,</span>
+<span class="w">                </span><span class="n">action</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;button_click:</span><span class="si">${</span><span class="n">signal</span><span class="p">.</span><span class="na">buttonId</span><span class="si">}</span><span class="s">&quot;</span><span class="p">,</span>
+<span class="w">                </span><span class="n">timestamp</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">System</span><span class="p">.</span><span class="na">currentTimeMillis</span><span class="p">()</span>
+<span class="w">            </span><span class="p">))</span>
+
+<span class="w">            </span><span class="n">execute</span><span class="p">(</span><span class="n">AuditTransformer</span><span class="p">.</span><span class="na">updateAnalyticsContract</span><span class="p">,</span><span class="w"> </span><span class="n">AnalyticsEvent</span><span class="p">(</span>
+<span class="w">                </span><span class="n">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;button_click&quot;</span><span class="p">,</span>
+<span class="w">                </span><span class="n">properties</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">mapOf</span><span class="p">(</span><span class="s">&quot;button_id&quot;</span><span class="w"> </span><span class="n">to</span><span class="w"> </span><span class="n">signal</span><span class="p">.</span><span class="na">buttonId</span><span class="p">)</span>
+<span class="w">            </span><span class="p">))</span>
+
+<span class="w">            </span><span class="c1">// Continue with main business logic</span>
+<span class="w">            </span><span class="n">send</span><span class="p">(</span><span class="n">ButtonClickProcessed</span><span class="p">(</span><span class="n">signal</span><span class="p">.</span><span class="na">buttonId</span><span class="p">))</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div>
+<h2 id="complex-communication-patterns">Complex Communication Patterns</h2>
+<h3 id="chain-of-responsibility">Chain of Responsibility</h3>
+<div class="highlight"><pre><span></span><code><span class="kd">class</span><span class="w"> </span><span class="nc">ValidationChainTransformer</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="n">Transformer</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">override</span><span class="w"> </span><span class="kd">val</span><span class="w"> </span><span class="nv">handlers</span><span class="p">:</span><span class="w"> </span><span class="n">Handlers</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">handlers</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">onSignal</span><span class="o">&lt;</span><span class="n">ValidateDataSignal</span><span class="o">&gt;</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">signal</span><span class="w"> </span><span class="o">-&gt;</span>
+<span class="w">            </span><span class="c1">// Start validation chain</span>
+<span class="w">            </span><span class="n">publish</span><span class="p">(</span><span class="n">ValidateFormatEffect</span><span class="p">(</span><span class="n">signal</span><span class="p">.</span><span class="na">data</span><span class="p">))</span>
+<span class="w">        </span><span class="p">}</span>
+
+<span class="w">        </span><span class="n">onEffect</span><span class="o">&lt;</span><span class="n">ValidateFormatEffect</span><span class="o">&gt;</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">effect</span><span class="w"> </span><span class="o">-&gt;</span>
+<span class="w">            </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">isValidFormat</span><span class="p">(</span><span class="n">effect</span><span class="p">.</span><span class="na">data</span><span class="p">))</span><span class="w"> </span><span class="p">{</span>
+<span class="w">                </span><span class="n">publish</span><span class="p">(</span><span class="n">ValidateBusinessRulesEffect</span><span class="p">(</span><span class="n">effect</span><span class="p">.</span><span class="na">data</span><span class="p">))</span>
+<span class="w">            </span><span class="p">}</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="p">{</span>
+<span class="w">                </span><span class="n">send</span><span class="p">(</span><span class="n">ValidationFailed</span><span class="p">(</span><span class="s">&quot;Invalid format&quot;</span><span class="p">))</span>
+<span class="w">            </span><span class="p">}</span>
+<span class="w">        </span><span class="p">}</span>
+
+<span class="w">        </span><span class="n">onEffect</span><span class="o">&lt;</span><span class="n">ValidateBusinessRulesEffect</span><span class="o">&gt;</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">effect</span><span class="w"> </span><span class="o">-&gt;</span>
+<span class="w">            </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">passesBusinessRules</span><span class="p">(</span><span class="n">effect</span><span class="p">.</span><span class="na">data</span><span class="p">))</span><span class="w"> </span><span class="p">{</span>
+<span class="w">                </span><span class="n">publish</span><span class="p">(</span><span class="n">ValidateSecurityEffect</span><span class="p">(</span><span class="n">effect</span><span class="p">.</span><span class="na">data</span><span class="p">))</span>
+<span class="w">            </span><span class="p">}</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="p">{</span>
+<span class="w">                </span><span class="n">send</span><span class="p">(</span><span class="n">ValidationFailed</span><span class="p">(</span><span class="s">&quot;Business rules violation&quot;</span><span class="p">))</span>
+<span class="w">            </span><span class="p">}</span>
+<span class="w">        </span><span class="p">}</span>
+
+<span class="w">        </span><span class="n">onEffect</span><span class="o">&lt;</span><span class="n">ValidateSecurityEffect</span><span class="o">&gt;</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">effect</span><span class="w"> </span><span class="o">-&gt;</span>
+<span class="w">            </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">isSecure</span><span class="p">(</span><span class="n">effect</span><span class="p">.</span><span class="na">data</span><span class="p">))</span><span class="w"> </span><span class="p">{</span>
+<span class="w">                </span><span class="n">send</span><span class="p">(</span><span class="n">ValidationPassed</span><span class="p">(</span><span class="n">effect</span><span class="p">.</span><span class="na">data</span><span class="p">))</span>
+<span class="w">            </span><span class="p">}</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="p">{</span>
+<span class="w">                </span><span class="n">send</span><span class="p">(</span><span class="n">ValidationFailed</span><span class="p">(</span><span class="s">&quot;Security check failed&quot;</span><span class="p">))</span>
+<span class="w">            </span><span class="p">}</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div>
+<h3 id="observer-pattern">Observer Pattern</h3>
+<div class="highlight"><pre><span></span><code><span class="kd">class</span><span class="w"> </span><span class="nc">EventBroadcasterTransformer</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="n">Transformer</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="kd">val</span><span class="w"> </span><span class="nv">subscribersHolder</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">dataHolder</span><span class="p">(</span>
+<span class="w">        </span><span class="n">initialValue</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">SubscriberState</span><span class="p">(),</span>
+<span class="w">        </span><span class="n">contract</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">subscriberContract</span>
+<span class="w">    </span><span class="p">)</span>
+
+<span class="w">    </span><span class="kd">override</span><span class="w"> </span><span class="kd">val</span><span class="w"> </span><span class="nv">handlers</span><span class="p">:</span><span class="w"> </span><span class="n">Handlers</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">handlers</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">onSignal</span><span class="o">&lt;</span><span class="n">SubscribeToEventsSignal</span><span class="o">&gt;</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">signal</span><span class="w"> </span><span class="o">-&gt;</span>
+<span class="w">            </span><span class="n">subscribersHolder</span><span class="p">.</span><span class="na">update</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">state</span><span class="w"> </span><span class="o">-&gt;</span>
+<span class="w">                </span><span class="n">state</span><span class="p">.</span><span class="na">copy</span><span class="p">(</span><span class="n">subscribers</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">state</span><span class="p">.</span><span class="na">subscribers</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">signal</span><span class="p">.</span><span class="na">subscriberId</span><span class="p">)</span>
+<span class="w">            </span><span class="p">}</span>
+<span class="w">        </span><span class="p">}</span>
+
+<span class="w">        </span><span class="n">onSignal</span><span class="o">&lt;</span><span class="n">BroadcastEventSignal</span><span class="o">&gt;</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">signal</span><span class="w"> </span><span class="o">-&gt;</span>
+<span class="w">            </span><span class="kd">val</span><span class="w"> </span><span class="nv">subscribers</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">subscribersHolder</span><span class="p">.</span><span class="na">getValue</span><span class="p">().</span><span class="na">subscribers</span>
+
+<span class="w">            </span><span class="n">subscribers</span><span class="p">.</span><span class="na">forEach</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">subscriberId</span><span class="w"> </span><span class="o">-&gt;</span>
+<span class="w">                </span><span class="n">publish</span><span class="p">(</span><span class="n">EventBroadcastEffect</span><span class="p">(</span><span class="n">subscriberId</span><span class="p">,</span><span class="w"> </span><span class="n">signal</span><span class="p">.</span><span class="na">event</span><span class="p">))</span>
+<span class="w">            </span><span class="p">}</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="kd">companion</span><span class="w"> </span><span class="kd">object</span><span class="w"> </span><span class="err">{</span>
+<span class="w">        </span><span class="kd">val</span><span class="w"> </span><span class="nv">subscriberContract</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Contract</span><span class="p">.</span><span class="na">dataHolder</span><span class="o">&lt;</span><span class="n">SubscriberState</span><span class="o">&gt;</span><span class="p">()</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+
+<span class="kd">class</span><span class="w"> </span><span class="nc">EventListenerTransformer</span><span class="p">(</span><span class="kd">private</span><span class="w"> </span><span class="kd">val</span><span class="w"> </span><span class="nv">listenerId</span><span class="p">:</span><span class="w"> </span><span class="kt">String</span><span class="p">)</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="n">Transformer</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">override</span><span class="w"> </span><span class="kd">val</span><span class="w"> </span><span class="nv">handlers</span><span class="p">:</span><span class="w"> </span><span class="n">Handlers</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">handlers</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">onEffect</span><span class="o">&lt;</span><span class="n">EventBroadcastEffect</span><span class="o">&gt;</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">effect</span><span class="w"> </span><span class="o">-&gt;</span>
+<span class="w">            </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">effect</span><span class="p">.</span><span class="na">subscriberId</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">listenerId</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">                </span><span class="c1">// Handle the broadcasted event</span>
+<span class="w">                </span><span class="n">handleEvent</span><span class="p">(</span><span class="n">effect</span><span class="p">.</span><span class="na">event</span><span class="p">)</span>
+<span class="w">            </span><span class="p">}</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="kd">suspend</span><span class="w"> </span><span class="kd">fun</span><span class="w"> </span><span class="n">CommunicationScope</span><span class="p">.</span><span class="nf">handleEvent</span><span class="p">(</span><span class="n">event</span><span class="p">:</span><span class="w"> </span><span class="n">Event</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="k">when</span><span class="w"> </span><span class="p">(</span><span class="n">event</span><span class="p">.</span><span class="na">type</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="s">&quot;user_action&quot;</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="n">send</span><span class="p">(</span><span class="n">UserActionReceived</span><span class="p">(</span><span class="n">event</span><span class="p">.</span><span class="na">data</span><span class="p">))</span>
+<span class="w">            </span><span class="s">&quot;system_update&quot;</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="n">send</span><span class="p">(</span><span class="n">SystemUpdateReceived</span><span class="p">(</span><span class="n">event</span><span class="p">.</span><span class="na">data</span><span class="p">))</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div>
+<h3 id="state-machine-communication">State Machine Communication</h3>
+<div class="highlight"><pre><span></span><code><span class="kd">class</span><span class="w"> </span><span class="nc">OrderStateMachineTransformer</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="n">Transformer</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="kd">val</span><span class="w"> </span><span class="nv">orderStateHolder</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">dataHolder</span><span class="p">(</span>
+<span class="w">        </span><span class="n">initialValue</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">OrderState</span><span class="p">.</span><span class="na">Pending</span><span class="p">,</span>
+<span class="w">        </span><span class="n">contract</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">orderStateContract</span>
+<span class="w">    </span><span class="p">)</span>
+
+<span class="w">    </span><span class="kd">override</span><span class="w"> </span><span class="kd">val</span><span class="w"> </span><span class="nv">computations</span><span class="p">:</span><span class="w"> </span><span class="n">Computations</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">computations</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">register</span><span class="p">(</span><span class="n">getCurrentOrderStateContract</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="n">orderStateHolder</span><span class="p">.</span><span class="na">getValue</span><span class="p">()</span>
+<span class="w">        </span><span class="p">}</span>
+
+<span class="w">        </span><span class="n">register</span><span class="p">(</span><span class="n">canTransitionToContract</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">targetState</span><span class="p">:</span><span class="w"> </span><span class="n">OrderState</span><span class="w"> </span><span class="o">-&gt;</span>
+<span class="w">            </span><span class="kd">val</span><span class="w"> </span><span class="nv">currentState</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">orderStateHolder</span><span class="p">.</span><span class="na">getValue</span><span class="p">()</span>
+<span class="w">            </span><span class="n">isValidTransition</span><span class="p">(</span><span class="n">currentState</span><span class="p">,</span><span class="w"> </span><span class="n">targetState</span><span class="p">)</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="kd">override</span><span class="w"> </span><span class="kd">val</span><span class="w"> </span><span class="nv">handlers</span><span class="p">:</span><span class="w"> </span><span class="n">Handlers</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">handlers</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">onSignal</span><span class="o">&lt;</span><span class="n">ProcessOrderSignal</span><span class="o">&gt;</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">signal</span><span class="w"> </span><span class="o">-&gt;</span>
+<span class="w">            </span><span class="kd">val</span><span class="w"> </span><span class="nv">currentState</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">orderStateHolder</span><span class="p">.</span><span class="na">getValue</span><span class="p">()</span>
+
+<span class="w">            </span><span class="k">when</span><span class="w"> </span><span class="p">(</span><span class="n">currentState</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">                </span><span class="k">is</span><span class="w"> </span><span class="n">OrderState</span><span class="p">.</span><span class="na">Pending</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="p">{</span>
+<span class="w">                    </span><span class="n">orderStateHolder</span><span class="p">.</span><span class="na">update</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">OrderState</span><span class="p">.</span><span class="na">Processing</span><span class="w"> </span><span class="p">}</span>
+<span class="w">                    </span><span class="n">publish</span><span class="p">(</span><span class="n">StartOrderProcessingEffect</span><span class="p">(</span><span class="n">signal</span><span class="p">.</span><span class="na">orderId</span><span class="p">))</span>
+<span class="w">                </span><span class="p">}</span>
+<span class="w">                </span><span class="k">is</span><span class="w"> </span><span class="n">OrderState</span><span class="p">.</span><span class="na">Processing</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="p">{</span>
+<span class="w">                    </span><span class="n">send</span><span class="p">(</span><span class="n">OrderAlreadyProcessing</span><span class="p">(</span><span class="n">signal</span><span class="p">.</span><span class="na">orderId</span><span class="p">))</span>
+<span class="w">                </span><span class="p">}</span>
+<span class="w">                </span><span class="k">is</span><span class="w"> </span><span class="n">OrderState</span><span class="p">.</span><span class="na">Completed</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="p">{</span>
+<span class="w">                    </span><span class="n">send</span><span class="p">(</span><span class="n">OrderAlreadyCompleted</span><span class="p">(</span><span class="n">signal</span><span class="p">.</span><span class="na">orderId</span><span class="p">))</span>
+<span class="w">                </span><span class="p">}</span>
+<span class="w">            </span><span class="p">}</span>
+<span class="w">        </span><span class="p">}</span>
+
+<span class="w">        </span><span class="n">onEffect</span><span class="o">&lt;</span><span class="n">OrderProcessingCompleteEffect</span><span class="o">&gt;</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">effect</span><span class="w"> </span><span class="o">-&gt;</span>
+<span class="w">            </span><span class="n">orderStateHolder</span><span class="p">.</span><span class="na">update</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">OrderState</span><span class="p">.</span><span class="na">Completed</span><span class="w"> </span><span class="p">}</span>
+<span class="w">            </span><span class="n">publish</span><span class="p">(</span><span class="n">OrderCompletedEffect</span><span class="p">(</span><span class="n">effect</span><span class="p">.</span><span class="na">orderId</span><span class="p">))</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="kd">companion</span><span class="w"> </span><span class="kd">object</span><span class="w"> </span><span class="err">{</span>
+<span class="w">        </span><span class="kd">val</span><span class="w"> </span><span class="nv">orderStateContract</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Contract</span><span class="p">.</span><span class="na">dataHolder</span><span class="o">&lt;</span><span class="n">OrderState</span><span class="o">&gt;</span><span class="p">()</span>
+<span class="w">        </span><span class="kd">val</span><span class="w"> </span><span class="nv">getCurrentOrderStateContract</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Contract</span><span class="p">.</span><span class="na">computation</span><span class="o">&lt;</span><span class="n">OrderState</span><span class="o">&gt;</span><span class="p">()</span>
+<span class="w">        </span><span class="kd">val</span><span class="w"> </span><span class="nv">canTransitionToContract</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Contract</span><span class="p">.</span><span class="na">computationWithArgs</span><span class="o">&lt;</span><span class="n">OrderState</span><span class="p">,</span><span class="w"> </span><span class="kt">Boolean</span><span class="o">&gt;</span><span class="p">()</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+
+<span class="kd">sealed</span><span class="w"> </span><span class="kd">class</span><span class="w"> </span><span class="nc">OrderState</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="n">Transmission</span><span class="p">.</span><span class="na">Data</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">object</span><span class="w"> </span><span class="nc">Pending</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="n">OrderState</span><span class="p">()</span>
+<span class="w">    </span><span class="kd">object</span><span class="w"> </span><span class="nc">Processing</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="n">OrderState</span><span class="p">()</span>
+<span class="w">    </span><span class="kd">object</span><span class="w"> </span><span class="nc">Completed</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="n">OrderState</span><span class="p">()</span>
+<span class="p">}</span>
+</code></pre></div>
+<h2 id="examples-from-samples">Examples from Samples</h2>
+<h3 id="components-sample-communication">Components Sample Communication</h3>
+<div class="highlight"><pre><span></span><code><span class="nd">@OptIn</span><span class="p">(</span><span class="n">ExperimentalTransmissionApi</span><span class="o">::</span><span class="n">class</span><span class="p">)</span>
+<span class="kd">class</span><span class="w"> </span><span class="nc">InputTransformer</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="n">Transformer</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="kd">val</span><span class="w"> </span><span class="nv">holder</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">dataHolder</span><span class="p">(</span><span class="n">InputUiState</span><span class="p">(),</span><span class="w"> </span><span class="n">holderContract</span><span class="p">)</span>
+
+<span class="w">    </span><span class="kd">override</span><span class="w"> </span><span class="kd">val</span><span class="w"> </span><span class="nv">computations</span><span class="p">:</span><span class="w"> </span><span class="n">Computations</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">computations</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">register</span><span class="p">(</span><span class="n">writtenInputContract</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="n">delay</span><span class="p">(</span><span class="m">1.</span><span class="n">seconds</span><span class="p">)</span>
+<span class="w">            </span><span class="n">WrittenInput</span><span class="p">(</span><span class="n">holder</span><span class="p">.</span><span class="na">getValue</span><span class="p">().</span><span class="na">writtenText</span><span class="p">)</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">        </span><span class="n">register</span><span class="p">(</span><span class="n">writtenInputWithArgs</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="n">WrittenInput</span><span class="p">(</span><span class="nb">it</span><span class="p">)</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="kd">override</span><span class="w"> </span><span class="kd">val</span><span class="w"> </span><span class="nv">handlers</span><span class="p">:</span><span class="w"> </span><span class="n">Handlers</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">handlers</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">onSignal</span><span class="o">&lt;</span><span class="n">InputSignal</span><span class="p">.</span><span class="na">InputUpdate</span><span class="o">&gt;</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">signal</span><span class="w"> </span><span class="o">-&gt;</span>
+<span class="w">            </span><span class="n">holder</span><span class="p">.</span><span class="na">update</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nb">it</span><span class="p">.</span><span class="na">copy</span><span class="p">(</span><span class="n">writtenText</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">signal</span><span class="p">.</span><span class="na">value</span><span class="p">)</span><span class="w"> </span><span class="p">}</span>
+
+<span class="w">            </span><span class="c1">// Checkpoint-based communication</span>
+<span class="w">            </span><span class="kd">val</span><span class="w"> </span><span class="nv">color</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">pauseOn</span><span class="p">(</span><span class="n">colorCheckpoint</span><span class="p">)</span>
+
+<span class="w">            </span><span class="c1">// Send effect to specific transformer</span>
+<span class="w">            </span><span class="n">send</span><span class="p">(</span>
+<span class="w">                </span><span class="n">effect</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ColorPickerEffect</span><span class="p">.</span><span class="na">SelectedColorUpdate</span><span class="p">(</span><span class="n">color</span><span class="p">),</span>
+<span class="w">                </span><span class="n">identity</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">multiOutputTransformerIdentity</span>
+<span class="w">            </span><span class="p">)</span>
+
+<span class="w">            </span><span class="c1">// Broadcast effect to all listeners</span>
+<span class="w">            </span><span class="n">publish</span><span class="p">(</span><span class="n">effect</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">InputEffect</span><span class="p">.</span><span class="na">InputUpdate</span><span class="p">(</span><span class="n">signal</span><span class="p">.</span><span class="na">value</span><span class="p">))</span>
+<span class="w">        </span><span class="p">}</span>
+
+<span class="w">        </span><span class="n">onEffect</span><span class="o">&lt;</span><span class="n">ColorPickerEffect</span><span class="p">.</span><span class="na">BackgroundColorUpdate</span><span class="o">&gt;</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">effect</span><span class="w"> </span><span class="o">-&gt;</span>
+<span class="w">            </span><span class="n">validate</span><span class="p">(</span><span class="n">colorCheckpoint</span><span class="p">,</span><span class="w"> </span><span class="n">effect</span><span class="p">.</span><span class="na">color</span><span class="p">)</span>
+<span class="w">            </span><span class="n">holder</span><span class="p">.</span><span class="na">update</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nb">it</span><span class="p">.</span><span class="na">copy</span><span class="p">(</span><span class="n">backgroundColor</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">effect</span><span class="p">.</span><span class="na">color</span><span class="p">)</span><span class="w"> </span><span class="p">}</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+
+<span class="kd">class</span><span class="w"> </span><span class="nc">ColorPickerTransformer</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="n">Transformer</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">override</span><span class="w"> </span><span class="kd">val</span><span class="w"> </span><span class="nv">handlers</span><span class="p">:</span><span class="w"> </span><span class="n">Handlers</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">handlers</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">onSignal</span><span class="o">&lt;</span><span class="n">ColorPickerSignal</span><span class="p">.</span><span class="na">ColorSelected</span><span class="o">&gt;</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">signal</span><span class="w"> </span><span class="o">-&gt;</span>
+<span class="w">            </span><span class="c1">// Respond to color selection</span>
+<span class="w">            </span><span class="n">publish</span><span class="p">(</span><span class="n">ColorPickerEffect</span><span class="p">.</span><span class="na">BackgroundColorUpdate</span><span class="p">(</span><span class="n">signal</span><span class="p">.</span><span class="na">color</span><span class="p">))</span>
+<span class="w">        </span><span class="p">}</span>
+
+<span class="w">        </span><span class="n">onEffect</span><span class="o">&lt;</span><span class="n">ColorPickerEffect</span><span class="p">.</span><span class="na">SelectedColorUpdate</span><span class="o">&gt;</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">effect</span><span class="w"> </span><span class="o">-&gt;</span>
+<span class="w">            </span><span class="c1">// Handle incoming color update from InputTransformer</span>
+<span class="w">            </span><span class="n">processSelectedColor</span><span class="p">(</span><span class="n">effect</span><span class="p">.</span><span class="na">color</span><span class="p">)</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div>
+<h2 id="advanced-communication-patterns">Advanced Communication Patterns</h2>
+<h3 id="request-response-pattern">Request-Response Pattern</h3>
+<div class="highlight"><pre><span></span><code><span class="kd">class</span><span class="w"> </span><span class="nc">ServiceTransformer</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="n">Transformer</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="kd">val</span><span class="w"> </span><span class="nv">pendingRequests</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">mutableMapOf</span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">String</span><span class="o">&gt;</span><span class="p">()</span>
+
+<span class="w">    </span><span class="kd">override</span><span class="w"> </span><span class="kd">val</span><span class="w"> </span><span class="nv">handlers</span><span class="p">:</span><span class="w"> </span><span class="n">Handlers</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">handlers</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">onEffect</span><span class="o">&lt;</span><span class="n">ServiceRequestEffect</span><span class="o">&gt;</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">effect</span><span class="w"> </span><span class="o">-&gt;</span>
+<span class="w">            </span><span class="kd">val</span><span class="w"> </span><span class="nv">requestId</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">generateRequestId</span><span class="p">()</span>
+<span class="w">            </span><span class="n">pendingRequests</span><span class="o">[</span><span class="n">requestId</span><span class="o">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">effect</span><span class="p">.</span><span class="na">requesterId</span>
+
+<span class="w">            </span><span class="c1">// Process request</span>
+<span class="w">            </span><span class="kd">val</span><span class="w"> </span><span class="nv">result</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">processServiceRequest</span><span class="p">(</span><span class="n">effect</span><span class="p">.</span><span class="na">request</span><span class="p">)</span>
+
+<span class="w">            </span><span class="c1">// Send response back to requester</span>
+<span class="w">            </span><span class="n">publish</span><span class="p">(</span><span class="n">ServiceResponseEffect</span><span class="p">(</span>
+<span class="w">                </span><span class="n">requestId</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">requestId</span><span class="p">,</span>
+<span class="w">                </span><span class="n">response</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">result</span><span class="p">,</span>
+<span class="w">                </span><span class="n">targetTransformerId</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">effect</span><span class="p">.</span><span class="na">requesterId</span>
+<span class="w">            </span><span class="p">))</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+
+<span class="kd">class</span><span class="w"> </span><span class="nc">ClientTransformer</span><span class="p">(</span><span class="kd">private</span><span class="w"> </span><span class="kd">val</span><span class="w"> </span><span class="nv">transformerId</span><span class="p">:</span><span class="w"> </span><span class="kt">String</span><span class="p">)</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="n">Transformer</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">override</span><span class="w"> </span><span class="kd">val</span><span class="w"> </span><span class="nv">handlers</span><span class="p">:</span><span class="w"> </span><span class="n">Handlers</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">handlers</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">onSignal</span><span class="o">&lt;</span><span class="n">RequestServiceSignal</span><span class="o">&gt;</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">signal</span><span class="w"> </span><span class="o">-&gt;</span>
+<span class="w">            </span><span class="c1">// Send request to service</span>
+<span class="w">            </span><span class="n">publish</span><span class="p">(</span><span class="n">ServiceRequestEffect</span><span class="p">(</span>
+<span class="w">                </span><span class="n">request</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">signal</span><span class="p">.</span><span class="na">request</span><span class="p">,</span>
+<span class="w">                </span><span class="n">requesterId</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">transformerId</span>
+<span class="w">            </span><span class="p">))</span>
+<span class="w">        </span><span class="p">}</span>
+
+<span class="w">        </span><span class="n">onEffect</span><span class="o">&lt;</span><span class="n">ServiceResponseEffect</span><span class="o">&gt;</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">effect</span><span class="w"> </span><span class="o">-&gt;</span>
+<span class="w">            </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">effect</span><span class="p">.</span><span class="na">targetTransformerId</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">transformerId</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">                </span><span class="c1">// Handle response</span>
+<span class="w">                </span><span class="n">send</span><span class="p">(</span><span class="n">ServiceResponseReceived</span><span class="p">(</span><span class="n">effect</span><span class="p">.</span><span class="na">response</span><span class="p">))</span>
+<span class="w">            </span><span class="p">}</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div>
+<h3 id="pipeline-pattern">Pipeline Pattern</h3>
+<div class="highlight"><pre><span></span><code><span class="kd">class</span><span class="w"> </span><span class="nc">PipelineStage1Transformer</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="n">Transformer</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">override</span><span class="w"> </span><span class="kd">val</span><span class="w"> </span><span class="nv">handlers</span><span class="p">:</span><span class="w"> </span><span class="n">Handlers</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">handlers</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">onSignal</span><span class="o">&lt;</span><span class="n">StartPipelineSignal</span><span class="o">&gt;</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">signal</span><span class="w"> </span><span class="o">-&gt;</span>
+<span class="w">            </span><span class="kd">val</span><span class="w"> </span><span class="nv">stage1Result</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">processStage1</span><span class="p">(</span><span class="n">signal</span><span class="p">.</span><span class="na">input</span><span class="p">)</span>
+<span class="w">            </span><span class="n">publish</span><span class="p">(</span><span class="n">Stage1CompleteEffect</span><span class="p">(</span><span class="n">stage1Result</span><span class="p">))</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+
+<span class="kd">class</span><span class="w"> </span><span class="nc">PipelineStage2Transformer</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="n">Transformer</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">override</span><span class="w"> </span><span class="kd">val</span><span class="w"> </span><span class="nv">handlers</span><span class="p">:</span><span class="w"> </span><span class="n">Handlers</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">handlers</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">onEffect</span><span class="o">&lt;</span><span class="n">Stage1CompleteEffect</span><span class="o">&gt;</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">effect</span><span class="w"> </span><span class="o">-&gt;</span>
+<span class="w">            </span><span class="kd">val</span><span class="w"> </span><span class="nv">stage2Result</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">processStage2</span><span class="p">(</span><span class="n">effect</span><span class="p">.</span><span class="na">data</span><span class="p">)</span>
+<span class="w">            </span><span class="n">publish</span><span class="p">(</span><span class="n">Stage2CompleteEffect</span><span class="p">(</span><span class="n">stage2Result</span><span class="p">))</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+
+<span class="kd">class</span><span class="w"> </span><span class="nc">PipelineStage3Transformer</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="n">Transformer</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">override</span><span class="w"> </span><span class="kd">val</span><span class="w"> </span><span class="nv">handlers</span><span class="p">:</span><span class="w"> </span><span class="n">Handlers</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">handlers</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">onEffect</span><span class="o">&lt;</span><span class="n">Stage2CompleteEffect</span><span class="o">&gt;</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">effect</span><span class="w"> </span><span class="o">-&gt;</span>
+<span class="w">            </span><span class="kd">val</span><span class="w"> </span><span class="nv">finalResult</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">processStage3</span><span class="p">(</span><span class="n">effect</span><span class="p">.</span><span class="na">data</span><span class="p">)</span>
+<span class="w">            </span><span class="n">send</span><span class="p">(</span><span class="n">PipelineCompleted</span><span class="p">(</span><span class="n">finalResult</span><span class="p">))</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div>
+<h3 id="mediator-pattern">Mediator Pattern</h3>
+<div class="highlight"><pre><span></span><code><span class="kd">class</span><span class="w"> </span><span class="nc">MediatorTransformer</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="n">Transformer</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">override</span><span class="w"> </span><span class="kd">val</span><span class="w"> </span><span class="nv">handlers</span><span class="p">:</span><span class="w"> </span><span class="n">Handlers</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">handlers</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">onEffect</span><span class="o">&lt;</span><span class="n">ComponentAEvent</span><span class="o">&gt;</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">effect</span><span class="w"> </span><span class="o">-&gt;</span>
+<span class="w">            </span><span class="c1">// Mediate between Component A and Component B</span>
+<span class="w">            </span><span class="kd">val</span><span class="w"> </span><span class="nv">transformedData</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">transformDataForB</span><span class="p">(</span><span class="n">effect</span><span class="p">.</span><span class="na">data</span><span class="p">)</span>
+<span class="w">            </span><span class="n">publish</span><span class="p">(</span><span class="n">ComponentBCommand</span><span class="p">(</span><span class="n">transformedData</span><span class="p">))</span>
+<span class="w">        </span><span class="p">}</span>
+
+<span class="w">        </span><span class="n">onEffect</span><span class="o">&lt;</span><span class="n">ComponentBEvent</span><span class="o">&gt;</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">effect</span><span class="w"> </span><span class="o">-&gt;</span>
+<span class="w">            </span><span class="c1">// Mediate between Component B and Component A</span>
+<span class="w">            </span><span class="kd">val</span><span class="w"> </span><span class="nv">transformedData</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">transformDataForA</span><span class="p">(</span><span class="n">effect</span><span class="p">.</span><span class="na">data</span><span class="p">)</span>
+<span class="w">            </span><span class="n">publish</span><span class="p">(</span><span class="n">ComponentACommand</span><span class="p">(</span><span class="n">transformedData</span><span class="p">))</span>
+<span class="w">        </span><span class="p">}</span>
+
+<span class="w">        </span><span class="n">onEffect</span><span class="o">&lt;</span><span class="n">ComponentACommand</span><span class="o">&gt;</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">effect</span><span class="w"> </span><span class="o">-&gt;</span>
+<span class="w">            </span><span class="c1">// Forward command to Component A</span>
+<span class="w">            </span><span class="n">publish</span><span class="p">(</span><span class="n">ProcessComponentAEffect</span><span class="p">(</span><span class="n">effect</span><span class="p">.</span><span class="na">data</span><span class="p">))</span>
+<span class="w">        </span><span class="p">}</span>
+
+<span class="w">        </span><span class="n">onEffect</span><span class="o">&lt;</span><span class="n">ComponentBCommand</span><span class="o">&gt;</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">effect</span><span class="w"> </span><span class="o">-&gt;</span>
+<span class="w">            </span><span class="c1">// Forward command to Component B  </span>
+<span class="w">            </span><span class="n">publish</span><span class="p">(</span><span class="n">ProcessComponentBEffect</span><span class="p">(</span><span class="n">effect</span><span class="p">.</span><span class="na">data</span><span class="p">))</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div>
+<h2 id="error-handling-in-communication">Error Handling in Communication</h2>
+<h3 id="safe-computation-calls">Safe Computation Calls</h3>
+<div class="highlight"><pre><span></span><code><span class="kd">class</span><span class="w"> </span><span class="nc">SafeCommunicationTransformer</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="n">Transformer</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">override</span><span class="w"> </span><span class="kd">val</span><span class="w"> </span><span class="nv">handlers</span><span class="p">:</span><span class="w"> </span><span class="n">Handlers</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">handlers</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">onSignal</span><span class="o">&lt;</span><span class="n">SafeQuerySignal</span><span class="o">&gt;</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="k">try</span><span class="w"> </span><span class="p">{</span>
+<span class="w">                </span><span class="kd">val</span><span class="w"> </span><span class="nv">result</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">compute</span><span class="p">(</span><span class="n">DataProviderTransformer</span><span class="p">.</span><span class="na">dataContract</span><span class="p">)</span>
+<span class="w">                </span><span class="n">send</span><span class="p">(</span><span class="n">QuerySuccessful</span><span class="p">(</span><span class="n">result</span><span class="p">))</span>
+<span class="w">            </span><span class="p">}</span><span class="w"> </span><span class="k">catch</span><span class="w"> </span><span class="p">(</span><span class="n">e</span><span class="p">:</span><span class="w"> </span><span class="n">Exception</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">                </span><span class="n">send</span><span class="p">(</span><span class="n">QueryFailed</span><span class="p">(</span><span class="s">&quot;Failed to compute data: </span><span class="si">${</span><span class="n">e</span><span class="p">.</span><span class="na">message</span><span class="si">}</span><span class="s">&quot;</span><span class="p">))</span>
+<span class="w">                </span><span class="n">execute</span><span class="p">(</span><span class="n">LoggingTransformer</span><span class="p">.</span><span class="na">logErrorContract</span><span class="p">,</span><span class="w"> </span><span class="n">e</span><span class="p">.</span><span class="na">message</span><span class="p">)</span>
+<span class="w">            </span><span class="p">}</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div>
+<h3 id="circuit-breaker-pattern">Circuit Breaker Pattern</h3>
+<div class="highlight"><pre><span></span><code><span class="kd">class</span><span class="w"> </span><span class="nc">CircuitBreakerTransformer</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="n">Transformer</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="kd">val</span><span class="w"> </span><span class="nv">circuitState</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">dataHolder</span><span class="p">(</span>
+<span class="w">        </span><span class="n">initialValue</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">CircuitState</span><span class="p">.</span><span class="na">Closed</span><span class="p">,</span>
+<span class="w">        </span><span class="n">contract</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">circuitStateContract</span>
+<span class="w">    </span><span class="p">)</span>
+
+<span class="w">    </span><span class="kd">override</span><span class="w"> </span><span class="kd">val</span><span class="w"> </span><span class="nv">handlers</span><span class="p">:</span><span class="w"> </span><span class="n">Handlers</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">handlers</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">onSignal</span><span class="o">&lt;</span><span class="n">CallExternalServiceSignal</span><span class="o">&gt;</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">signal</span><span class="w"> </span><span class="o">-&gt;</span>
+<span class="w">            </span><span class="kd">val</span><span class="w"> </span><span class="nv">currentState</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">circuitState</span><span class="p">.</span><span class="na">getValue</span><span class="p">()</span>
+
+<span class="w">            </span><span class="k">when</span><span class="w"> </span><span class="p">(</span><span class="n">currentState</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">                </span><span class="k">is</span><span class="w"> </span><span class="n">CircuitState</span><span class="p">.</span><span class="na">Closed</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="p">{</span>
+<span class="w">                    </span><span class="k">try</span><span class="w"> </span><span class="p">{</span>
+<span class="w">                        </span><span class="kd">val</span><span class="w"> </span><span class="nv">result</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">callExternalService</span><span class="p">(</span><span class="n">signal</span><span class="p">.</span><span class="na">request</span><span class="p">)</span>
+<span class="w">                        </span><span class="n">send</span><span class="p">(</span><span class="n">ServiceCallSuccessful</span><span class="p">(</span><span class="n">result</span><span class="p">))</span>
+<span class="w">                    </span><span class="p">}</span><span class="w"> </span><span class="k">catch</span><span class="w"> </span><span class="p">(</span><span class="n">e</span><span class="p">:</span><span class="w"> </span><span class="n">Exception</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">                        </span><span class="n">circuitState</span><span class="p">.</span><span class="na">update</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">CircuitState</span><span class="p">.</span><span class="na">Open</span><span class="p">(</span><span class="n">System</span><span class="p">.</span><span class="na">currentTimeMillis</span><span class="p">())</span><span class="w"> </span><span class="p">}</span>
+<span class="w">                        </span><span class="n">send</span><span class="p">(</span><span class="n">ServiceCallFailed</span><span class="p">(</span><span class="s">&quot;Service unavailable&quot;</span><span class="p">))</span>
+<span class="w">                    </span><span class="p">}</span>
+<span class="w">                </span><span class="p">}</span>
+<span class="w">                </span><span class="k">is</span><span class="w"> </span><span class="n">CircuitState</span><span class="p">.</span><span class="na">Open</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="p">{</span>
+<span class="w">                    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">System</span><span class="p">.</span><span class="na">currentTimeMillis</span><span class="p">()</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">currentState</span><span class="p">.</span><span class="na">openedAt</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="n">CIRCUIT_TIMEOUT</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">                        </span><span class="n">circuitState</span><span class="p">.</span><span class="na">update</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">CircuitState</span><span class="p">.</span><span class="na">HalfOpen</span><span class="w"> </span><span class="p">}</span>
+<span class="w">                        </span><span class="c1">// Retry the call</span>
+<span class="w">                        </span><span class="n">onSignal</span><span class="p">(</span><span class="n">signal</span><span class="p">)</span>
+<span class="w">                    </span><span class="p">}</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="p">{</span>
+<span class="w">                        </span><span class="n">send</span><span class="p">(</span><span class="n">ServiceCallFailed</span><span class="p">(</span><span class="s">&quot;Circuit breaker is open&quot;</span><span class="p">))</span>
+<span class="w">                    </span><span class="p">}</span>
+<span class="w">                </span><span class="p">}</span>
+<span class="w">                </span><span class="k">is</span><span class="w"> </span><span class="n">CircuitState</span><span class="p">.</span><span class="na">HalfOpen</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="p">{</span>
+<span class="w">                    </span><span class="k">try</span><span class="w"> </span><span class="p">{</span>
+<span class="w">                        </span><span class="kd">val</span><span class="w"> </span><span class="nv">result</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">callExternalService</span><span class="p">(</span><span class="n">signal</span><span class="p">.</span><span class="na">request</span><span class="p">)</span>
+<span class="w">                        </span><span class="n">circuitState</span><span class="p">.</span><span class="na">update</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">CircuitState</span><span class="p">.</span><span class="na">Closed</span><span class="w"> </span><span class="p">}</span>
+<span class="w">                        </span><span class="n">send</span><span class="p">(</span><span class="n">ServiceCallSuccessful</span><span class="p">(</span><span class="n">result</span><span class="p">))</span>
+<span class="w">                    </span><span class="p">}</span><span class="w"> </span><span class="k">catch</span><span class="w"> </span><span class="p">(</span><span class="n">e</span><span class="p">:</span><span class="w"> </span><span class="n">Exception</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">                        </span><span class="n">circuitState</span><span class="p">.</span><span class="na">update</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">CircuitState</span><span class="p">.</span><span class="na">Open</span><span class="p">(</span><span class="n">System</span><span class="p">.</span><span class="na">currentTimeMillis</span><span class="p">())</span><span class="w"> </span><span class="p">}</span>
+<span class="w">                        </span><span class="n">send</span><span class="p">(</span><span class="n">ServiceCallFailed</span><span class="p">(</span><span class="s">&quot;Service still unavailable&quot;</span><span class="p">))</span>
+<span class="w">                    </span><span class="p">}</span>
+<span class="w">                </span><span class="p">}</span>
+<span class="w">            </span><span class="p">}</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div>
+<h2 id="best-practices">Best Practices</h2>
+<h3 id="1-use-appropriate-communication-methods">1. Use Appropriate Communication Methods</h3>
+<div class="highlight"><pre><span></span><code><span class="c1">// Use Effects for asynchronous notifications</span>
+<span class="n">publish</span><span class="p">(</span><span class="n">UserLoggedInEffect</span><span class="p">(</span><span class="n">user</span><span class="p">.</span><span class="na">id</span><span class="p">))</span>
+
+<span class="c1">// Use Computations for data queries</span>
+<span class="kd">val</span><span class="w"> </span><span class="nv">userData</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">compute</span><span class="p">(</span><span class="n">UserTransformer</span><span class="p">.</span><span class="na">getCurrentUserContract</span><span class="p">)</span>
+
+<span class="c1">// Use Executions for fire-and-forget operations</span>
+<span class="n">execute</span><span class="p">(</span><span class="n">AuditTransformer</span><span class="p">.</span><span class="na">logActionContract</span><span class="p">,</span><span class="w"> </span><span class="n">action</span><span class="p">)</span>
+</code></pre></div>
+<h3 id="2-design-clear-interfaces">2. Design Clear Interfaces</h3>
+<div class="highlight"><pre><span></span><code><span class="c1">// Good - clear, specific contracts</span>
+<span class="kd">object</span><span class="w"> </span><span class="nc">OrderContracts</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">val</span><span class="w"> </span><span class="nv">getCurrentOrder</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Contract</span><span class="p">.</span><span class="na">computation</span><span class="o">&lt;</span><span class="n">Order?&gt;</span><span class="p">()</span>
+<span class="w">    </span><span class="kd">val</span><span class="w"> </span><span class="nv">calculateOrderTotal</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Contract</span><span class="p">.</span><span class="na">computationWithArgs</span><span class="o">&lt;</span><span class="n">OrderItems</span><span class="p">,</span><span class="w"> </span><span class="n">BigDecimal</span><span class="o">&gt;</span><span class="p">()</span>
+<span class="w">    </span><span class="kd">val</span><span class="w"> </span><span class="nv">validateOrder</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Contract</span><span class="p">.</span><span class="na">computationWithArgs</span><span class="o">&lt;</span><span class="n">Order</span><span class="p">,</span><span class="w"> </span><span class="n">ValidationResult</span><span class="o">&gt;</span><span class="p">()</span>
+<span class="w">    </span><span class="kd">val</span><span class="w"> </span><span class="nv">saveOrder</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Contract</span><span class="p">.</span><span class="na">executionWithArgs</span><span class="o">&lt;</span><span class="n">Order</span><span class="o">&gt;</span><span class="p">()</span>
+<span class="p">}</span>
+
+<span class="c1">// Avoid - vague, generic contracts</span>
+<span class="kd">val</span><span class="w"> </span><span class="nv">dataContract</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Contract</span><span class="p">.</span><span class="na">computation</span><span class="o">&lt;</span><span class="kt">Any</span><span class="o">&gt;</span><span class="p">()</span>
+<span class="kd">val</span><span class="w"> </span><span class="nv">processContract</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Contract</span><span class="p">.</span><span class="na">computationWithArgs</span><span class="o">&lt;</span><span class="kt">Any</span><span class="p">,</span><span class="w"> </span><span class="kt">Any</span><span class="o">&gt;</span><span class="p">()</span>
+</code></pre></div>
+<h3 id="3-handle-communication-failures">3. Handle Communication Failures</h3>
+<div class="highlight"><pre><span></span><code><span class="kd">override</span><span class="w"> </span><span class="kd">val</span><span class="w"> </span><span class="nv">handlers</span><span class="p">:</span><span class="w"> </span><span class="n">Handlers</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">handlers</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">onSignal</span><span class="o">&lt;</span><span class="n">QueryDataSignal</span><span class="o">&gt;</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="k">try</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="kd">val</span><span class="w"> </span><span class="nv">data</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">compute</span><span class="p">(</span><span class="n">DataProviderTransformer</span><span class="p">.</span><span class="na">dataContract</span><span class="p">)</span>
+<span class="w">            </span><span class="n">send</span><span class="p">(</span><span class="n">DataQuerySuccessful</span><span class="p">(</span><span class="n">data</span><span class="p">))</span>
+<span class="w">        </span><span class="p">}</span><span class="w"> </span><span class="k">catch</span><span class="w"> </span><span class="p">(</span><span class="n">e</span><span class="p">:</span><span class="w"> </span><span class="n">Exception</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="n">send</span><span class="p">(</span><span class="n">DataQueryFailed</span><span class="p">(</span><span class="s">&quot;Communication failed: </span><span class="si">${</span><span class="n">e</span><span class="p">.</span><span class="na">message</span><span class="si">}</span><span class="s">&quot;</span><span class="p">))</span>
+<span class="w">            </span><span class="n">execute</span><span class="p">(</span><span class="n">LoggingTransformer</span><span class="p">.</span><span class="na">logErrorContract</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;Query failed: </span><span class="si">${</span><span class="n">e</span><span class="p">.</span><span class="na">message</span><span class="si">}</span><span class="s">&quot;</span><span class="p">)</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div>
+<h3 id="4-maintain-loose-coupling">4. Maintain Loose Coupling</h3>
+<div class="highlight"><pre><span></span><code><span class="c1">// Good - communicates through contracts</span>
+<span class="kd">val</span><span class="w"> </span><span class="nv">userData</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">compute</span><span class="p">(</span><span class="n">UserContracts</span><span class="p">.</span><span class="na">getCurrentUser</span><span class="p">)</span>
+
+<span class="c1">// Avoid - direct references</span>
+<span class="kd">val</span><span class="w"> </span><span class="nv">userData</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">userTransformer</span><span class="p">.</span><span class="na">getCurrentUser</span><span class="p">()</span><span class="w"> </span><span class="c1">// Direct coupling</span>
+</code></pre></div>
+<h3 id="5-document-communication-flows">5. Document Communication Flows</h3>
+<div class="highlight"><pre><span></span><code><span class="cm">/**</span>
+<span class="cm"> * Order Processing Flow:</span>
+<span class="cm"> * 1. OrderTransformer receives CreateOrderSignal</span>
+<span class="cm"> * 2. Publishes ValidateOrderEffect </span>
+<span class="cm"> * 3. ValidationTransformer validates and publishes ProcessPaymentEffect</span>
+<span class="cm"> * 4. PaymentTransformer processes payment and publishes SaveOrderEffect</span>
+<span class="cm"> * 5. OrderTransformer saves order and sends OrderCreatedData</span>
+<span class="cm"> */</span>
+<span class="kd">class</span><span class="w"> </span><span class="nc">OrderTransformer</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="n">Transformer</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="c1">// Implementation...</span>
+<span class="p">}</span>
+</code></pre></div>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+  <script>var tabs=__md_get("__tabs");if(Array.isArray(tabs))e:for(var set of document.querySelectorAll(".tabbed-set")){var labels=set.querySelector(".tabbed-labels");for(var tab of tabs)for(var label of labels.getElementsByTagName("label"))if(label.innerText.trim()===tab){var input=document.getElementById(label.htmlFor);input.checked=!0;continue e}}</script>
+
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+    
+      
+      <nav class="md-footer__inner md-grid" aria-label="Footer" >
+        
+          
+          <a href="../contracts/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Contracts">
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+            </div>
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Previous
+              </span>
+              <div class="md-ellipsis">
+                Contracts
+              </div>
+            </div>
+          </a>
+        
+        
+          
+          <a href="../testing/" class="md-footer__link md-footer__link--next" aria-label="Next: Testing">
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Next
+              </span>
+              <div class="md-ellipsis">
+                Testing
+              </div>
+            </div>
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11z"/></svg>
+            </div>
+          </a>
+        
+      </nav>
+    
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+    <div class="md-copyright__highlight">
+      Copyright &copy; 2024 Trendyol
+    </div>
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      <script id="__config" type="application/json">{"base": "..", "features": ["content.code.copy", "content.code.select", "content.code.annotate", "content.tabs.link", "content.tooltips", "header.autohide", "navigation.top", "navigation.tracking", "navigation.sections", "navigation.indexes", "navigation.footer", "search.highlight", "search.share", "search.suggest", "toc.integrate"], "search": "../assets/javascripts/workers/search.d50fe291.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.13a4f30d.min.js"></script>
+      
+    
+  </body>
+</html>

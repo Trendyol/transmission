@@ -1,0 +1,1634 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Experimental asynchronous communication for Business Logic">
+      
+      
+        <meta name="author" content="Trendyol">
+      
+      
+      
+        <link rel="prev" href="../transformer_communication/">
+      
+      
+        <link rel="next" href="../changelog/">
+      
+      
+      <link rel="icon" href="../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.6.14">
+    
+    
+      
+        <title>Testing - Transmission</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.342714a4.min.css">
+      
+        
+        <link rel="stylesheet" href="../assets/stylesheets/palette.06af60db.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato:300,300i,400,400i,700,700i%7CFira+Code:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Lato";--md-code-font:"Fira Code"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="white" data-md-color-accent="orange">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#testing" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href=".." title="Transmission" class="md-header__button md-logo" aria-label="Transmission" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Transmission
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Testing
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="white" data-md-color-accent="orange"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="black" data-md-color-accent="yellow"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12s-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+          <a href="javascript:void(0)" class="md-search__icon md-icon" title="Share" aria-label="Share" data-clipboard data-clipboard-text="" data-md-component="search-share" tabindex="-1">
+            
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9a3 3 0 0 0-3 3 3 3 0 0 0 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.15c-.05.21-.08.43-.08.66 0 1.61 1.31 2.91 2.92 2.91s2.92-1.3 2.92-2.91A2.92 2.92 0 0 0 18 16.08"/></svg>
+          </a>
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/trendyol/transmission" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.7.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81"/></svg>
+  </div>
+  <div class="md-source__repository">
+    Transmission
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+  
+
+<nav class="md-nav md-nav--primary md-nav--integrated" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href=".." title="Transmission" class="md-nav__button md-logo" aria-label="Transmission" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    Transmission
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/trendyol/transmission" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.7.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81"/></svg>
+  </div>
+  <div class="md-source__repository">
+    Transmission
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href=".." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Introduction
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../how_to_use/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    How To Use
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../setup/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Setting Up
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../transmissions/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Transmissions
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../transformer/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Transformer
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../router/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    TransmissionRouter
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../dataholder/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    DataHolder
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../handlers/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Handlers
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../contracts/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Contracts
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../transformer_communication/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Transformer Communication
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    Testing
+    
+  </span>
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    Testing
+    
+  </span>
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#testing-dependencies" class="md-nav__link">
+    <span class="md-ellipsis">
+      Testing Dependencies
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#imports" class="md-nav__link">
+    <span class="md-ellipsis">
+      Imports
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#basic-testing" class="md-nav__link">
+    <span class="md-ellipsis">
+      Basic Testing
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Basic Testing">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#testing-a-simple-transformer" class="md-nav__link">
+    <span class="md-ellipsis">
+      Testing a Simple Transformer
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#testing-signal-handlers" class="md-nav__link">
+    <span class="md-ellipsis">
+      Testing Signal Handlers
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#testing-effect-handlers" class="md-nav__link">
+    <span class="md-ellipsis">
+      Testing Effect Handlers
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#testing-with-mocking" class="md-nav__link">
+    <span class="md-ellipsis">
+      Testing with Mocking
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Testing with Mocking">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#mocking-data" class="md-nav__link">
+    <span class="md-ellipsis">
+      Mocking Data
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#mocking-computations" class="md-nav__link">
+    <span class="md-ellipsis">
+      Mocking Computations
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#testing-with-checkpoints" class="md-nav__link">
+    <span class="md-ellipsis">
+      Testing with Checkpoints
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#testing-with-initial-processing" class="md-nav__link">
+    <span class="md-ellipsis">
+      Testing with Initial Processing
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#testing-complex-flows" class="md-nav__link">
+    <span class="md-ellipsis">
+      Testing Complex Flows
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Testing Complex Flows">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#testing-effect-chains" class="md-nav__link">
+    <span class="md-ellipsis">
+      Testing Effect Chains
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#testing-state-machines" class="md-nav__link">
+    <span class="md-ellipsis">
+      Testing State Machines
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#testing-error-handling" class="md-nav__link">
+    <span class="md-ellipsis">
+      Testing Error Handling
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Testing Error Handling">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#testing-exception-handling" class="md-nav__link">
+    <span class="md-ellipsis">
+      Testing Exception Handling
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#testing-fallback-mechanisms" class="md-nav__link">
+    <span class="md-ellipsis">
+      Testing Fallback Mechanisms
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#testing-with-real-examples" class="md-nav__link">
+    <span class="md-ellipsis">
+      Testing with Real Examples
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Testing with Real Examples">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#counter-sample-test" class="md-nav__link">
+    <span class="md-ellipsis">
+      Counter Sample Test
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#components-sample-test" class="md-nav__link">
+    <span class="md-ellipsis">
+      Components Sample Test
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#advanced-testing-with-assertions" class="md-nav__link">
+    <span class="md-ellipsis">
+      Advanced Testing with Assertions
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Advanced Testing with Assertions">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#using-all-dataeffects" class="md-nav__link">
+    <span class="md-ellipsis">
+      Using All Data/Effects
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#using-find-data-with-predicates" class="md-nav__link">
+    <span class="md-ellipsis">
+      Using Find Data with Predicates
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#advanced-testing-patterns" class="md-nav__link">
+    <span class="md-ellipsis">
+      Advanced Testing Patterns
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Advanced Testing Patterns">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#testing-inter-transformer-communication" class="md-nav__link">
+    <span class="md-ellipsis">
+      Testing Inter-Transformer Communication
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#testing-time-dependent-operations" class="md-nav__link">
+    <span class="md-ellipsis">
+      Testing Time-Dependent Operations
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#testing-multiple-transformer-interactions" class="md-nav__link">
+    <span class="md-ellipsis">
+      Testing Multiple Transformer Interactions
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#testing-utilities" class="md-nav__link">
+    <span class="md-ellipsis">
+      Testing Utilities
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Testing Utilities">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#custom-test-helpers" class="md-nav__link">
+    <span class="md-ellipsis">
+      Custom Test Helpers
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#parameterized-tests" class="md-nav__link">
+    <span class="md-ellipsis">
+      Parameterized Tests
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#mock-transformers-for-testing" class="md-nav__link">
+    <span class="md-ellipsis">
+      Mock Transformers for Testing
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#best-practices" class="md-nav__link">
+    <span class="md-ellipsis">
+      Best Practices
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Best Practices">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1-test-business-logic-not-implementation" class="md-nav__link">
+    <span class="md-ellipsis">
+      1. Test Business Logic, Not Implementation
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2-use-descriptive-test-names" class="md-nav__link">
+    <span class="md-ellipsis">
+      2. Use Descriptive Test Names
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#3-test-edge-cases" class="md-nav__link">
+    <span class="md-ellipsis">
+      3. Test Edge Cases
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#4-keep-tests-isolated" class="md-nav__link">
+    <span class="md-ellipsis">
+      4. Keep Tests Isolated
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#5-verify-both-positive-and-negative-cases" class="md-nav__link">
+    <span class="md-ellipsis">
+      5. Verify Both Positive and Negative Cases
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#summary" class="md-nav__link">
+    <span class="md-ellipsis">
+      Summary
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../changelog/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Changelog
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+<h1 id="testing">Testing</h1>
+<p>The Transmission library includes a comprehensive testing framework that makes it easy to test your Transformers, business logic, and communication flows in isolation.</p>
+<h2 id="testing-dependencies">Testing Dependencies</h2>
+<p>Add the testing module to your project:</p>
+<div class="highlight"><pre><span></span><code><span class="c1">// build.gradle.kts</span>
+<span class="n">dependencies</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">testImplementation</span><span class="p">(</span><span class="s">&quot;com.trendyol:transmission-test:&lt;version&gt;&quot;</span><span class="p">)</span>
+<span class="p">}</span>
+</code></pre></div>
+<h2 id="imports">Imports</h2>
+<p>For testing, you'll typically need these imports:</p>
+<div class="highlight"><pre><span></span><code><span class="k">import</span><span class="w"> </span><span class="nn">com.trendyol.transmission.test.*</span>
+<span class="k">import</span><span class="w"> </span><span class="nn">org.junit.jupiter.api.Test</span>
+<span class="k">import</span><span class="w"> </span><span class="nn">kotlin.test.assertEquals</span>
+<span class="k">import</span><span class="w"> </span><span class="nn">kotlin.test.assertNotNull</span>
+<span class="k">import</span><span class="w"> </span><span class="nn">kotlin.test.assertTrue</span>
+<span class="k">import</span><span class="w"> </span><span class="nn">kotlin.test.assertFalse</span>
+</code></pre></div>
+<h2 id="basic-testing">Basic Testing</h2>
+<h3 id="testing-a-simple-transformer">Testing a Simple Transformer</h3>
+<div class="highlight"><pre><span></span><code><span class="nd">@Test</span>
+<span class="kd">fun</span><span class="w"> </span><span class="nf">`should increment counter when receiving increment signal`</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">val</span><span class="w"> </span><span class="nv">transformer</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">CounterTransformer</span><span class="p">()</span>
+
+<span class="w">    </span><span class="n">transformer</span><span class="p">.</span><span class="na">test</span><span class="p">()</span>
+<span class="w">        </span><span class="p">.</span><span class="na">testSignal</span><span class="p">(</span><span class="n">CounterSignal</span><span class="p">.</span><span class="na">Increment</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="c1">// Verify data output</span>
+<span class="w">            </span><span class="kd">val</span><span class="w"> </span><span class="nv">data</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">lastData</span><span class="o">&lt;</span><span class="n">CounterData</span><span class="o">&gt;</span><span class="p">()</span>
+<span class="w">            </span><span class="n">assertEquals</span><span class="p">(</span><span class="m">1</span><span class="p">,</span><span class="w"> </span><span class="n">data</span><span class="o">?.</span><span class="na">count</span><span class="p">)</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div>
+<h3 id="testing-signal-handlers">Testing Signal Handlers</h3>
+<div class="highlight"><pre><span></span><code><span class="nd">@Test</span>
+<span class="kd">fun</span><span class="w"> </span><span class="nf">`should handle user login correctly`</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">val</span><span class="w"> </span><span class="nv">authTransformer</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">AuthTransformer</span><span class="p">()</span>
+
+<span class="w">    </span><span class="n">authTransformer</span><span class="p">.</span><span class="na">test</span><span class="p">()</span>
+<span class="w">        </span><span class="p">.</span><span class="na">testSignal</span><span class="p">(</span><span class="n">UserLoginSignal</span><span class="p">(</span><span class="n">validCredentials</span><span class="p">))</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="c1">// Verify successful login data</span>
+<span class="w">            </span><span class="kd">val</span><span class="w"> </span><span class="nv">userData</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">lastData</span><span class="o">&lt;</span><span class="n">UserData</span><span class="o">&gt;</span><span class="p">()</span>
+<span class="w">            </span><span class="n">assertEquals</span><span class="p">(</span><span class="s">&quot;John Doe&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">userData</span><span class="o">?.</span><span class="na">user</span><span class="o">?.</span><span class="na">name</span><span class="p">)</span>
+<span class="w">            </span><span class="n">assertTrue</span><span class="p">(</span><span class="n">userData</span><span class="o">?.</span><span class="na">isAuthenticated</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="kc">true</span><span class="p">)</span>
+
+<span class="w">            </span><span class="c1">// Verify navigation effect</span>
+<span class="w">            </span><span class="kd">val</span><span class="w"> </span><span class="nv">navEffect</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">lastEffect</span><span class="o">&lt;</span><span class="n">NavigationEffect</span><span class="p">.</span><span class="na">GoToHome</span><span class="o">&gt;</span><span class="p">()</span>
+<span class="w">            </span><span class="n">assertNotNull</span><span class="p">(</span><span class="n">navEffect</span><span class="p">)</span>
+
+<span class="w">            </span><span class="c1">// Verify no error data</span>
+<span class="w">            </span><span class="n">assertFalse</span><span class="p">(</span><span class="n">hasData</span><span class="o">&lt;</span><span class="n">ErrorData</span><span class="o">&gt;</span><span class="p">())</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div>
+<h3 id="testing-effect-handlers">Testing Effect Handlers</h3>
+<div class="highlight"><pre><span></span><code><span class="nd">@Test</span>
+<span class="kd">fun</span><span class="w"> </span><span class="nf">`should process refresh effect correctly`</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">val</span><span class="w"> </span><span class="nv">dataTransformer</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">DataTransformer</span><span class="p">()</span>
+
+<span class="w">    </span><span class="n">dataTransformer</span><span class="p">.</span><span class="na">test</span><span class="p">()</span>
+<span class="w">        </span><span class="p">.</span><span class="na">testEffect</span><span class="p">(</span><span class="n">RefreshDataEffect</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="c1">// Verify data is refreshed</span>
+<span class="w">            </span><span class="kd">val</span><span class="w"> </span><span class="nv">data</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">lastData</span><span class="o">&lt;</span><span class="n">FreshData</span><span class="o">&gt;</span><span class="p">()</span>
+<span class="w">            </span><span class="n">assertNotNull</span><span class="p">(</span><span class="n">data</span><span class="o">?.</span><span class="na">content</span><span class="p">)</span>
+<span class="w">            </span><span class="n">assertTrue</span><span class="p">(</span><span class="n">data</span><span class="o">?.</span><span class="na">timestamp</span><span class="o">?.</span><span class="na">let</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nb">it</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="m">0</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="kc">true</span><span class="p">)</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div>
+<h2 id="testing-with-mocking">Testing with Mocking</h2>
+<h3 id="mocking-data">Mocking Data</h3>
+<div class="highlight"><pre><span></span><code><span class="nd">@Test</span>
+<span class="kd">fun</span><span class="w"> </span><span class="nf">`should handle mocked computation data`</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">val</span><span class="w"> </span><span class="nv">transformer</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">UserTransformer</span><span class="p">()</span>
+
+<span class="w">    </span><span class="n">transformer</span><span class="p">.</span><span class="na">test</span><span class="p">()</span>
+<span class="w">        </span><span class="p">.</span><span class="na">withData</span><span class="p">(</span><span class="n">UserTransformer</span><span class="p">.</span><span class="na">getCurrentUserContract</span><span class="p">,</span><span class="w"> </span><span class="n">mockUserData</span><span class="p">)</span>
+<span class="w">        </span><span class="p">.</span><span class="na">testSignal</span><span class="p">(</span><span class="n">UpdateUserSignal</span><span class="p">(</span><span class="s">&quot;New Name&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;new@email.com&quot;</span><span class="p">))</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="kd">val</span><span class="w"> </span><span class="nv">state</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">lastData</span><span class="o">&lt;</span><span class="n">UserState</span><span class="o">&gt;</span><span class="p">()</span>
+<span class="w">            </span><span class="n">assertEquals</span><span class="p">(</span><span class="s">&quot;New Name&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">state</span><span class="o">?.</span><span class="na">user</span><span class="o">?.</span><span class="na">name</span><span class="p">)</span>
+<span class="w">            </span><span class="n">assertEquals</span><span class="p">(</span><span class="s">&quot;new@email.com&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">state</span><span class="o">?.</span><span class="na">user</span><span class="o">?.</span><span class="na">email</span><span class="p">)</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div>
+<h3 id="mocking-computations">Mocking Computations</h3>
+<div class="highlight"><pre><span></span><code><span class="nd">@Test</span>
+<span class="kd">fun</span><span class="w"> </span><span class="nf">`should use mocked computation results`</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">val</span><span class="w"> </span><span class="nv">calculatorTransformer</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">CalculatorTransformer</span><span class="p">()</span>
+
+<span class="w">    </span><span class="n">calculatorTransformer</span><span class="p">.</span><span class="na">test</span><span class="p">()</span>
+<span class="w">        </span><span class="p">.</span><span class="na">withComputation</span><span class="p">(</span><span class="n">CalculatorTransformer</span><span class="p">.</span><span class="na">getCurrentValueContract</span><span class="p">,</span><span class="w"> </span><span class="m">42</span><span class="p">)</span>
+<span class="w">        </span><span class="p">.</span><span class="na">withComputation</span><span class="p">(</span><span class="n">CalculatorTransformer</span><span class="p">.</span><span class="na">addNumbersContract</span><span class="p">,</span><span class="w"> </span><span class="m">15</span><span class="p">)</span>
+<span class="w">        </span><span class="p">.</span><span class="na">testSignal</span><span class="p">(</span><span class="n">CalculateSignal</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="kd">val</span><span class="w"> </span><span class="nv">result</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">lastData</span><span class="o">&lt;</span><span class="n">CalculationResult</span><span class="o">&gt;</span><span class="p">()</span>
+<span class="w">            </span><span class="n">assertEquals</span><span class="p">(</span><span class="m">42</span><span class="p">,</span><span class="w"> </span><span class="n">result</span><span class="o">?.</span><span class="na">currentValue</span><span class="p">)</span>
+<span class="w">            </span><span class="n">assertEquals</span><span class="p">(</span><span class="m">15</span><span class="p">,</span><span class="w"> </span><span class="n">result</span><span class="o">?.</span><span class="na">additionResult</span><span class="p">)</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div>
+<h3 id="testing-with-checkpoints">Testing with Checkpoints</h3>
+<div class="highlight"><pre><span></span><code><span class="nd">@Test</span>
+<span class="kd">fun</span><span class="w"> </span><span class="nf">`should handle checkpoint-based flow`</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">val</span><span class="w"> </span><span class="nv">transformer</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">InputTransformer</span><span class="p">()</span>
+
+<span class="w">    </span><span class="n">transformer</span><span class="p">.</span><span class="na">test</span><span class="p">()</span>
+<span class="w">        </span><span class="p">.</span><span class="na">withCheckpoint</span><span class="p">(</span><span class="n">InputTransformer</span><span class="p">.</span><span class="na">colorCheckpoint</span><span class="p">,</span><span class="w"> </span><span class="n">Color</span><span class="p">.</span><span class="na">Gray</span><span class="p">)</span>
+<span class="w">        </span><span class="p">.</span><span class="na">testSignal</span><span class="p">(</span><span class="n">InputSignal</span><span class="p">.</span><span class="na">InputUpdate</span><span class="p">(</span><span class="s">&quot;test&quot;</span><span class="p">))</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="n">assertEquals</span><span class="p">(</span><span class="n">InputEffect</span><span class="p">.</span><span class="na">InputUpdate</span><span class="p">(</span><span class="s">&quot;test&quot;</span><span class="p">),</span><span class="w"> </span><span class="n">lastEffect</span><span class="p">())</span>
+<span class="w">            </span><span class="n">assertEquals</span><span class="p">(</span><span class="n">InputUiState</span><span class="p">(</span><span class="s">&quot;test&quot;</span><span class="p">),</span><span class="w"> </span><span class="n">lastData</span><span class="p">())</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div>
+<h3 id="testing-with-initial-processing">Testing with Initial Processing</h3>
+<div class="highlight"><pre><span></span><code><span class="nd">@Test</span>
+<span class="kd">fun</span><span class="w"> </span><span class="nf">`should handle initial processing setup`</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">val</span><span class="w"> </span><span class="nv">transformer</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">DataTransformer</span><span class="p">()</span>
+<span class="w">    </span><span class="kd">val</span><span class="w"> </span><span class="nv">initialTransmissions</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">listOf</span><span class="p">(</span>
+<span class="w">        </span><span class="n">DataSignal</span><span class="p">.</span><span class="na">Initialize</span><span class="p">,</span>
+<span class="w">        </span><span class="n">DataSignal</span><span class="p">.</span><span class="na">LoadDefaults</span>
+<span class="w">    </span><span class="p">)</span>
+
+<span class="w">    </span><span class="n">transformer</span><span class="p">.</span><span class="na">test</span><span class="p">()</span>
+<span class="w">        </span><span class="p">.</span><span class="na">withInitialProcessing</span><span class="p">(</span><span class="n">initialTransmissions</span><span class="p">)</span>
+<span class="w">        </span><span class="p">.</span><span class="na">testSignal</span><span class="p">(</span><span class="n">DataSignal</span><span class="p">.</span><span class="na">Process</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="n">assertTrue</span><span class="p">(</span><span class="n">hasData</span><span class="o">&lt;</span><span class="n">InitializedData</span><span class="o">&gt;</span><span class="p">())</span>
+<span class="w">            </span><span class="n">assertTrue</span><span class="p">(</span><span class="n">hasData</span><span class="o">&lt;</span><span class="n">DefaultsData</span><span class="o">&gt;</span><span class="p">())</span>
+<span class="w">            </span><span class="n">assertTrue</span><span class="p">(</span><span class="n">hasData</span><span class="o">&lt;</span><span class="n">ProcessedData</span><span class="o">&gt;</span><span class="p">())</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div>
+<h2 id="testing-complex-flows">Testing Complex Flows</h2>
+<h3 id="testing-effect-chains">Testing Effect Chains</h3>
+<div class="highlight"><pre><span></span><code><span class="nd">@Test</span>
+<span class="kd">fun</span><span class="w"> </span><span class="nf">`should process validation chain correctly`</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">val</span><span class="w"> </span><span class="nv">validationTransformer</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ValidationChainTransformer</span><span class="p">()</span>
+
+<span class="w">    </span><span class="n">validationTransformer</span><span class="p">.</span><span class="na">test</span><span class="p">()</span>
+<span class="w">        </span><span class="p">.</span><span class="na">testSignal</span><span class="p">(</span><span class="n">ValidateDataSignal</span><span class="p">(</span><span class="n">validTestData</span><span class="p">))</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="c1">// Should progress through validation stages</span>
+<span class="w">            </span><span class="n">assertTrue</span><span class="p">(</span><span class="n">hasEffect</span><span class="o">&lt;</span><span class="n">ValidateFormatEffect</span><span class="o">&gt;</span><span class="p">())</span>
+<span class="w">            </span><span class="n">assertTrue</span><span class="p">(</span><span class="n">hasEffect</span><span class="o">&lt;</span><span class="n">ValidateBusinessRulesEffect</span><span class="o">&gt;</span><span class="p">())</span>
+<span class="w">            </span><span class="n">assertTrue</span><span class="p">(</span><span class="n">hasEffect</span><span class="o">&lt;</span><span class="n">ValidateSecurityEffect</span><span class="o">&gt;</span><span class="p">())</span>
+
+<span class="w">            </span><span class="c1">// Should end with successful validation</span>
+<span class="w">            </span><span class="n">assertTrue</span><span class="p">(</span><span class="n">hasData</span><span class="o">&lt;</span><span class="n">ValidationPassed</span><span class="o">&gt;</span><span class="p">())</span>
+<span class="w">            </span><span class="n">assertFalse</span><span class="p">(</span><span class="n">hasData</span><span class="o">&lt;</span><span class="n">ValidationFailed</span><span class="o">&gt;</span><span class="p">())</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="p">}</span>
+
+<span class="nd">@Test</span>
+<span class="kd">fun</span><span class="w"> </span><span class="nf">`should fail validation chain on invalid data`</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">val</span><span class="w"> </span><span class="nv">validationTransformer</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ValidationChainTransformer</span><span class="p">()</span>
+
+<span class="w">    </span><span class="n">validationTransformer</span><span class="p">.</span><span class="na">test</span><span class="p">()</span>
+<span class="w">        </span><span class="p">.</span><span class="na">testSignal</span><span class="p">(</span><span class="n">ValidateDataSignal</span><span class="p">(</span><span class="n">invalidTestData</span><span class="p">))</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="c1">// Should fail at format validation</span>
+<span class="w">            </span><span class="n">assertTrue</span><span class="p">(</span><span class="n">hasEffect</span><span class="o">&lt;</span><span class="n">ValidateFormatEffect</span><span class="o">&gt;</span><span class="p">())</span>
+<span class="w">            </span><span class="n">assertFalse</span><span class="p">(</span><span class="n">hasEffect</span><span class="o">&lt;</span><span class="n">ValidateBusinessRulesEffect</span><span class="o">&gt;</span><span class="p">())</span>
+
+<span class="w">            </span><span class="c1">// Should send failure data</span>
+<span class="w">            </span><span class="kd">val</span><span class="w"> </span><span class="nv">failure</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">lastData</span><span class="o">&lt;</span><span class="n">ValidationFailed</span><span class="o">&gt;</span><span class="p">()</span>
+<span class="w">            </span><span class="n">assertEquals</span><span class="p">(</span><span class="s">&quot;Invalid format&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">failure</span><span class="o">?.</span><span class="na">reason</span><span class="p">)</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div>
+<h3 id="testing-state-machines">Testing State Machines</h3>
+<div class="highlight"><pre><span></span><code><span class="nd">@Test</span>
+<span class="kd">fun</span><span class="w"> </span><span class="nf">`should transition order states correctly`</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">val</span><span class="w"> </span><span class="nv">orderStateMachine</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">OrderStateMachineTransformer</span><span class="p">()</span>
+
+<span class="w">    </span><span class="n">orderStateMachine</span><span class="p">.</span><span class="na">test</span><span class="p">()</span>
+<span class="w">        </span><span class="p">.</span><span class="na">testSignal</span><span class="p">(</span><span class="n">ProcessOrderSignal</span><span class="p">(</span><span class="s">&quot;order-123&quot;</span><span class="p">))</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="c1">// Verify state transitions through multiple data emissions</span>
+<span class="w">            </span><span class="kd">val</span><span class="w"> </span><span class="nv">states</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">allData</span><span class="o">&lt;</span><span class="n">OrderState</span><span class="o">&gt;</span><span class="p">()</span>
+<span class="w">            </span><span class="n">assertTrue</span><span class="p">(</span><span class="n">states</span><span class="p">.</span><span class="na">any</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nb">it</span><span class="w"> </span><span class="k">is</span><span class="w"> </span><span class="n">OrderState</span><span class="p">.</span><span class="na">Processing</span><span class="w"> </span><span class="p">})</span>
+
+<span class="w">            </span><span class="c1">// Verify final state</span>
+<span class="w">            </span><span class="kd">val</span><span class="w"> </span><span class="nv">finalState</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">lastData</span><span class="o">&lt;</span><span class="n">OrderState</span><span class="o">&gt;</span><span class="p">()</span>
+<span class="w">            </span><span class="n">assertTrue</span><span class="p">(</span><span class="n">finalState</span><span class="w"> </span><span class="k">is</span><span class="w"> </span><span class="n">OrderState</span><span class="p">.</span><span class="na">Completed</span><span class="p">)</span>
+
+<span class="w">            </span><span class="c1">// Verify effects</span>
+<span class="w">            </span><span class="n">assertTrue</span><span class="p">(</span><span class="n">hasEffect</span><span class="o">&lt;</span><span class="n">StartOrderProcessingEffect</span><span class="o">&gt;</span><span class="p">())</span>
+<span class="w">            </span><span class="n">assertTrue</span><span class="p">(</span><span class="n">hasEffect</span><span class="o">&lt;</span><span class="n">OrderCompletedEffect</span><span class="o">&gt;</span><span class="p">())</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">        </span><span class="p">.</span><span class="na">testEffect</span><span class="p">(</span><span class="n">OrderProcessingCompleteEffect</span><span class="p">(</span><span class="s">&quot;order-123&quot;</span><span class="p">))</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="kd">val</span><span class="w"> </span><span class="nv">completedState</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">lastData</span><span class="o">&lt;</span><span class="n">OrderState</span><span class="o">&gt;</span><span class="p">()</span>
+<span class="w">            </span><span class="n">assertTrue</span><span class="p">(</span><span class="n">completedState</span><span class="w"> </span><span class="k">is</span><span class="w"> </span><span class="n">OrderState</span><span class="p">.</span><span class="na">Completed</span><span class="p">)</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div>
+<h2 id="testing-error-handling">Testing Error Handling</h2>
+<h3 id="testing-exception-handling">Testing Exception Handling</h3>
+<div class="highlight"><pre><span></span><code><span class="nd">@Test</span>
+<span class="kd">fun</span><span class="w"> </span><span class="nf">`should handle errors gracefully`</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">val</span><span class="w"> </span><span class="nv">riskyTransformer</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">RiskyTransformer</span><span class="p">()</span>
+
+<span class="w">    </span><span class="n">riskyTransformer</span><span class="p">.</span><span class="na">test</span><span class="p">()</span>
+<span class="w">        </span><span class="p">.</span><span class="na">testSignal</span><span class="p">(</span><span class="n">RiskyOperationSignal</span><span class="p">(</span><span class="n">invalidData</span><span class="p">))</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="c1">// Should produce error data instead of crashing</span>
+<span class="w">            </span><span class="kd">val</span><span class="w"> </span><span class="nv">error</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">lastData</span><span class="o">&lt;</span><span class="n">ErrorData</span><span class="o">&gt;</span><span class="p">()</span>
+<span class="w">            </span><span class="n">assertTrue</span><span class="p">(</span><span class="n">error</span><span class="o">?.</span><span class="na">message</span><span class="o">?.</span><span class="na">contains</span><span class="p">(</span><span class="s">&quot;Invalid data&quot;</span><span class="p">)</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="kc">true</span><span class="p">)</span>
+
+<span class="w">            </span><span class="c1">// Should not produce success data</span>
+<span class="w">            </span><span class="n">assertFalse</span><span class="p">(</span><span class="n">hasData</span><span class="o">&lt;</span><span class="n">SuccessData</span><span class="o">&gt;</span><span class="p">())</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div>
+<h3 id="testing-fallback-mechanisms">Testing Fallback Mechanisms</h3>
+<div class="highlight"><pre><span></span><code><span class="nd">@Test</span>
+<span class="kd">fun</span><span class="w"> </span><span class="nf">`should fallback when external service fails`</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">val</span><span class="w"> </span><span class="nv">serviceTransformer</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ExternalServiceTransformer</span><span class="p">()</span>
+
+<span class="w">    </span><span class="n">serviceTransformer</span><span class="p">.</span><span class="na">test</span><span class="p">()</span>
+<span class="w">        </span><span class="p">.</span><span class="na">withComputation</span><span class="p">(</span><span class="n">ExternalServiceTransformer</span><span class="p">.</span><span class="na">serviceContract</span><span class="p">,</span><span class="w"> </span><span class="kc">null</span><span class="p">)</span><span class="w"> </span><span class="c1">// Mock failure</span>
+<span class="w">        </span><span class="p">.</span><span class="na">testSignal</span><span class="p">(</span><span class="n">CallExternalServiceSignal</span><span class="p">(</span><span class="s">&quot;test-request&quot;</span><span class="p">))</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="c1">// Should use fallback</span>
+<span class="w">            </span><span class="kd">val</span><span class="w"> </span><span class="nv">fallbackData</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">lastData</span><span class="o">&lt;</span><span class="n">FallbackData</span><span class="o">&gt;</span><span class="p">()</span>
+<span class="w">            </span><span class="n">assertEquals</span><span class="p">(</span><span class="s">&quot;fallback-response&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">fallbackData</span><span class="o">?.</span><span class="na">content</span><span class="p">)</span>
+
+<span class="w">            </span><span class="n">assertTrue</span><span class="p">(</span><span class="n">hasEffect</span><span class="o">&lt;</span><span class="n">ServiceFailureLoggedEffect</span><span class="o">&gt;</span><span class="p">())</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div>
+<h2 id="testing-with-real-examples">Testing with Real Examples</h2>
+<h3 id="counter-sample-test">Counter Sample Test</h3>
+<div class="highlight"><pre><span></span><code><span class="nd">@Test</span>
+<span class="kd">fun</span><span class="w"> </span><span class="nf">`worker should process lookup signal correctly`</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">val</span><span class="w"> </span><span class="nv">worker</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Worker</span><span class="p">(</span><span class="s">&quot;test-worker&quot;</span><span class="p">)</span>
+
+<span class="w">    </span><span class="n">worker</span><span class="p">.</span><span class="na">test</span><span class="p">()</span>
+<span class="w">        </span><span class="p">.</span><span class="na">testSignal</span><span class="p">(</span><span class="n">CounterSignal</span><span class="p">.</span><span class="na">Lookup</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="kd">val</span><span class="w"> </span><span class="nv">data</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">lastData</span><span class="o">&lt;</span><span class="n">CounterData</span><span class="o">&gt;</span><span class="p">()</span>
+<span class="w">            </span><span class="n">assertTrue</span><span class="p">(</span><span class="n">data</span><span class="o">?.</span><span class="na">id</span><span class="o">?.</span><span class="na">contains</span><span class="p">(</span><span class="s">&quot;test-worker&quot;</span><span class="p">)</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="kc">true</span><span class="p">)</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div>
+<h3 id="components-sample-test">Components Sample Test</h3>
+<div class="highlight"><pre><span></span><code><span class="nd">@Test</span>
+<span class="kd">fun</span><span class="w"> </span><span class="nf">`input transformer should handle input updates`</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">val</span><span class="w"> </span><span class="nv">inputTransformer</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">InputTransformer</span><span class="p">(</span><span class="n">Dispatchers</span><span class="p">.</span><span class="na">Unconfined</span><span class="p">)</span>
+
+<span class="w">    </span><span class="n">inputTransformer</span><span class="p">.</span><span class="na">test</span><span class="p">()</span>
+<span class="w">        </span><span class="p">.</span><span class="na">testSignal</span><span class="p">(</span><span class="n">InputSignal</span><span class="p">.</span><span class="na">InputUpdate</span><span class="p">(</span><span class="s">&quot;Hello World&quot;</span><span class="p">))</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="c1">// Verify state update</span>
+<span class="w">            </span><span class="kd">val</span><span class="w"> </span><span class="nv">state</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">lastData</span><span class="o">&lt;</span><span class="n">InputUiState</span><span class="o">&gt;</span><span class="p">()</span>
+<span class="w">            </span><span class="n">assertEquals</span><span class="p">(</span><span class="s">&quot;Hello World&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">state</span><span class="o">?.</span><span class="na">writtenText</span><span class="p">)</span>
+
+<span class="w">            </span><span class="c1">// Verify effect publication</span>
+<span class="w">            </span><span class="kd">val</span><span class="w"> </span><span class="nv">effect</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">lastEffect</span><span class="o">&lt;</span><span class="n">InputEffect</span><span class="p">.</span><span class="na">InputUpdate</span><span class="o">&gt;</span><span class="p">()</span>
+<span class="w">            </span><span class="n">assertEquals</span><span class="p">(</span><span class="s">&quot;Hello World&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">effect</span><span class="o">?.</span><span class="na">value</span><span class="p">)</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="p">}</span>
+
+<span class="nd">@Test</span>
+<span class="kd">fun</span><span class="w"> </span><span class="nf">`color picker should handle background color update`</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">val</span><span class="w"> </span><span class="nv">colorPickerTransformer</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ColorPickerTransformer</span><span class="p">()</span>
+
+<span class="w">    </span><span class="n">colorPickerTransformer</span><span class="p">.</span><span class="na">test</span><span class="p">()</span>
+<span class="w">        </span><span class="p">.</span><span class="na">testEffect</span><span class="p">(</span><span class="n">ColorPickerEffect</span><span class="p">.</span><span class="na">BackgroundColorUpdate</span><span class="p">(</span><span class="n">Color</span><span class="p">.</span><span class="na">Gray</span><span class="p">))</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="kd">val</span><span class="w"> </span><span class="nv">state</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">lastData</span><span class="o">&lt;</span><span class="n">ColorPickerUiState</span><span class="o">&gt;</span><span class="p">()</span>
+<span class="w">            </span><span class="n">assertEquals</span><span class="p">(</span><span class="n">Color</span><span class="p">.</span><span class="na">Gray</span><span class="p">,</span><span class="w"> </span><span class="n">state</span><span class="o">?.</span><span class="na">backgroundColor</span><span class="p">)</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div>
+<h2 id="advanced-testing-with-assertions">Advanced Testing with Assertions</h2>
+<h3 id="using-all-dataeffects">Using All Data/Effects</h3>
+<div class="highlight"><pre><span></span><code><span class="nd">@Test</span>
+<span class="kd">fun</span><span class="w"> </span><span class="nf">`should track all data emissions`</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">val</span><span class="w"> </span><span class="nv">transformer</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">MultiDataTransformer</span><span class="p">()</span>
+
+<span class="w">    </span><span class="n">transformer</span><span class="p">.</span><span class="na">test</span><span class="p">()</span>
+<span class="w">        </span><span class="p">.</span><span class="na">testSignal</span><span class="p">(</span><span class="n">EmitMultipleDataSignal</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="kd">val</span><span class="w"> </span><span class="nv">allUserData</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">allData</span><span class="o">&lt;</span><span class="n">UserData</span><span class="o">&gt;</span><span class="p">()</span>
+<span class="w">            </span><span class="n">assertEquals</span><span class="p">(</span><span class="m">3</span><span class="p">,</span><span class="w"> </span><span class="n">allUserData</span><span class="p">.</span><span class="na">size</span><span class="p">)</span>
+
+<span class="w">            </span><span class="kd">val</span><span class="w"> </span><span class="nv">allEffects</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">allEffects</span><span class="o">&lt;</span><span class="n">NotificationEffect</span><span class="o">&gt;</span><span class="p">()</span>
+<span class="w">            </span><span class="n">assertTrue</span><span class="p">(</span><span class="n">allEffects</span><span class="p">.</span><span class="na">isNotEmpty</span><span class="p">())</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div>
+<h3 id="using-find-data-with-predicates">Using Find Data with Predicates</h3>
+<div class="highlight"><pre><span></span><code><span class="nd">@Test</span>
+<span class="kd">fun</span><span class="w"> </span><span class="nf">`should find specific data with predicate`</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">val</span><span class="w"> </span><span class="nv">transformer</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">SearchTransformer</span><span class="p">()</span>
+
+<span class="w">    </span><span class="n">transformer</span><span class="p">.</span><span class="na">test</span><span class="p">()</span>
+<span class="w">        </span><span class="p">.</span><span class="na">testSignal</span><span class="p">(</span><span class="n">SearchSignal</span><span class="p">(</span><span class="s">&quot;query&quot;</span><span class="p">))</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="kd">val</span><span class="w"> </span><span class="nv">specificResult</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">findData</span><span class="o">&lt;</span><span class="n">SearchResult</span><span class="o">&gt;</span><span class="w"> </span><span class="p">{</span><span class="w"> </span>
+<span class="w">                </span><span class="nb">it</span><span class="p">.</span><span class="na">query</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="s">&quot;query&quot;</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="nb">it</span><span class="p">.</span><span class="na">resultCount</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="m">0</span><span class="w"> </span>
+<span class="w">            </span><span class="p">}</span>
+<span class="w">            </span><span class="n">assertNotNull</span><span class="p">(</span><span class="n">specificResult</span><span class="p">)</span>
+
+<span class="w">            </span><span class="kd">val</span><span class="w"> </span><span class="nv">nthResult</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">nthData</span><span class="o">&lt;</span><span class="n">SearchResult</span><span class="o">&gt;</span><span class="p">(</span><span class="m">1</span><span class="p">)</span><span class="w"> </span><span class="c1">// Second result</span>
+<span class="w">            </span><span class="n">assertNotNull</span><span class="p">(</span><span class="n">nthResult</span><span class="p">)</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div>
+<h2 id="advanced-testing-patterns">Advanced Testing Patterns</h2>
+<h3 id="testing-inter-transformer-communication">Testing Inter-Transformer Communication</h3>
+<div class="highlight"><pre><span></span><code><span class="nd">@Test</span>
+<span class="kd">fun</span><span class="w"> </span><span class="nf">`should communicate between transformers correctly`</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">val</span><span class="w"> </span><span class="nv">providerTransformer</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">DataProviderTransformer</span><span class="p">()</span>
+<span class="w">    </span><span class="kd">val</span><span class="w"> </span><span class="nv">consumerTransformer</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">DataConsumerTransformer</span><span class="p">()</span>
+
+<span class="w">    </span><span class="c1">// Setup provider with mock data</span>
+<span class="w">    </span><span class="n">providerTransformer</span><span class="p">.</span><span class="na">test</span><span class="p">()</span>
+<span class="w">        </span><span class="p">.</span><span class="na">withData</span><span class="p">(</span><span class="n">DataProviderTransformer</span><span class="p">.</span><span class="na">dataContract</span><span class="p">,</span><span class="w"> </span><span class="n">mockProviderData</span><span class="p">)</span>
+<span class="w">        </span><span class="p">.</span><span class="na">testSignal</span><span class="p">(</span><span class="n">UpdateDataSignal</span><span class="p">(</span><span class="s">&quot;Test Data&quot;</span><span class="p">))</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="n">assertTrue</span><span class="p">(</span><span class="n">hasData</span><span class="o">&lt;</span><span class="n">DataUpdated</span><span class="o">&gt;</span><span class="p">())</span>
+<span class="w">        </span><span class="p">}</span>
+
+<span class="w">    </span><span class="c1">// Test consumer querying provider</span>
+<span class="w">    </span><span class="n">consumerTransformer</span><span class="p">.</span><span class="na">test</span><span class="p">()</span>
+<span class="w">        </span><span class="p">.</span><span class="na">withComputation</span><span class="p">(</span><span class="n">DataProviderTransformer</span><span class="p">.</span><span class="na">dataContract</span><span class="p">,</span><span class="w"> </span><span class="n">mockProviderData</span><span class="p">)</span>
+<span class="w">        </span><span class="p">.</span><span class="na">testSignal</span><span class="p">(</span><span class="n">RequestDataSignal</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="kd">val</span><span class="w"> </span><span class="nv">data</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">lastData</span><span class="o">&lt;</span><span class="n">RequestedData</span><span class="o">&gt;</span><span class="p">()</span>
+<span class="w">            </span><span class="n">assertEquals</span><span class="p">(</span><span class="s">&quot;Test Data&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">data</span><span class="o">?.</span><span class="na">content</span><span class="p">)</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div>
+<h3 id="testing-time-dependent-operations">Testing Time-Dependent Operations</h3>
+<div class="highlight"><pre><span></span><code><span class="nd">@Test</span>
+<span class="kd">fun</span><span class="w"> </span><span class="nf">`should handle delayed operations correctly`</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">val</span><span class="w"> </span><span class="nv">delayedTransformer</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">DelayedTransformer</span><span class="p">()</span>
+
+<span class="w">    </span><span class="n">delayedTransformer</span><span class="p">.</span><span class="na">test</span><span class="p">()</span>
+<span class="w">        </span><span class="p">.</span><span class="na">testSignal</span><span class="p">(</span><span class="n">StartDelayedOperationSignal</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="c1">// Verify immediate response</span>
+<span class="w">            </span><span class="n">assertTrue</span><span class="p">(</span><span class="n">hasData</span><span class="o">&lt;</span><span class="n">OperationStartedData</span><span class="o">&gt;</span><span class="p">())</span>
+
+<span class="w">            </span><span class="c1">// Verify delayed result appears</span>
+<span class="w">            </span><span class="kd">val</span><span class="w"> </span><span class="nv">delayedResult</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">lastData</span><span class="o">&lt;</span><span class="n">DelayedOperationCompletedData</span><span class="o">&gt;</span><span class="p">()</span>
+<span class="w">            </span><span class="n">assertNotNull</span><span class="p">(</span><span class="n">delayedResult</span><span class="p">)</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div>
+<h3 id="testing-multiple-transformer-interactions">Testing Multiple Transformer Interactions</h3>
+<div class="highlight"><pre><span></span><code><span class="nd">@Test</span>
+<span class="kd">fun</span><span class="w"> </span><span class="nf">`should handle multi-transformer workflow`</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">val</span><span class="w"> </span><span class="nv">orderTransformer</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">OrderTransformer</span><span class="p">()</span>
+<span class="w">    </span><span class="kd">val</span><span class="w"> </span><span class="nv">paymentTransformer</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">PaymentTransformer</span><span class="p">()</span>
+<span class="w">    </span><span class="kd">val</span><span class="w"> </span><span class="nv">inventoryTransformer</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">InventoryTransformer</span><span class="p">()</span>
+
+<span class="w">    </span><span class="c1">// Mock external dependencies</span>
+<span class="w">    </span><span class="n">orderTransformer</span><span class="p">.</span><span class="na">test</span><span class="p">()</span>
+<span class="w">        </span><span class="p">.</span><span class="na">withComputation</span><span class="p">(</span><span class="n">PaymentTransformer</span><span class="p">.</span><span class="na">processPaymentContract</span><span class="p">,</span><span class="w"> </span><span class="n">paymentResult</span><span class="p">)</span>
+<span class="w">        </span><span class="p">.</span><span class="na">withComputation</span><span class="p">(</span><span class="n">InventoryTransformer</span><span class="p">.</span><span class="na">reserveItemsContract</span><span class="p">,</span><span class="w"> </span><span class="n">inventoryResult</span><span class="p">)</span>
+<span class="w">        </span><span class="p">.</span><span class="na">testSignal</span><span class="p">(</span><span class="n">CreateOrderSignal</span><span class="p">(</span><span class="n">orderDetails</span><span class="p">))</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="n">assertTrue</span><span class="p">(</span><span class="n">hasEffect</span><span class="o">&lt;</span><span class="n">ValidateInventoryEffect</span><span class="o">&gt;</span><span class="p">())</span>
+<span class="w">            </span><span class="n">assertTrue</span><span class="p">(</span><span class="n">hasEffect</span><span class="o">&lt;</span><span class="n">ProcessPaymentEffect</span><span class="o">&gt;</span><span class="p">())</span>
+
+<span class="w">            </span><span class="kd">val</span><span class="w"> </span><span class="nv">order</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">lastData</span><span class="o">&lt;</span><span class="n">OrderCreatedData</span><span class="o">&gt;</span><span class="p">()</span>
+<span class="w">            </span><span class="n">assertEquals</span><span class="p">(</span><span class="n">OrderStatus</span><span class="p">.</span><span class="na">CREATED</span><span class="p">,</span><span class="w"> </span><span class="n">order</span><span class="o">?.</span><span class="na">status</span><span class="p">)</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div>
+<h2 id="testing-utilities">Testing Utilities</h2>
+<h3 id="custom-test-helpers">Custom Test Helpers</h3>
+<div class="highlight"><pre><span></span><code><span class="kd">fun</span><span class="w"> </span><span class="n">TransmissionTest</span><span class="p">.</span><span class="nf">sendValidLoginSignal</span><span class="p">():</span><span class="w"> </span><span class="n">TransmissionTest</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="k">this</span><span class="p">.</span><span class="na">testSignal</span><span class="p">(</span><span class="n">UserLoginSignal</span><span class="p">(</span><span class="n">Credentials</span><span class="p">(</span><span class="s">&quot;user&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;password&quot;</span><span class="p">)))</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="c1">// Validation logic can be here or separate</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+
+<span class="kd">fun</span><span class="w"> </span><span class="n">TransmissionTest</span><span class="p">.</span><span class="nf">expectSuccessfulLogin</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">this</span><span class="p">.</span><span class="na">testSignal</span><span class="p">(</span><span class="n">UserLoginSignal</span><span class="p">(</span><span class="n">validCredentials</span><span class="p">))</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="kd">val</span><span class="w"> </span><span class="nv">userData</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">lastData</span><span class="o">&lt;</span><span class="n">UserData</span><span class="o">&gt;</span><span class="p">()</span>
+<span class="w">        </span><span class="n">assertTrue</span><span class="p">(</span><span class="n">userData</span><span class="o">?.</span><span class="na">isAuthenticated</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="kc">true</span><span class="p">)</span>
+<span class="w">        </span><span class="n">assertTrue</span><span class="p">(</span><span class="n">hasEffect</span><span class="o">&lt;</span><span class="n">NavigationEffect</span><span class="p">.</span><span class="na">GoToHome</span><span class="o">&gt;</span><span class="p">())</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+
+<span class="nd">@Test</span>
+<span class="kd">fun</span><span class="w"> </span><span class="nf">`should login successfully with valid credentials`</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">val</span><span class="w"> </span><span class="nv">authTransformer</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">AuthTransformer</span><span class="p">()</span>
+
+<span class="w">    </span><span class="n">authTransformer</span><span class="p">.</span><span class="na">test</span><span class="p">()</span>
+<span class="w">        </span><span class="p">.</span><span class="na">expectSuccessfulLogin</span><span class="p">()</span>
+<span class="p">}</span>
+</code></pre></div>
+<h3 id="parameterized-tests">Parameterized Tests</h3>
+<div class="highlight"><pre><span></span><code><span class="nd">@ParameterizedTest</span>
+<span class="nd">@ValueSource</span><span class="p">(</span><span class="n">strings</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">[</span><span class="s">&quot;&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot; &quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;invalid-format&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;too-long-input&quot;</span><span class="o">]</span><span class="p">)</span>
+<span class="kd">fun</span><span class="w"> </span><span class="nf">`should reject invalid inputs`</span><span class="p">(</span><span class="n">invalidInput</span><span class="p">:</span><span class="w"> </span><span class="kt">String</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">val</span><span class="w"> </span><span class="nv">validationTransformer</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ValidationTransformer</span><span class="p">()</span>
+
+<span class="w">    </span><span class="n">validationTransformer</span><span class="p">.</span><span class="na">test</span><span class="p">()</span>
+<span class="w">        </span><span class="p">.</span><span class="na">testSignal</span><span class="p">(</span><span class="n">ValidateInputSignal</span><span class="p">(</span><span class="n">invalidInput</span><span class="p">))</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="kd">val</span><span class="w"> </span><span class="nv">result</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">lastData</span><span class="o">&lt;</span><span class="n">ValidationResult</span><span class="o">&gt;</span><span class="p">()</span>
+<span class="w">            </span><span class="n">assertFalse</span><span class="p">(</span><span class="n">result</span><span class="o">?.</span><span class="na">isValid</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="kc">true</span><span class="p">)</span>
+<span class="w">            </span><span class="n">assertNotNull</span><span class="p">(</span><span class="n">result</span><span class="o">?.</span><span class="na">errorMessage</span><span class="p">)</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div>
+<h3 id="mock-transformers-for-testing">Mock Transformers for Testing</h3>
+<div class="highlight"><pre><span></span><code><span class="kd">class</span><span class="w"> </span><span class="nc">MockExternalServiceTransformer</span><span class="p">(</span>
+<span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="kd">val</span><span class="w"> </span><span class="nv">shouldFail</span><span class="p">:</span><span class="w"> </span><span class="kt">Boolean</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">false</span>
+<span class="p">)</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="n">Transformer</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+
+<span class="w">    </span><span class="kd">override</span><span class="w"> </span><span class="kd">val</span><span class="w"> </span><span class="nv">computations</span><span class="p">:</span><span class="w"> </span><span class="n">Computations</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">computations</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">register</span><span class="p">(</span><span class="n">ExternalServiceTransformer</span><span class="p">.</span><span class="na">getDataContract</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">shouldFail</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">                </span><span class="k">throw</span><span class="w"> </span><span class="n">RuntimeException</span><span class="p">(</span><span class="s">&quot;Service unavailable&quot;</span><span class="p">)</span>
+<span class="w">            </span><span class="p">}</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="p">{</span>
+<span class="w">                </span><span class="s">&quot;Mock data&quot;</span>
+<span class="w">            </span><span class="p">}</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+
+<span class="nd">@Test</span>
+<span class="kd">fun</span><span class="w"> </span><span class="nf">`should handle external service failure`</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">val</span><span class="w"> </span><span class="nv">businessTransformer</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">BusinessTransformer</span><span class="p">()</span>
+
+<span class="w">    </span><span class="n">businessTransformer</span><span class="p">.</span><span class="na">test</span><span class="p">()</span>
+<span class="w">        </span><span class="p">.</span><span class="na">withComputation</span><span class="p">(</span><span class="n">ExternalServiceTransformer</span><span class="p">.</span><span class="na">getDataContract</span><span class="p">,</span><span class="w"> </span><span class="kc">null</span><span class="p">)</span>
+<span class="w">        </span><span class="p">.</span><span class="na">testSignal</span><span class="p">(</span><span class="n">ProcessDataSignal</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="kd">val</span><span class="w"> </span><span class="nv">error</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">lastData</span><span class="o">&lt;</span><span class="n">ErrorData</span><span class="o">&gt;</span><span class="p">()</span>
+<span class="w">            </span><span class="n">assertTrue</span><span class="p">(</span><span class="n">error</span><span class="o">?.</span><span class="na">message</span><span class="o">?.</span><span class="na">contains</span><span class="p">(</span><span class="s">&quot;Service unavailable&quot;</span><span class="p">)</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="kc">true</span><span class="p">)</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div>
+<h2 id="best-practices">Best Practices</h2>
+<h3 id="1-test-business-logic-not-implementation">1. Test Business Logic, Not Implementation</h3>
+<div class="highlight"><pre><span></span><code><span class="c1">// Good - tests behavior</span>
+<span class="nd">@Test</span>
+<span class="kd">fun</span><span class="w"> </span><span class="nf">`should calculate order total correctly`</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">val</span><span class="w"> </span><span class="nv">orderTransformer</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">OrderTransformer</span><span class="p">()</span>
+
+<span class="w">    </span><span class="n">orderTransformer</span><span class="p">.</span><span class="na">test</span><span class="p">()</span>
+<span class="w">        </span><span class="p">.</span><span class="na">testSignal</span><span class="p">(</span><span class="n">CalculateOrderSignal</span><span class="p">(</span><span class="n">orderWithItems</span><span class="p">))</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="kd">val</span><span class="w"> </span><span class="nv">total</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">lastData</span><span class="o">&lt;</span><span class="n">OrderTotal</span><span class="o">&gt;</span><span class="p">()</span>
+<span class="w">            </span><span class="n">assertEquals</span><span class="p">(</span><span class="n">BigDecimal</span><span class="p">(</span><span class="s">&quot;150.00&quot;</span><span class="p">),</span><span class="w"> </span><span class="n">total</span><span class="o">?.</span><span class="na">amount</span><span class="p">)</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="p">}</span>
+
+<span class="c1">// Avoid - tests implementation details</span>
+<span class="nd">@Test</span>
+<span class="kd">fun</span><span class="w"> </span><span class="nf">`should call specific internal method`</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="c1">// Testing internal method calls is fragile</span>
+<span class="p">}</span>
+</code></pre></div>
+<h3 id="2-use-descriptive-test-names">2. Use Descriptive Test Names</h3>
+<div class="highlight"><pre><span></span><code><span class="c1">// Good</span>
+<span class="nd">@Test</span>
+<span class="kd">fun</span><span class="w"> </span><span class="nf">`should reject order when inventory is insufficient`</span><span class="p">()</span>
+
+<span class="nd">@Test</span>
+<span class="kd">fun</span><span class="w"> </span><span class="nf">`should send welcome email after successful registration`</span><span class="p">()</span>
+
+<span class="c1">// Avoid</span>
+<span class="nd">@Test</span>
+<span class="kd">fun</span><span class="w"> </span><span class="nf">`test1()`</span><span class="p">()</span>
+
+<span class="nd">@Test</span>
+<span class="kd">fun</span><span class="w"> </span><span class="nf">`testOrderProcessing()`</span><span class="p">()</span>
+</code></pre></div>
+<h3 id="3-test-edge-cases">3. Test Edge Cases</h3>
+<div class="highlight"><pre><span></span><code><span class="nd">@Test</span>
+<span class="kd">fun</span><span class="w"> </span><span class="nf">`should handle empty input gracefully`</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">val</span><span class="w"> </span><span class="nv">processor</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">DataProcessorTransformer</span><span class="p">()</span>
+
+<span class="w">    </span><span class="n">processor</span><span class="p">.</span><span class="na">test</span><span class="p">()</span>
+<span class="w">        </span><span class="p">.</span><span class="na">testSignal</span><span class="p">(</span><span class="n">ProcessDataSignal</span><span class="p">(</span><span class="n">emptyList</span><span class="p">()))</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="kd">val</span><span class="w"> </span><span class="nv">result</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">lastData</span><span class="o">&lt;</span><span class="n">ProcessingResult</span><span class="o">&gt;</span><span class="p">()</span>
+<span class="w">            </span><span class="n">assertTrue</span><span class="p">(</span><span class="n">result</span><span class="o">?.</span><span class="na">isEmpty</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="kc">true</span><span class="p">)</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="p">}</span>
+
+<span class="nd">@Test</span>
+<span class="kd">fun</span><span class="w"> </span><span class="nf">`should handle null values correctly`</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">val</span><span class="w"> </span><span class="nv">transformer</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">NullSafeTransformer</span><span class="p">()</span>
+
+<span class="w">    </span><span class="n">transformer</span><span class="p">.</span><span class="na">test</span><span class="p">()</span>
+<span class="w">        </span><span class="p">.</span><span class="na">testSignal</span><span class="p">(</span><span class="n">ProcessNullableSignal</span><span class="p">(</span><span class="kc">null</span><span class="p">))</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="kd">val</span><span class="w"> </span><span class="nv">result</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">lastData</span><span class="o">&lt;</span><span class="n">SafeProcessingResult</span><span class="o">&gt;</span><span class="p">()</span>
+<span class="w">            </span><span class="n">assertEquals</span><span class="p">(</span><span class="s">&quot;default&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">result</span><span class="o">?.</span><span class="na">value</span><span class="p">)</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div>
+<h3 id="4-keep-tests-isolated">4. Keep Tests Isolated</h3>
+<div class="highlight"><pre><span></span><code><span class="c1">// Good - each test is independent</span>
+<span class="nd">@Test</span>
+<span class="kd">fun</span><span class="w"> </span><span class="nf">`should process valid order`</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">val</span><span class="w"> </span><span class="nv">transformer</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">OrderTransformer</span><span class="p">()</span>
+<span class="w">    </span><span class="c1">// Test implementation</span>
+<span class="p">}</span>
+
+<span class="nd">@Test</span>
+<span class="kd">fun</span><span class="w"> </span><span class="nf">`should reject invalid order`</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">val</span><span class="w"> </span><span class="nv">transformer</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">OrderTransformer</span><span class="p">()</span><span class="w"> </span><span class="c1">// Fresh instance</span>
+<span class="w">    </span><span class="c1">// Test implementation</span>
+<span class="p">}</span>
+
+<span class="c1">// Avoid - shared state between tests</span>
+<span class="kd">class</span><span class="w"> </span><span class="nc">OrderTransformerTest</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="kd">val</span><span class="w"> </span><span class="nv">sharedTransformer</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">OrderTransformer</span><span class="p">()</span><span class="w"> </span><span class="c1">// Bad: shared state</span>
+<span class="p">}</span>
+</code></pre></div>
+<h3 id="5-verify-both-positive-and-negative-cases">5. Verify Both Positive and Negative Cases</h3>
+<div class="highlight"><pre><span></span><code><span class="nd">@Test</span>
+<span class="kd">fun</span><span class="w"> </span><span class="nf">`should succeed with valid data`</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">val</span><span class="w"> </span><span class="nv">transformer</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">DataTransformer</span><span class="p">()</span>
+
+<span class="w">    </span><span class="n">transformer</span><span class="p">.</span><span class="na">test</span><span class="p">()</span>
+<span class="w">        </span><span class="p">.</span><span class="na">testSignal</span><span class="p">(</span><span class="n">ValidDataSignal</span><span class="p">(</span><span class="n">validData</span><span class="p">))</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="n">assertTrue</span><span class="p">(</span><span class="n">hasData</span><span class="o">&lt;</span><span class="n">SuccessData</span><span class="o">&gt;</span><span class="p">())</span>
+<span class="w">            </span><span class="n">assertFalse</span><span class="p">(</span><span class="n">hasData</span><span class="o">&lt;</span><span class="n">ErrorData</span><span class="o">&gt;</span><span class="p">())</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="p">}</span>
+
+<span class="nd">@Test</span>
+<span class="kd">fun</span><span class="w"> </span><span class="nf">`should fail with invalid data`</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">val</span><span class="w"> </span><span class="nv">transformer</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">DataTransformer</span><span class="p">()</span>
+
+<span class="w">    </span><span class="n">transformer</span><span class="p">.</span><span class="na">test</span><span class="p">()</span>
+<span class="w">        </span><span class="p">.</span><span class="na">testSignal</span><span class="p">(</span><span class="n">InvalidDataSignal</span><span class="p">(</span><span class="n">invalidData</span><span class="p">))</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="n">assertTrue</span><span class="p">(</span><span class="n">hasData</span><span class="o">&lt;</span><span class="n">ErrorData</span><span class="o">&gt;</span><span class="p">())</span>
+<span class="w">            </span><span class="n">assertFalse</span><span class="p">(</span><span class="n">hasData</span><span class="o">&lt;</span><span class="n">SuccessData</span><span class="o">&gt;</span><span class="p">())</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="p">}</span>
+
+<span class="nd">@Test</span>
+<span class="kd">fun</span><span class="w"> </span><span class="nf">`should handle edge cases`</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">val</span><span class="w"> </span><span class="nv">transformer</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">DataTransformer</span><span class="p">()</span>
+
+<span class="w">    </span><span class="n">transformer</span><span class="p">.</span><span class="na">test</span><span class="p">()</span>
+<span class="w">        </span><span class="p">.</span><span class="na">testSignal</span><span class="p">(</span><span class="n">EdgeCaseSignal</span><span class="p">(</span><span class="n">edgeCaseData</span><span class="p">))</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="kd">val</span><span class="w"> </span><span class="nv">result</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">lastData</span><span class="o">&lt;</span><span class="n">ProcessingResult</span><span class="o">&gt;</span><span class="p">()</span>
+<span class="w">            </span><span class="c1">// Verify boundary condition handling</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div>
+<h2 id="summary">Summary</h2>
+<p>The Transmission testing framework provides a comprehensive API for testing your transformers:</p>
+<ul>
+<li><strong>transformer.test()</strong> - Creates a TransmissionTest instance</li>
+<li><strong>testSignal(signal) { assertions }</strong> - Tests signal handling</li>
+<li><strong>testEffect(effect) { assertions }</strong> - Tests effect handling</li>
+<li><strong>withData/withComputation/withCheckpoint</strong> - Mocking and setup</li>
+<li><strong>lastData<T>(), allData<T>(), hasData<T>()</strong> - Data assertions</li>
+<li><strong>lastEffect<T>(), allEffects<T>(), hasEffect<T>()</strong> - Effect assertions</li>
+<li><strong>findData<T>(predicate), nthData(index)</strong> - Advanced data queries</li>
+</ul>
+<p>Use these tools to create comprehensive, maintainable tests that verify your business logic while remaining resilient to implementation changes.</p>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+  <script>var tabs=__md_get("__tabs");if(Array.isArray(tabs))e:for(var set of document.querySelectorAll(".tabbed-set")){var labels=set.querySelector(".tabbed-labels");for(var tab of tabs)for(var label of labels.getElementsByTagName("label"))if(label.innerText.trim()===tab){var input=document.getElementById(label.htmlFor);input.checked=!0;continue e}}</script>
+
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+    
+      
+      <nav class="md-footer__inner md-grid" aria-label="Footer" >
+        
+          
+          <a href="../transformer_communication/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Transformer Communication">
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+            </div>
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Previous
+              </span>
+              <div class="md-ellipsis">
+                Transformer Communication
+              </div>
+            </div>
+          </a>
+        
+        
+          
+          <a href="../changelog/" class="md-footer__link md-footer__link--next" aria-label="Next: Changelog">
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Next
+              </span>
+              <div class="md-ellipsis">
+                Changelog
+              </div>
+            </div>
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11z"/></svg>
+            </div>
+          </a>
+        
+      </nav>
+    
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+    <div class="md-copyright__highlight">
+      Copyright &copy; 2024 Trendyol
+    </div>
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      <script id="__config" type="application/json">{"base": "..", "features": ["content.code.copy", "content.code.select", "content.code.annotate", "content.tabs.link", "content.tooltips", "header.autohide", "navigation.top", "navigation.tracking", "navigation.sections", "navigation.indexes", "navigation.footer", "search.highlight", "search.share", "search.suggest", "toc.integrate"], "search": "../assets/javascripts/workers/search.d50fe291.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.13a4f30d.min.js"></script>
+      
+    
+  </body>
+</html>
