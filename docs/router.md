@@ -128,7 +128,7 @@ router.process(NotificationEffect("Custom notification"))
 ```kotlin
 // Collect all data from all transformers
 lifecycleScope.launch {
-    router.dataStream.collect { data ->
+    router.streamData().collect { data ->
         when (data) {
             is UserData -> updateUserUI(data)
             is CounterData -> updateCounterUI(data)
@@ -143,8 +143,7 @@ lifecycleScope.launch {
 ```kotlin
 // Observe only user data
 lifecycleScope.launch {
-    router.dataStream
-        .filterIsInstance<UserData>()
+    router.streamData<UserData>()
         .collect { userData ->
             updateUserProfile(userData)
         }
@@ -152,7 +151,7 @@ lifecycleScope.launch {
 
 // Observe multiple specific types
 lifecycleScope.launch {
-    router.dataStream
+    router.streamData()
         .filter { it is UserData || it is ProfileData }
         .collect { data ->
             when (data) {
@@ -169,8 +168,7 @@ Access to the effect stream for monitoring:
 
 ```kotlin
 lifecycleScope.launch {
-    router.effectStream
-        .filterIsInstance<LoggingEffect>()
+    router.streamEffect<LoggingEffect>()
         .collect { effect ->
             println("Log: ${effect.message}")
         }
@@ -209,8 +207,7 @@ class CounterModule {
 // Usage in UI
 class CounterViewModel(private val router: TransmissionRouter) {
     
-    val counterData = router.dataStream
-        .filterIsInstance<CounterData>()
+    val counterData = router.streamData<CounterData>()
         .stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(5000),
@@ -245,8 +242,8 @@ class ComponentsModule {
 class ComponentViewModel(private val router: TransmissionRouter) {
     
     val uiState = combine(
-        router.dataStream.filterIsInstance<InputUiState>(),
-        router.dataStream.filterIsInstance<OutputCalculationResult>()
+        router.streamData<InputUiState>(),
+        router.streamData<OutputCalculationResult>()
     ) { inputState, outputResult ->
         SampleScreenUiState(
             inputState = inputState,
@@ -311,8 +308,7 @@ val dataRouter = TransmissionRouter {
 }
 
 // Cross-router communication via effects
-authRouter.effectStream
-    .filterIsInstance<UserLoggedInEffect>()
+authRouter.streamEffect<UserLoggedInEffect>()
     .collect { effect ->
         dataRouter.process(LoadUserDataSignal(effect.userId))
     }

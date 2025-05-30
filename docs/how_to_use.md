@@ -113,16 +113,14 @@ textInput.addTextChangedListener {
 
 // Observe data changes
 lifecycleScope.launch {
-    router.dataStream
-        .filterIsInstance<CounterData>()
+    router.streamData<CounterData>()
         .collect { data ->
             countTextView.text = "Count: ${data.count}"
         }
 }
 
 lifecycleScope.launch {
-    router.dataStream
-        .filterIsInstance<TextData>()
+    router.streamData<TextData>()
         .collect { data ->
             outputTextView.text = data.text
         }

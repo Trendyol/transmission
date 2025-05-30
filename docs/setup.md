@@ -220,7 +220,7 @@ object TransmissionModule {
     @Singleton
     fun provideTransmissionRouter(
         transformers: Set<Transformer>
-    ): TransmissionRouter = TransmissionRouterBuilder.build {
+    ): TransmissionRouter = TransmissionRouter {
         addTransformerSet(transformers)
     }
 }
@@ -242,7 +242,7 @@ val transmissionModule = module {
     
     // Define router
     single { 
-        TransmissionRouterBuilder.build {
+        TransmissionRouter {
             addTransformerSet(get<Set<Transformer>>())
         }
     }
