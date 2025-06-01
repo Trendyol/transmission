@@ -22,6 +22,7 @@ misc.xml
 deploymentTargetDropDown.xml
 render.experimental.xml
 .kotlin/
+.intellijPlatform/
 
 # Keystore files
 *.jks

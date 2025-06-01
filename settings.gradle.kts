@@ -12,10 +12,12 @@ pluginManagement {
 	}
 }
 dependencyResolutionManagement {
-	repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
+	repositoriesMode.set(RepositoriesMode.PREFER_PROJECT)
 	repositories {
 		google()
 		mavenCentral()
+		gradlePluginPortal()
+		maven { url = uri("https://www.jetbrains.com/intellij-repository/releases") }
 	}
 }
 
@@ -25,3 +27,4 @@ include(":transmission-test")
 include(":samples:components")
 include(":samples:counter")
 includeBuild("gradle/build-logic")
+include(":transmission-visualizer")
