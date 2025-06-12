@@ -22,6 +22,7 @@ dependencyResolutionManagement {
 rootProject.name = "transmission"
 include(":transmission")
 include(":transmission-test")
+include(":transmission-viewmodel")
 include(":samples:components")
 include(":samples:counter")
 includeBuild("gradle/build-logic")

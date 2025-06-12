@@ -99,7 +99,9 @@ val router = TransmissionRouter {
 
 ## 4. Connect Your UI
 
-Connect your UI to the Transmission network:
+### Option A: Direct Router Usage
+
+Connect your UI directly to the Transmission network:
 
 ```kotlin
 // Handle UI events
@@ -124,6 +126,67 @@ lifecycleScope.launch {
         .collect { data ->
             outputTextView.text = data.text
         }
+}
+```
+
+### Option B: RouterViewModel (Multiplatform)
+
+For multiplatform applications, use RouterViewModel for cleaner architecture across all platforms:
+
+```kotlin
+class MainViewModel : RouterViewModel(
+    setOf(
+        CounterTransformer(),
+        TextTransformer(),
+        LoggingTransformer()
+    )
+) {
+    // StateFlow properties for UI
+    val counterState = streamDataAsState<CounterData>(CounterData(0))
+    val textState = streamDataAsState<TextData>(TextData(""))
+    
+    // Handle effects
+    override fun onEffect(effect: Transmission.Effect) {
+        when (effect) {
+            is LoggingEffect -> Log.d("MainViewModel", effect.message)
+        }
+    }
+    
+    // Public methods for UI interaction
+    fun incrementCounter() {
+        processSignal(IncrementCounterSignal)
+    }
+    
+    fun updateText(text: String) {
+        processSignal(UpdateTextSignal(text))
+    }
+    
+    fun refreshUI() {
+        processEffect(RefreshUIEffect)
+    }
+}
+
+// In your Compose UI
+@Composable
+fun MainScreen(viewModel: MainViewModel = viewModel()) {
+    val counterState by viewModel.counterState.collectAsState()
+    val textState by viewModel.textState.collectAsState()
+    
+    Column {
+        Text("Count: ${counterState.count}")
+        Button(onClick = { viewModel.incrementCounter() }) {
+            Text("Increment")
+        }
+        
+        TextField(
+            value = textState.text,
+            onValueChange = { viewModel.updateText(it) }
+        )
+        
+        Button(onClick = { viewModel.refreshUI() }) {
+            Text("Refresh")
+        }
+    }
 }
 ```
 

@@ -15,6 +15,9 @@ Add the dependency to your app's build.gradle file:
 dependencies {
     implementation 'com.trendyol:transmission:<latest-version>'
     
+    // For Android ViewModel integration
+    implementation 'com.trendyol:transmission-viewmodel:<latest-version>'
+    
     // If you need testing utilities
     testImplementation 'com.trendyol:transmission-test:<latest-version>'
 }
@@ -26,6 +29,9 @@ Or in Kotlin DSL:
 // In your app's build.gradle.kts file
 dependencies {
     implementation("com.trendyol:transmission:<latest-version>")
+    
+    // For Android ViewModel integration
+    implementation("com.trendyol:transmission-viewmodel:<latest-version>")
     
     // If you need testing utilities
     testImplementation("com.trendyol:transmission-test:<latest-version>")
@@ -249,6 +255,165 @@ val transmissionModule = module {
 }
 ```
 
+## RouterViewModel Setup (Multiplatform)
+
+### RouterViewModel Module
+
+For multiplatform projects using ViewModels, add the RouterViewModel dependency:
+
+```kotlin
+// Multiplatform module build.gradle.kts
+kotlin {
+    sourceSets {
+        val commonMain by getting {
+            dependencies {
+                implementation("com.trendyol:transmission:<latest-version>")
+                implementation("com.trendyol:transmission-viewmodel:<latest-version>")
+                
+                // Multiplatform ViewModel
+                implementation("androidx.lifecycle:lifecycle-viewmodel:2.7.0")
+            }
+        }
+    }
+}
+
+// Or for Android-only module
+dependencies {
+    implementation("com.trendyol:transmission:<latest-version>")
+    implementation("com.trendyol:transmission-viewmodel:<latest-version>")
+    
+    // ViewModel and Lifecycle
+    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.7.0")
+    implementation("androidx.lifecycle:lifecycle-runtime-compose:2.7.0")
+}
+```
+
+### With Dependency Injection
+
+#### Hilt + RouterViewModel
+
+```kotlin
+// Module setup
+@Module
+@InstallIn(SingletonComponent::class)
+object TransmissionModule {
+    
+    @Provides
+    @Singleton
+    fun provideTransformers(): Set<Transformer> = setOf(
+        UserTransformer(),
+        AuthTransformer(),
+        DataTransformer()
+    )
+    
+    @Provides
+    @Singleton
+    fun provideTransformerSetLoader(
+        transformers: Set<Transformer>
+    ): TransformerSetLoader = object : TransformerSetLoader {
+        override suspend fun load(): Set<Transformer> = transformers
+    }
+}
+
+// ViewModel with injection
+@HiltViewModel
+class MainViewModel @Inject constructor(
+    private val transformerSetLoader: TransformerSetLoader
+) : RouterViewModel(
+    loader = transformerSetLoader,
+    config = RouterViewModelConfig(
+        capacity = Capacity.High,
+        dispatcher = Dispatchers.IO
+    )
+) {
+    val uiState = streamDataAsState<UiState>(UiState.Loading)
+    
+    fun handleUserAction(action: UserAction) {
+        processSignal(UserSignal.Action(action))
+    }
+}
+```
+
+#### Koin + RouterViewModel
+
+```kotlin
+// Koin module
+val androidTransmissionModule = module {
+    // Transformers
+    single { UserTransformer() }
+    single { AuthTransformer() }
+    single { DataTransformer() }
+    
+    // Transformer set
+    single<Set<Transformer>> { 
+        setOf(get<UserTransformer>(), get<AuthTransformer>(), get<DataTransformer>()) 
+    }
+    
+    // RouterViewModel configuration
+    single { 
+        RouterViewModelConfig(
+            capacity = Capacity.High,
+            dispatcher = get(named("ioDispatcher"))
+        )
+    }
+    
+    // ViewModels
+    viewModel { 
+        UserViewModel(
+            transformerSet = get<Set<Transformer>>(),
+            config = get<RouterViewModelConfig>()
+        )
+    }
+}
+
+// ViewModel implementation
+class UserViewModel(
+    transformerSet: Set<Transformer>,
+    config: RouterViewModelConfig
+) : RouterViewModel(transformerSet, config) {
+    
+    val userState = streamDataAsState<UserData>(UserData.Empty)
+    val loadingState = streamDataAsState<LoadingData>(LoadingData.Idle)
+    
+    override fun onEffect(effect: Transmission.Effect) {
+        when (effect) {
+            is NavigationEffect -> handleNavigation(effect)
+            is ErrorEffect -> showError(effect.message)
+        }
+    }
+    
+    fun login(credentials: Credentials) {
+        processSignal(AuthSignal.Login(credentials))
+    }
+}
+```
+
+### Compose Integration
+
+```kotlin
+// Compose usage with RouterViewModel
+@Composable
+fun UserScreen(
+    viewModel: UserViewModel = hiltViewModel()
+) {
+    val userState by viewModel.userState.collectAsState()
+    val loadingState by viewModel.loadingState.collectAsState()
+    
+    when (loadingState) {
+        is LoadingData.Loading -> LoadingIndicator()
+        is LoadingData.Error -> ErrorMessage(loadingState.message)
+        else -> {
+            UserContent(
+                userData = userState,
+                onLoginClick = { credentials ->
+                    viewModel.login(credentials)
+                }
+            )
+        }
+    }
+}
+```
+
 ## Proguard / R8 Configuration
 
 If you're using ProGuard or R8, add the following rules to your ProGuard configuration:
@@ -257,6 +422,9 @@ If you're using ProGuard or R8, add the following rules to your ProGuard configu
 # Transmission Library
 -keep class com.trendyol.transmission.** { *; }
 -keepclassmembers class * implements com.trendyol.transmission.Transmission { *; }
+
+# RouterViewModel (if using)
+-keep class com.trendyol.transmissionviewmodel.** { *; }
 ```
 
 This ensures that your Transmission interfaces and classes are not obfuscated, which is important for reflection-based operations in the library.
