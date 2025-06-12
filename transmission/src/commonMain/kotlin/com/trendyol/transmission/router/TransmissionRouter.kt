@@ -29,7 +29,7 @@ class TransmissionRouter internal constructor(
     internal val autoInitialization: Boolean = true,
     internal val capacity: Capacity = Capacity.Default,
     dispatcher: CoroutineDispatcher = Dispatchers.Default,
-) {
+): StreamOwner {
 
     private val exceptionHandler = CoroutineExceptionHandler { _, _ -> }
     private val routerScope = CoroutineScope(SupervisorJob() + dispatcher + exceptionHandler)
@@ -46,11 +46,9 @@ class TransmissionRouter internal constructor(
 
     private val checkpointTracker = CheckpointTracker()
 
-    @PublishedApi
-    internal val dataStream = dataBroadcast.output
+    override val dataStream = dataBroadcast.output
 
-    @PublishedApi
-    internal val effectStream: SharedFlow<Transmission.Effect> = effectBroadcast.output
+    override val effectStream: SharedFlow<Transmission.Effect> = effectBroadcast.output
         .map { it.effect }.shareIn(routerScope, SharingStarted.Lazily)
 
     private val _queryManager = QueryManager(
