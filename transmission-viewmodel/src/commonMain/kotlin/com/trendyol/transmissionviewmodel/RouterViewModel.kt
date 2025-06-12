@@ -34,7 +34,7 @@ data class RouterViewModelConfig(
 )
 
 /**
- * An abstract [ViewModel] that simplifies the integration of [TransmissionRouter] with Android's ViewModel architecture.
+ * An abstract [ViewModel] that simplifies the integration of [TransmissionRouter] with multiplatform ViewModel architecture.
  * 
  * This class provides a convenient wrapper around [TransmissionRouter] with automatic setup and lifecycle management.
  * It handles the router initialization, stream collection, and cleanup automatically, allowing developers to focus

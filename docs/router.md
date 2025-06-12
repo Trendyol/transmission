@@ -2,6 +2,8 @@
 
 The **TransmissionRouter** is the central hub that manages communication between all Transformers in your application. It receives Signals from the UI, distributes them to appropriate Transformers, collects their outputs, and provides streams for data consumption.
 
+For Android development, consider using **RouterViewModel** which provides a simplified, lifecycle-aware wrapper around TransmissionRouter.
+
 ## Basic Setup
 
 ### Simple Router Creation
@@ -443,6 +445,377 @@ val router = TransmissionRouter {
     addTransformerSet(transformers)
     addDispatcher(Dispatchers.Main.immediate)
 }
+```
+
+# RouterViewModel
+
+**RouterViewModel** is a convenience wrapper around TransmissionRouter that extends `androidx.lifecycle.ViewModel`. It's fully Kotlin Multiplatform compatible and provides automatic setup, lifecycle management, and simplified stream handling across all platforms.
+
+## Key Features
+
+- **Automatic Setup**: Router is configured and initialized automatically
+- **Lifecycle Management**: Router cleanup is handled in `onCleared()`
+- **Stream Collection**: Data and effect streams are automatically collected in `viewModelScope`
+- **Hook Methods**: Override `onData`, `onEffect`, `onProcessSignal`, and `onProcessEffect` for custom logic
+- **Query Support**: Built-in access to `QueryHandler` for querying transformer states
+- **StateFlow Helpers**: Built-in methods for converting streams to StateFlow
+- **Error Handling**: Built-in error handling with `onError` callback
+
+## Basic Usage
+
+### Simple Implementation
+
+```kotlin
+class UserViewModel : RouterViewModel(
+    setOf(
+        UserTransformer(),
+        AuthTransformer(),
+        ProfileTransformer()
+    )
+) {
+    // Create StateFlow from data streams
+    val userState = streamDataAsState<UserData>(UserData.Empty)
+    val authState = streamDataAsState<AuthData>(AuthData.LoggedOut)
+    
+    // Handle data updates
+    override fun onData(data: Transmission.Data) {
+        when (data) {
+            is UserData -> logUserUpdate(data)
+            is AuthData -> handleAuthChange(data)
+        }
+    }
+    
+    // Handle effects
+    override fun onEffect(effect: Transmission.Effect) {
+        when (effect) {
+            is NavigationEffect -> navigateTo(effect.destination)
+            is ErrorEffect -> showError(effect.message)
+        }
+    }
+    
+    // User actions
+    fun login(credentials: Credentials) {
+        processSignal(AuthSignal.Login(credentials))
+    }
+    
+    fun updateProfile(profile: Profile) {
+        processSignal(UserSignal.UpdateProfile(profile))
+    }
+}
+```
+
+### Advanced Configuration
+
+```kotlin
+class FeatureViewModel : RouterViewModel(
+    loader = FeatureTransformerSetLoader(),
+    config = RouterViewModelConfig(
+        capacity = Capacity.High,
+        dispatcher = Dispatchers.IO,
+        identity = Contract.identity("feature-router")
+    )
+) {
+    // Type-safe stream access
+    val errorStream = streamEffect<ErrorEffect>()
+    val loadingData = streamData<LoadingData>()
+    
+    // Custom error handling
+    override fun onError(throwable: Throwable) {
+        logError("Router error", throwable)
+        processEffect(ErrorEffect("System error occurred"))
+    }
+    
+    // Post-processing hooks
+    override fun onProcessSignal(signal: Transmission.Signal) {
+        analytics.trackSignal(signal::class.simpleName)
+    }
+    
+    // Query transformer states
+    suspend fun getCurrentUserData(): UserData? {
+        return queryHandler.getData(UserTransformer.dataContract)
+    }
+}
+```
+
+## Configuration Options
+
+### RouterViewModelConfig
+
+```kotlin
+data class RouterViewModelConfig(
+    val capacity: Capacity = Capacity.Default,           // Buffer capacity
+    val dispatcher: CoroutineDispatcher = Dispatchers.Default, // Coroutine dispatcher
+    val identity: Contract.Identity = Contract.identity()       // Router identity
+)
+```
+
+### Usage with Configuration
+
+```kotlin
+// High-performance configuration
+val config = RouterViewModelConfig(
+    capacity = Capacity.High,
+    dispatcher = Dispatchers.IO
+)
+
+class MyViewModel : RouterViewModel(transformers, config) {
+    // Implementation
+}
+```
+
+## Stream Helpers
+
+### StateFlow Creation
+
+```kotlin
+class ShoppingViewModel : RouterViewModel(shoppingTransformers) {
+    // Automatic StateFlow conversion
+    val cartState = streamDataAsState<CartData>(CartData.Empty)
+    val productsState = streamDataAsState<ProductListData>(ProductListData.Loading)
+    val checkoutState = streamDataAsState<CheckoutData>(CheckoutData.Idle)
+    
+    // Custom sharing behavior
+    val userPreferences = streamDataAsState<UserPreferencesData>(
+        initialValue = UserPreferencesData.Default,
+        started = SharingStarted.Eagerly
+    )
+}
+```
+
+### Type-Safe Stream Access
+
+```kotlin
+class ChatViewModel : RouterViewModel(chatTransformers) {
+    // Access specific data types
+    val messageFlow = streamData<MessageData>()
+    val userStatusFlow = streamData<UserStatusData>()
+    
+    // Access specific effect types  
+    val notificationEffects = streamEffect<NotificationEffect>()
+    val navigationEffects = streamEffect<NavigationEffect>()
+    
+    init {
+        // Custom stream handling
+        viewModelScope.launch {
+            navigationEffects.collect { effect ->
+                handleNavigation(effect)
+            }
+        }
+    }
+}
+```
+
+## Dependency Injection Integration
+
+### Hilt Example
+
+```kotlin
+@HiltViewModel
+class MainViewModel @Inject constructor(
+    private val transformerSetLoader: MainTransformerSetLoader
+) : RouterViewModel(
+    loader = transformerSetLoader,
+    config = RouterViewModelConfig(capacity = Capacity.High)
+) {
+    val mainState = streamDataAsState<MainScreenData>(MainScreenData.Loading)
+    
+    fun refreshData() {
+        processSignal(RefreshSignal)
+    }
+}
+```
+
+### Koin Example
+
+```kotlin
+val viewModelModule = module {
+    viewModel { 
+        UserViewModel(
+            transformerSet = get<Set<Transformer>>(),
+            config = RouterViewModelConfig(
+                dispatcher = get(named("ioDispatcher"))
+            )
+        )
+    }
+}
+
+class UserViewModel(
+    transformerSet: Set<Transformer>,
+    config: RouterViewModelConfig
+) : RouterViewModel(transformerSet, config) {
+    // Implementation
+}
+```
+
+## Error Handling
+
+```kotlin
+class RobustViewModel : RouterViewModel(transformers) {
+    override fun onError(throwable: Throwable) {
+        when (throwable) {
+            is NetworkException -> handleNetworkError(throwable)
+            is ValidationException -> handleValidationError(throwable)
+            else -> {
+                logError("Unexpected router error", throwable)
+                processEffect(ErrorEffect("Something went wrong"))
+            }
+        }
+    }
+    
+    override fun onProcessSignal(signal: Transmission.Signal) {
+        // Log all processed signals for debugging
+        if (BuildConfig.DEBUG) {
+            Log.d("RouterViewModel", "Processed signal: $signal")
+        }
+    }
+}
+```
+
+## Multiplatform Support
+
+RouterViewModel is built using `androidx.lifecycle.ViewModel` which is fully multiplatform:
+
+```kotlin
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+```
+
+This means you can use RouterViewModel across all supported platforms:
+- **Android**: Native AndroidX ViewModel support
+- **iOS**: Full lifecycle management via androidx.lifecycle-viewmodel
+- **Desktop**: JVM-based lifecycle management  
+- **Web**: Kotlin/JS lifecycle management
+
+### Platform-Specific Considerations
+
+While RouterViewModel works on all platforms, you may want different configurations per platform:
+
+```kotlin
+// Platform-specific configurations
+expect fun defaultRouterConfig(): RouterViewModelConfig
+
+// androidMain
+actual fun defaultRouterConfig() = RouterViewModelConfig(
+    capacity = Capacity.High,
+    dispatcher = Dispatchers.Main.immediate
+)
+
+// iosMain  
+actual fun defaultRouterConfig() = RouterViewModelConfig(
+    capacity = Capacity.Default,
+    dispatcher = Dispatchers.Main
+)
+
+// Usage
+class MyViewModel : RouterViewModel(
+    transformers = myTransformers,
+    config = defaultRouterConfig()
+)
+
+## Comparison: Direct Router vs RouterViewModel
+
+### Direct TransmissionRouter
+
+```kotlin
+class ManualViewModel : ViewModel() {
+    private val router = TransmissionRouter {
+        addTransformerSet(transformers)
+    }
+    
+    val dataState = router.streamData<MyData>()
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), MyData.Empty)
+    
+    init {
+        viewModelScope.launch {
+            router.streamEffect<MyEffect>().collect { effect ->
+                handleEffect(effect)
+            }
+        }
+    }
+    
+    fun processUserAction(action: MySignal) {
+        router.process(action)
+    }
+    
+    override fun onCleared() {
+        router.clear()
+        super.onCleared()
+    }
+}
+```
+
+### RouterViewModel
+
+```kotlin
+class SimpleViewModel : RouterViewModel(transformers) {
+    val dataState = streamDataAsState<MyData>(MyData.Empty)
+    
+    override fun onEffect(effect: Transmission.Effect) {
+        if (effect is MyEffect) {
+            handleEffect(effect)
+        }
+    }
+    
+    fun processUserAction(action: MySignal) {
+        processSignal(action)
+    }
+    
+    // Cleanup is automatic!
+}
+```
+
+## Best Practices for RouterViewModel
+
+### 1. Use StateFlow for UI State
+
+```kotlin
+class GoodViewModel : RouterViewModel(transformers) {
+    // ✅ Good: Direct StateFlow creation
+    val uiState = streamDataAsState<UiState>(UiState.Loading)
+    
+    // ❌ Avoid: Manual StateFlow conversion in ViewModels
+    // val uiState = streamData<UiState>()
+    //     .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), UiState.Loading)
+}
+```
+
+### 2. Handle Effects Properly
+
+```kotlin
+class EffectHandlingViewModel : RouterViewModel(transformers) {
+    override fun onEffect(effect: Transmission.Effect) {
+        when (effect) {
+            is NavigationEffect -> {
+                // Handle navigation - don't process signals here
+                navigationManager.navigateTo(effect.destination)
+            }
+            is ValidationEffect -> {
+                // Handle validation feedback
+                showValidationError(effect.message)
+            }
+        }
+    }
+}
+```
+
+### 3. Use Configuration for Performance
+
+```kotlin
+// ✅ Good: Configure based on use case
+class HighThroughputViewModel : RouterViewModel(
+    transformers = heavyTransformers,
+    config = RouterViewModelConfig(
+        capacity = Capacity.High,
+        dispatcher = Dispatchers.Default
+    )
+)
+
+class IOIntensiveViewModel : RouterViewModel(
+    transformers = networkTransformers,
+    config = RouterViewModelConfig(
+        dispatcher = Dispatchers.IO
+    )
+)
 ```
 
 ## Best Practices
