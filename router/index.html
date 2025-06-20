@@ -1,0 +1,1725 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Experimental asynchronous communication for Business Logic">
+      
+      
+        <meta name="author" content="Trendyol">
+      
+      
+      
+        <link rel="prev" href="../transformer/">
+      
+      
+        <link rel="next" href="../dataholder/">
+      
+      
+      <link rel="icon" href="../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.6.14">
+    
+    
+      
+        <title>TransmissionRouter - Transmission</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.342714a4.min.css">
+      
+        
+        <link rel="stylesheet" href="../assets/stylesheets/palette.06af60db.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato:300,300i,400,400i,700,700i%7CFira+Code:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Lato";--md-code-font:"Fira Code"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="white" data-md-color-accent="orange">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#transmissionrouter" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href=".." title="Transmission" class="md-header__button md-logo" aria-label="Transmission" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Transmission
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              TransmissionRouter
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="white" data-md-color-accent="orange"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="black" data-md-color-accent="yellow"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12s-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+          <a href="javascript:void(0)" class="md-search__icon md-icon" title="Share" aria-label="Share" data-clipboard data-clipboard-text="" data-md-component="search-share" tabindex="-1">
+            
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9a3 3 0 0 0-3 3 3 3 0 0 0 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.15c-.05.21-.08.43-.08.66 0 1.61 1.31 2.91 2.92 2.91s2.92-1.3 2.92-2.91A2.92 2.92 0 0 0 18 16.08"/></svg>
+          </a>
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/trendyol/transmission" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.7.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81"/></svg>
+  </div>
+  <div class="md-source__repository">
+    Transmission
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+  
+
+<nav class="md-nav md-nav--primary md-nav--integrated" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href=".." title="Transmission" class="md-nav__button md-logo" aria-label="Transmission" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    Transmission
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/trendyol/transmission" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.7.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81"/></svg>
+  </div>
+  <div class="md-source__repository">
+    Transmission
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href=".." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Introduction
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../how_to_use/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    How To Use
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../setup/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Setting Up
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../transmissions/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Transmissions
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../transformer/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Transformer
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    TransmissionRouter
+    
+  </span>
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    TransmissionRouter
+    
+  </span>
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#basic-setup" class="md-nav__link">
+    <span class="md-ellipsis">
+      Basic Setup
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Basic Setup">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#simple-router-creation" class="md-nav__link">
+    <span class="md-ellipsis">
+      Simple Router Creation
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#with-custom-configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      With Custom Configuration
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#constructor-parameters" class="md-nav__link">
+    <span class="md-ellipsis">
+      Constructor Parameters
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#builder-configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      Builder Configuration
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Builder Configuration">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#adding-transformers" class="md-nav__link">
+    <span class="md-ellipsis">
+      Adding Transformers
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#setting-capacity" class="md-nav__link">
+    <span class="md-ellipsis">
+      Setting Capacity
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#custom-dispatcher" class="md-nav__link">
+    <span class="md-ellipsis">
+      Custom Dispatcher
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#manual-initialization" class="md-nav__link">
+    <span class="md-ellipsis">
+      Manual Initialization
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#processing-transmissions" class="md-nav__link">
+    <span class="md-ellipsis">
+      Processing Transmissions
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Processing Transmissions">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#processing-signals" class="md-nav__link">
+    <span class="md-ellipsis">
+      Processing Signals
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#processing-effects" class="md-nav__link">
+    <span class="md-ellipsis">
+      Processing Effects
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#data-streams" class="md-nav__link">
+    <span class="md-ellipsis">
+      Data Streams
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Data Streams">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#observing-all-data" class="md-nav__link">
+    <span class="md-ellipsis">
+      Observing All Data
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#filtering-specific-data-types" class="md-nav__link">
+    <span class="md-ellipsis">
+      Filtering Specific Data Types
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#effect-streams" class="md-nav__link">
+    <span class="md-ellipsis">
+      Effect Streams
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#query-helper" class="md-nav__link">
+    <span class="md-ellipsis">
+      Query Helper
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#complete-examples" class="md-nav__link">
+    <span class="md-ellipsis">
+      Complete Examples
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Complete Examples">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#counter-app-from-sample" class="md-nav__link">
+    <span class="md-ellipsis">
+      Counter App from Sample
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#components-app-from-sample" class="md-nav__link">
+    <span class="md-ellipsis">
+      Components App from Sample
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#advanced-features" class="md-nav__link">
+    <span class="md-ellipsis">
+      Advanced Features
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Advanced Features">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#custom-transformer-set-loader" class="md-nav__link">
+    <span class="md-ellipsis">
+      Custom Transformer Set Loader
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#multiple-routers" class="md-nav__link">
+    <span class="md-ellipsis">
+      Multiple Routers
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#lifecycle-management" class="md-nav__link">
+    <span class="md-ellipsis">
+      Lifecycle Management
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Lifecycle Management">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#proper-cleanup" class="md-nav__link">
+    <span class="md-ellipsis">
+      Proper Cleanup
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#integration-with-dependency-injection" class="md-nav__link">
+    <span class="md-ellipsis">
+      Integration with Dependency Injection
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Integration with Dependency Injection">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#hilt-example" class="md-nav__link">
+    <span class="md-ellipsis">
+      Hilt Example
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#koin-example" class="md-nav__link">
+    <span class="md-ellipsis">
+      Koin Example
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#error-handling" class="md-nav__link">
+    <span class="md-ellipsis">
+      Error Handling
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#performance-considerations" class="md-nav__link">
+    <span class="md-ellipsis">
+      Performance Considerations
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Performance Considerations">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#capacity-settings" class="md-nav__link">
+    <span class="md-ellipsis">
+      Capacity Settings
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#dispatcher-selection" class="md-nav__link">
+    <span class="md-ellipsis">
+      Dispatcher Selection
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../dataholder/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    DataHolder
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../handlers/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Handlers
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../contracts/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Contracts
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../transformer_communication/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Transformer Communication
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../testing/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Testing
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../changelog/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Changelog
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+<h1 id="transmissionrouter">TransmissionRouter</h1>
+<p>The <strong>TransmissionRouter</strong> is the central hub that manages communication between all Transformers in your application. It receives Signals from the UI, distributes them to appropriate Transformers, collects their outputs, and provides streams for data consumption.</p>
+<p>For Android development, consider using <strong>RouterViewModel</strong> which provides a simplified, lifecycle-aware wrapper around TransmissionRouter.</p>
+<h2 id="basic-setup">Basic Setup</h2>
+<h3 id="simple-router-creation">Simple Router Creation</h3>
+<div class="highlight"><pre><span></span><code><span class="kd">val</span><span class="w"> </span><span class="nv">router</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">TransmissionRouter</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">addTransformerSet</span><span class="p">(</span><span class="n">setOf</span><span class="p">(</span>
+<span class="w">        </span><span class="n">UserTransformer</span><span class="p">(),</span>
+<span class="w">        </span><span class="n">AuthTransformer</span><span class="p">(),</span>
+<span class="w">        </span><span class="n">DataTransformer</span><span class="p">()</span>
+<span class="w">    </span><span class="p">))</span>
+<span class="p">}</span>
+</code></pre></div>
+<h3 id="with-custom-configuration">With Custom Configuration</h3>
+<div class="highlight"><pre><span></span><code><span class="kd">val</span><span class="w"> </span><span class="nv">router</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">TransmissionRouter</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">addTransformerSet</span><span class="p">(</span><span class="n">transformers</span><span class="p">)</span>
+<span class="w">    </span><span class="n">addDispatcher</span><span class="p">(</span><span class="n">Dispatchers</span><span class="p">.</span><span class="na">IO</span><span class="p">)</span><span class="w"> </span>
+<span class="w">    </span><span class="n">setCapacity</span><span class="p">(</span><span class="n">Capacity</span><span class="p">.</span><span class="na">High</span><span class="p">)</span>
+<span class="p">}</span>
+</code></pre></div>
+<h2 id="constructor-parameters">Constructor Parameters</h2>
+<div class="highlight"><pre><span></span><code><span class="kd">class</span><span class="w"> </span><span class="nc">TransmissionRouter</span><span class="w"> </span><span class="n">internal</span><span class="w"> </span><span class="k">constructor</span><span class="p">(</span>
+<span class="w">    </span><span class="n">identity</span><span class="p">:</span><span class="w"> </span><span class="n">Contract</span><span class="p">.</span><span class="na">Identity</span><span class="p">,</span>
+<span class="w">    </span><span class="n">transformerSetLoader</span><span class="p">:</span><span class="w"> </span><span class="n">TransformerSetLoader? </span><span class="o">=</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span>
+<span class="w">    </span><span class="n">autoInitialization</span><span class="p">:</span><span class="w"> </span><span class="kt">Boolean</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span>
+<span class="w">    </span><span class="n">capacity</span><span class="p">:</span><span class="w"> </span><span class="n">Capacity</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Capacity</span><span class="p">.</span><span class="na">Default</span><span class="p">,</span>
+<span class="w">    </span><span class="n">dispatcher</span><span class="p">:</span><span class="w"> </span><span class="n">CoroutineDispatcher</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Dispatchers</span><span class="p">.</span><span class="na">Default</span><span class="p">,</span>
+<span class="p">)</span>
+</code></pre></div>
+<ul>
+<li><strong>identity</strong>: Unique identifier for the router</li>
+<li><strong>transformerSetLoader</strong>: Lazy loading mechanism for transformers</li>
+<li><strong>autoInitialization</strong>: Whether to initialize automatically (default: true)</li>
+<li><strong>capacity</strong>: Buffer capacity for internal streams</li>
+<li><strong>dispatcher</strong>: Coroutine dispatcher for router operations</li>
+</ul>
+<h2 id="builder-configuration">Builder Configuration</h2>
+<h3 id="adding-transformers">Adding Transformers</h3>
+<div class="highlight"><pre><span></span><code><span class="c1">// Direct transformer set</span>
+<span class="kd">val</span><span class="w"> </span><span class="nv">router</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">TransmissionRouter</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">addTransformerSet</span><span class="p">(</span><span class="n">setOf</span><span class="p">(</span>
+<span class="w">        </span><span class="n">CounterTransformer</span><span class="p">(),</span>
+<span class="w">        </span><span class="n">LoggingTransformer</span><span class="p">()</span>
+<span class="w">    </span><span class="p">))</span>
+<span class="p">}</span>
+
+<span class="c1">// Using a loader for lazy initialization</span>
+<span class="kd">val</span><span class="w"> </span><span class="nv">router</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">TransmissionRouter</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">addLoader</span><span class="p">(</span><span class="n">MyTransformerSetLoader</span><span class="p">())</span>
+<span class="p">}</span>
+</code></pre></div>
+<h3 id="setting-capacity">Setting Capacity</h3>
+<p>Capacity affects the buffer size of internal streams:</p>
+<div class="highlight"><pre><span></span><code><span class="kd">val</span><span class="w"> </span><span class="nv">router</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">TransmissionRouter</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">addTransformerSet</span><span class="p">(</span><span class="n">transformers</span><span class="p">)</span>
+<span class="w">    </span><span class="n">setCapacity</span><span class="p">(</span><span class="n">Capacity</span><span class="p">.</span><span class="na">High</span><span class="p">)</span><span class="w"> </span><span class="c1">// Higher capacity = better performance under load</span>
+<span class="p">}</span>
+
+<span class="c1">// Available capacity options</span>
+<span class="kd">enum</span><span class="w"> </span><span class="kd">class</span><span class="w"> </span><span class="nc">Capacity</span><span class="p">(</span><span class="kd">val</span><span class="w"> </span><span class="nv">value</span><span class="p">:</span><span class="w"> </span><span class="kt">Int</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">Low</span><span class="p">(</span><span class="m">64</span><span class="p">),</span>
+<span class="w">    </span><span class="n">Default</span><span class="p">(</span><span class="m">256</span><span class="p">),</span><span class="w"> </span>
+<span class="w">    </span><span class="n">High</span><span class="p">(</span><span class="m">1024</span><span class="p">),</span>
+<span class="w">    </span><span class="n">Unlimited</span><span class="p">(</span><span class="n">Channel</span><span class="p">.</span><span class="na">UNLIMITED</span><span class="p">)</span>
+<span class="p">}</span>
+</code></pre></div>
+<h3 id="custom-dispatcher">Custom Dispatcher</h3>
+<div class="highlight"><pre><span></span><code><span class="kd">val</span><span class="w"> </span><span class="nv">router</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">TransmissionRouter</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">addTransformerSet</span><span class="p">(</span><span class="n">transformers</span><span class="p">)</span>
+<span class="w">    </span><span class="n">addDispatcher</span><span class="p">(</span><span class="n">Dispatchers</span><span class="p">.</span><span class="na">IO</span><span class="p">)</span><span class="w"> </span><span class="c1">// Use IO dispatcher for network/database operations</span>
+<span class="p">}</span>
+</code></pre></div>
+<h3 id="manual-initialization">Manual Initialization</h3>
+<div class="highlight"><pre><span></span><code><span class="kd">val</span><span class="w"> </span><span class="nv">router</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">TransmissionRouter</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">overrideInitialization</span><span class="p">()</span><span class="w"> </span><span class="c1">// Disable auto-initialization</span>
+<span class="p">}</span>
+
+<span class="c1">// Later, initialize manually</span>
+<span class="n">router</span><span class="p">.</span><span class="na">initialize</span><span class="p">(</span><span class="n">myTransformerSetLoader</span><span class="p">)</span>
+</code></pre></div>
+<h2 id="processing-transmissions">Processing Transmissions</h2>
+<h3 id="processing-signals">Processing Signals</h3>
+<div class="highlight"><pre><span></span><code><span class="c1">// Process signals from UI</span>
+<span class="n">router</span><span class="p">.</span><span class="na">process</span><span class="p">(</span><span class="n">UserLoginSignal</span><span class="p">(</span><span class="n">credentials</span><span class="p">))</span>
+<span class="n">router</span><span class="p">.</span><span class="na">process</span><span class="p">(</span><span class="n">RefreshDataSignal</span><span class="p">)</span>
+<span class="n">router</span><span class="p">.</span><span class="na">process</span><span class="p">(</span><span class="n">CounterSignal</span><span class="p">.</span><span class="na">Increment</span><span class="p">)</span>
+</code></pre></div>
+<h3 id="processing-effects">Processing Effects</h3>
+<div class="highlight"><pre><span></span><code><span class="c1">// Process effects (typically from other transformers)</span>
+<span class="n">router</span><span class="p">.</span><span class="na">process</span><span class="p">(</span><span class="n">LoggingEffect</span><span class="p">(</span><span class="s">&quot;Manual log entry&quot;</span><span class="p">))</span>
+<span class="n">router</span><span class="p">.</span><span class="na">process</span><span class="p">(</span><span class="n">NotificationEffect</span><span class="p">(</span><span class="s">&quot;Custom notification&quot;</span><span class="p">))</span>
+</code></pre></div>
+<h2 id="data-streams">Data Streams</h2>
+<h3 id="observing-all-data">Observing All Data</h3>
+<div class="highlight"><pre><span></span><code><span class="c1">// Collect all data from all transformers</span>
+<span class="n">lifecycleScope</span><span class="p">.</span><span class="na">launch</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">router</span><span class="p">.</span><span class="na">streamData</span><span class="p">().</span><span class="na">collect</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">data</span><span class="w"> </span><span class="o">-&gt;</span>
+<span class="w">        </span><span class="k">when</span><span class="w"> </span><span class="p">(</span><span class="n">data</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="k">is</span><span class="w"> </span><span class="n">UserData</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="n">updateUserUI</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+<span class="w">            </span><span class="k">is</span><span class="w"> </span><span class="n">CounterData</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="n">updateCounterUI</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+<span class="w">            </span><span class="k">is</span><span class="w"> </span><span class="n">ErrorData</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="n">showError</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div>
+<h3 id="filtering-specific-data-types">Filtering Specific Data Types</h3>
+<div class="highlight"><pre><span></span><code><span class="c1">// Observe only user data</span>
+<span class="n">lifecycleScope</span><span class="p">.</span><span class="na">launch</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">router</span><span class="p">.</span><span class="na">streamData</span><span class="o">&lt;</span><span class="n">UserData</span><span class="o">&gt;</span><span class="p">()</span>
+<span class="w">        </span><span class="p">.</span><span class="na">collect</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">userData</span><span class="w"> </span><span class="o">-&gt;</span>
+<span class="w">            </span><span class="n">updateUserProfile</span><span class="p">(</span><span class="n">userData</span><span class="p">)</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="p">}</span>
+
+<span class="c1">// Observe multiple specific types</span>
+<span class="n">lifecycleScope</span><span class="p">.</span><span class="na">launch</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">router</span><span class="p">.</span><span class="na">streamData</span><span class="p">()</span>
+<span class="w">        </span><span class="p">.</span><span class="na">filter</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nb">it</span><span class="w"> </span><span class="k">is</span><span class="w"> </span><span class="n">UserData</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="nb">it</span><span class="w"> </span><span class="k">is</span><span class="w"> </span><span class="n">ProfileData</span><span class="w"> </span><span class="p">}</span>
+<span class="w">        </span><span class="p">.</span><span class="na">collect</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">data</span><span class="w"> </span><span class="o">-&gt;</span>
+<span class="w">            </span><span class="k">when</span><span class="w"> </span><span class="p">(</span><span class="n">data</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">                </span><span class="k">is</span><span class="w"> </span><span class="n">UserData</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="n">handleUserData</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+<span class="w">                </span><span class="k">is</span><span class="w"> </span><span class="n">ProfileData</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="n">handleProfileData</span><span class="p">(</span><span class="n">data</span><span class="p">)</span><span class="w"> </span>
+<span class="w">            </span><span class="p">}</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div>
+<h2 id="effect-streams">Effect Streams</h2>
+<p>Access to the effect stream for monitoring:</p>
+<div class="highlight"><pre><span></span><code><span class="n">lifecycleScope</span><span class="p">.</span><span class="na">launch</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">router</span><span class="p">.</span><span class="na">streamEffect</span><span class="o">&lt;</span><span class="n">LoggingEffect</span><span class="o">&gt;</span><span class="p">()</span>
+<span class="w">        </span><span class="p">.</span><span class="na">collect</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">effect</span><span class="w"> </span><span class="o">-&gt;</span>
+<span class="w">            </span><span class="n">println</span><span class="p">(</span><span class="s">&quot;Log: </span><span class="si">${</span><span class="n">effect</span><span class="p">.</span><span class="na">message</span><span class="si">}</span><span class="s">&quot;</span><span class="p">)</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div>
+<h2 id="query-helper">Query Helper</h2>
+<p>The router provides a query helper for debugging and monitoring:</p>
+<div class="highlight"><pre><span></span><code><span class="kd">val</span><span class="w"> </span><span class="nv">queryHelper</span><span class="p">:</span><span class="w"> </span><span class="n">QueryHandler</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">router</span><span class="p">.</span><span class="na">queryHelper</span>
+
+<span class="c1">// Use for debugging transformer states</span>
+<span class="c1">// (Specific usage depends on your debugging needs)</span>
+</code></pre></div>
+<h2 id="complete-examples">Complete Examples</h2>
+<h3 id="counter-app-from-sample">Counter App from Sample</h3>
+<div class="highlight"><pre><span></span><code><span class="c1">// From samples/counter</span>
+<span class="kd">class</span><span class="w"> </span><span class="nc">CounterModule</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">fun</span><span class="w"> </span><span class="nf">provideTransmissionRouter</span><span class="p">():</span><span class="w"> </span><span class="n">TransmissionRouter</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="n">TransmissionRouter</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="n">addTransformerSet</span><span class="p">(</span><span class="n">setOf</span><span class="p">(</span>
+<span class="w">                </span><span class="n">Worker</span><span class="p">(</span><span class="s">&quot;1&quot;</span><span class="p">),</span>
+<span class="w">                </span><span class="n">Worker</span><span class="p">(</span><span class="s">&quot;2&quot;</span><span class="p">),</span>
+<span class="w">                </span><span class="n">Worker</span><span class="p">(</span><span class="s">&quot;3&quot;</span><span class="p">)</span>
+<span class="w">            </span><span class="p">))</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+
+<span class="c1">// Usage in UI</span>
+<span class="kd">class</span><span class="w"> </span><span class="nc">CounterViewModel</span><span class="p">(</span><span class="kd">private</span><span class="w"> </span><span class="kd">val</span><span class="w"> </span><span class="nv">router</span><span class="p">:</span><span class="w"> </span><span class="n">TransmissionRouter</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+
+<span class="w">    </span><span class="kd">val</span><span class="w"> </span><span class="nv">counterData</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">router</span><span class="p">.</span><span class="na">streamData</span><span class="o">&lt;</span><span class="n">CounterData</span><span class="o">&gt;</span><span class="p">()</span>
+<span class="w">        </span><span class="p">.</span><span class="na">stateIn</span><span class="p">(</span>
+<span class="w">            </span><span class="n">scope</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">viewModelScope</span><span class="p">,</span>
+<span class="w">            </span><span class="n">started</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">SharingStarted</span><span class="p">.</span><span class="na">WhileSubscribed</span><span class="p">(</span><span class="m">5000</span><span class="p">),</span>
+<span class="w">            </span><span class="n">initialValue</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">CounterData</span><span class="p">(</span><span class="s">&quot;Initial&quot;</span><span class="p">)</span>
+<span class="w">        </span><span class="p">)</span>
+
+<span class="w">    </span><span class="kd">fun</span><span class="w"> </span><span class="nf">lookup</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">router</span><span class="p">.</span><span class="na">process</span><span class="p">(</span><span class="n">CounterSignal</span><span class="p">.</span><span class="na">Lookup</span><span class="p">)</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div>
+<h3 id="components-app-from-sample">Components App from Sample</h3>
+<div class="highlight"><pre><span></span><code><span class="c1">// From samples/components  </span>
+<span class="kd">class</span><span class="w"> </span><span class="nc">ComponentsModule</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">fun</span><span class="w"> </span><span class="nf">provideTransmissionRouter</span><span class="p">():</span><span class="w"> </span><span class="n">TransmissionRouter</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="n">TransmissionRouter</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="n">addTransformerSet</span><span class="p">(</span><span class="n">setOf</span><span class="p">(</span>
+<span class="w">                </span><span class="n">InputTransformer</span><span class="p">(</span><span class="n">defaultDispatcher</span><span class="p">),</span>
+<span class="w">                </span><span class="n">ColorPickerTransformer</span><span class="p">(</span><span class="n">defaultDispatcher</span><span class="p">),</span>
+<span class="w">                </span><span class="n">OutputTransformer</span><span class="p">(</span><span class="n">defaultDispatcher</span><span class="p">),</span>
+<span class="w">                </span><span class="n">MultiOutputTransformer</span><span class="p">()</span>
+<span class="w">            </span><span class="p">))</span>
+<span class="w">            </span><span class="n">addDispatcher</span><span class="p">(</span><span class="n">defaultDispatcher</span><span class="p">)</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+
+<span class="c1">// Usage with multiple data types</span>
+<span class="kd">class</span><span class="w"> </span><span class="nc">ComponentViewModel</span><span class="p">(</span><span class="kd">private</span><span class="w"> </span><span class="kd">val</span><span class="w"> </span><span class="nv">router</span><span class="p">:</span><span class="w"> </span><span class="n">TransmissionRouter</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+
+<span class="w">    </span><span class="kd">val</span><span class="w"> </span><span class="nv">uiState</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">combine</span><span class="p">(</span>
+<span class="w">        </span><span class="n">router</span><span class="p">.</span><span class="na">streamData</span><span class="o">&lt;</span><span class="n">InputUiState</span><span class="o">&gt;</span><span class="p">(),</span>
+<span class="w">        </span><span class="n">router</span><span class="p">.</span><span class="na">streamData</span><span class="o">&lt;</span><span class="n">OutputCalculationResult</span><span class="o">&gt;</span><span class="p">()</span>
+<span class="w">    </span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">inputState</span><span class="p">,</span><span class="w"> </span><span class="n">outputResult</span><span class="w"> </span><span class="o">-&gt;</span>
+<span class="w">        </span><span class="n">SampleScreenUiState</span><span class="p">(</span>
+<span class="w">            </span><span class="n">inputState</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">inputState</span><span class="p">,</span>
+<span class="w">            </span><span class="n">outputResult</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">outputResult</span>
+<span class="w">        </span><span class="p">)</span>
+<span class="w">    </span><span class="p">}.</span><span class="na">stateIn</span><span class="p">(</span>
+<span class="w">        </span><span class="n">scope</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">viewModelScope</span><span class="p">,</span>
+<span class="w">        </span><span class="n">started</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">SharingStarted</span><span class="p">.</span><span class="na">WhileSubscribed</span><span class="p">(</span><span class="m">5000</span><span class="p">),</span>
+<span class="w">        </span><span class="n">initialValue</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">SampleScreenUiState</span><span class="p">()</span>
+<span class="w">    </span><span class="p">)</span>
+
+<span class="w">    </span><span class="kd">fun</span><span class="w"> </span><span class="nf">updateInput</span><span class="p">(</span><span class="n">value</span><span class="p">:</span><span class="w"> </span><span class="kt">String</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">router</span><span class="p">.</span><span class="na">process</span><span class="p">(</span><span class="n">InputSignal</span><span class="p">.</span><span class="na">InputUpdate</span><span class="p">(</span><span class="n">value</span><span class="p">))</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="kd">fun</span><span class="w"> </span><span class="nf">selectColor</span><span class="p">(</span><span class="n">color</span><span class="p">:</span><span class="w"> </span><span class="n">Color</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">router</span><span class="p">.</span><span class="na">process</span><span class="p">(</span><span class="n">ColorPickerSignal</span><span class="p">.</span><span class="na">ColorSelected</span><span class="p">(</span><span class="n">color</span><span class="p">))</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div>
+<h2 id="advanced-features">Advanced Features</h2>
+<h3 id="custom-transformer-set-loader">Custom Transformer Set Loader</h3>
+<p>For complex applications, you might want to load transformers dynamically:</p>
+<div class="highlight"><pre><span></span><code><span class="kd">class</span><span class="w"> </span><span class="nc">CustomTransformerSetLoader</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="n">TransformerSetLoader</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">override</span><span class="w"> </span><span class="kd">suspend</span><span class="w"> </span><span class="kd">fun</span><span class="w"> </span><span class="nf">load</span><span class="p">():</span><span class="w"> </span><span class="n">Set</span><span class="o">&lt;</span><span class="n">Transformer</span><span class="o">&gt;</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="n">buildSet</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="c1">// Load based on configuration</span>
+<span class="w">            </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">isFeatureEnabled</span><span class="p">(</span><span class="s">&quot;auth&quot;</span><span class="p">))</span><span class="w"> </span><span class="p">{</span>
+<span class="w">                </span><span class="n">add</span><span class="p">(</span><span class="n">AuthTransformer</span><span class="p">())</span>
+<span class="w">            </span><span class="p">}</span>
+<span class="w">            </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">isFeatureEnabled</span><span class="p">(</span><span class="s">&quot;analytics&quot;</span><span class="p">))</span><span class="w"> </span><span class="p">{</span>
+<span class="w">                </span><span class="n">add</span><span class="p">(</span><span class="n">AnalyticsTransformer</span><span class="p">())</span><span class="w"> </span>
+<span class="w">            </span><span class="p">}</span>
+<span class="w">            </span><span class="c1">// Always include core transformers</span>
+<span class="w">            </span><span class="n">add</span><span class="p">(</span><span class="n">CoreTransformer</span><span class="p">())</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+
+<span class="kd">val</span><span class="w"> </span><span class="nv">router</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">TransmissionRouter</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">addLoader</span><span class="p">(</span><span class="n">CustomTransformerSetLoader</span><span class="p">())</span>
+<span class="p">}</span>
+</code></pre></div>
+<h3 id="multiple-routers">Multiple Routers</h3>
+<p>For large applications, you might use multiple routers:</p>
+<div class="highlight"><pre><span></span><code><span class="c1">// Feature-specific routers</span>
+<span class="kd">val</span><span class="w"> </span><span class="nv">authRouter</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">TransmissionRouter</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">addTransformerSet</span><span class="p">(</span><span class="n">authTransformers</span><span class="p">)</span>
+<span class="p">}</span>
+
+<span class="kd">val</span><span class="w"> </span><span class="nv">dataRouter</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">TransmissionRouter</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">addTransformerSet</span><span class="p">(</span><span class="n">dataTransformers</span><span class="p">)</span>
+<span class="p">}</span>
+
+<span class="c1">// Cross-router communication via effects</span>
+<span class="n">authRouter</span><span class="p">.</span><span class="na">streamEffect</span><span class="o">&lt;</span><span class="n">UserLoggedInEffect</span><span class="o">&gt;</span><span class="p">()</span>
+<span class="w">    </span><span class="p">.</span><span class="na">collect</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">effect</span><span class="w"> </span><span class="o">-&gt;</span>
+<span class="w">        </span><span class="n">dataRouter</span><span class="p">.</span><span class="na">process</span><span class="p">(</span><span class="n">LoadUserDataSignal</span><span class="p">(</span><span class="n">effect</span><span class="p">.</span><span class="na">userId</span><span class="p">))</span>
+<span class="w">    </span><span class="p">}</span>
+</code></pre></div>
+<h2 id="lifecycle-management">Lifecycle Management</h2>
+<h3 id="proper-cleanup">Proper Cleanup</h3>
+<div class="highlight"><pre><span></span><code><span class="kd">class</span><span class="w"> </span><span class="nc">MyRepository</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="kd">val</span><span class="w"> </span><span class="nv">router</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">TransmissionRouter</span><span class="w"> </span><span class="p">{</span><span class="w"> </span>
+<span class="w">        </span><span class="n">addTransformerSet</span><span class="p">(</span><span class="n">transformers</span><span class="p">)</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="kd">fun</span><span class="w"> </span><span class="nf">cleanup</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">router</span><span class="p">.</span><span class="na">clear</span><span class="p">()</span><span class="w"> </span><span class="c1">// Cleans up all transformers and coroutines</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+
+<span class="c1">// In Android ViewModel</span>
+<span class="kd">class</span><span class="w"> </span><span class="nc">MyViewModel</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="n">ViewModel</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="kd">val</span><span class="w"> </span><span class="nv">router</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">TransmissionRouter</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="cm">/* config */</span><span class="w"> </span><span class="p">}</span>
+
+<span class="w">    </span><span class="kd">override</span><span class="w"> </span><span class="kd">fun</span><span class="w"> </span><span class="nf">onCleared</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">router</span><span class="p">.</span><span class="na">clear</span><span class="p">()</span>
+<span class="w">        </span><span class="k">super</span><span class="p">.</span><span class="na">onCleared</span><span class="p">()</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div>
+<h3 id="integration-with-dependency-injection">Integration with Dependency Injection</h3>
+<h4 id="hilt-example">Hilt Example</h4>
+<div class="highlight"><pre><span></span><code><span class="nd">@Module</span>
+<span class="nd">@InstallIn</span><span class="p">(</span><span class="n">SingletonComponent</span><span class="o">::</span><span class="n">class</span><span class="p">)</span>
+<span class="kd">object</span><span class="w"> </span><span class="nc">TransmissionModule</span><span class="w"> </span><span class="p">{</span>
+
+<span class="w">    </span><span class="nd">@Provides</span>
+<span class="w">    </span><span class="nd">@Singleton</span>
+<span class="w">    </span><span class="kd">fun</span><span class="w"> </span><span class="nf">provideTransformers</span><span class="p">():</span><span class="w"> </span><span class="n">Set</span><span class="o">&lt;</span><span class="n">Transformer</span><span class="o">&gt;</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">setOf</span><span class="p">(</span>
+<span class="w">        </span><span class="n">UserTransformer</span><span class="p">(),</span>
+<span class="w">        </span><span class="n">AuthTransformer</span><span class="p">(),</span>
+<span class="w">        </span><span class="n">DataTransformer</span><span class="p">()</span>
+<span class="w">    </span><span class="p">)</span>
+
+<span class="w">    </span><span class="nd">@Provides</span>
+<span class="w">    </span><span class="nd">@Singleton</span>
+<span class="w">    </span><span class="kd">fun</span><span class="w"> </span><span class="nf">provideTransmissionRouter</span><span class="p">(</span>
+<span class="w">        </span><span class="n">transformers</span><span class="p">:</span><span class="w"> </span><span class="n">Set</span><span class="o">&lt;</span><span class="n">Transformer</span><span class="o">&gt;</span>
+<span class="w">    </span><span class="p">):</span><span class="w"> </span><span class="n">TransmissionRouter</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">TransmissionRouter</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">addTransformerSet</span><span class="p">(</span><span class="n">transformers</span><span class="p">)</span>
+<span class="w">        </span><span class="n">setCapacity</span><span class="p">(</span><span class="n">Capacity</span><span class="p">.</span><span class="na">High</span><span class="p">)</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div>
+<h4 id="koin-example">Koin Example</h4>
+<div class="highlight"><pre><span></span><code><span class="kd">val</span><span class="w"> </span><span class="nv">transmissionModule</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">module</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">single</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">UserTransformer</span><span class="p">()</span><span class="w"> </span><span class="p">}</span>
+<span class="w">    </span><span class="n">single</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">AuthTransformer</span><span class="p">()</span><span class="w"> </span><span class="p">}</span>
+<span class="w">    </span><span class="n">single</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">DataTransformer</span><span class="p">()</span><span class="w"> </span><span class="p">}</span>
+
+<span class="w">    </span><span class="n">single</span><span class="o">&lt;</span><span class="n">Set</span><span class="o">&lt;</span><span class="n">Transformer</span><span class="o">&gt;&gt;</span><span class="w"> </span><span class="p">{</span><span class="w"> </span>
+<span class="w">        </span><span class="n">setOf</span><span class="p">(</span><span class="k">get</span><span class="o">&lt;</span><span class="n">UserTransformer</span><span class="o">&gt;</span><span class="p">(),</span><span class="w"> </span><span class="k">get</span><span class="o">&lt;</span><span class="n">AuthTransformer</span><span class="o">&gt;</span><span class="p">(),</span><span class="w"> </span><span class="k">get</span><span class="o">&lt;</span><span class="n">DataTransformer</span><span class="o">&gt;</span><span class="p">())</span><span class="w"> </span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="n">single</span><span class="w"> </span><span class="p">{</span><span class="w"> </span>
+<span class="w">        </span><span class="n">TransmissionRouter</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="n">addTransformerSet</span><span class="p">(</span><span class="k">get</span><span class="o">&lt;</span><span class="n">Set</span><span class="o">&lt;</span><span class="n">Transformer</span><span class="o">&gt;&gt;</span><span class="p">())</span>
+<span class="w">            </span><span class="n">setCapacity</span><span class="p">(</span><span class="n">Capacity</span><span class="p">.</span><span class="na">High</span><span class="p">)</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div>
+<h2 id="error-handling">Error Handling</h2>
+<p>The router includes built-in error handling:</p>
+<div class="highlight"><pre><span></span><code><span class="c1">// Transformer errors are isolated and don&#39;t crash the router</span>
+<span class="c1">// Individual transformers can override onError() to handle their own errors</span>
+
+<span class="kd">class</span><span class="w"> </span><span class="nc">SafeTransformer</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="n">Transformer</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">override</span><span class="w"> </span><span class="kd">fun</span><span class="w"> </span><span class="nf">onError</span><span class="p">(</span><span class="n">throwable</span><span class="p">:</span><span class="w"> </span><span class="n">Throwable</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="c1">// Handle transformer-specific errors</span>
+<span class="w">        </span><span class="n">publish</span><span class="p">(</span><span class="n">ErrorEffect</span><span class="p">(</span><span class="s">&quot;Transformer error: </span><span class="si">${</span><span class="n">throwable</span><span class="p">.</span><span class="na">message</span><span class="si">}</span><span class="s">&quot;</span><span class="p">))</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div>
+<h2 id="performance-considerations">Performance Considerations</h2>
+<h3 id="capacity-settings">Capacity Settings</h3>
+<div class="highlight"><pre><span></span><code><span class="c1">// For high-throughput applications</span>
+<span class="kd">val</span><span class="w"> </span><span class="nv">router</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">TransmissionRouter</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">addTransformerSet</span><span class="p">(</span><span class="n">transformers</span><span class="p">)</span>
+<span class="w">    </span><span class="n">setCapacity</span><span class="p">(</span><span class="n">Capacity</span><span class="p">.</span><span class="na">High</span><span class="p">)</span><span class="w"> </span><span class="c1">// or Capacity.Unlimited for extreme cases</span>
+<span class="p">}</span>
+
+<span class="c1">// For memory-constrained environments</span>
+<span class="kd">val</span><span class="w"> </span><span class="nv">router</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">TransmissionRouter</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">addTransformerSet</span><span class="p">(</span><span class="n">transformers</span><span class="p">)</span><span class="w"> </span>
+<span class="w">    </span><span class="n">setCapacity</span><span class="p">(</span><span class="n">Capacity</span><span class="p">.</span><span class="na">Low</span><span class="p">)</span>
+<span class="p">}</span>
+</code></pre></div>
+<h3 id="dispatcher-selection">Dispatcher Selection</h3>
+<div class="highlight"><pre><span></span><code><span class="c1">// For CPU-intensive work</span>
+<span class="kd">val</span><span class="w"> </span><span class="nv">router</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">TransmissionRouter</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">addTransformerSet</span><span class="p">(</span><span class="n">transformers</span><span class="p">)</span>
+<span class="w">    </span><span class="n">addDispatcher</span><span class="p">(</span><span class="n">Dispatchers</span><span class="p">.</span><span class="na">Default</span><span class="p">)</span>
+<span class="p">}</span>
+
+<span class="c1">// For IO-intensive work</span>
+<span class="kd">val</span><span class="w"> </span><span class="nv">router</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">TransmissionRouter</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">addTransformerSet</span><span class="p">(</span><span class="n">transformers</span><span class="p">)</span>
+<span class="w">    </span><span class="n">addDispatcher</span><span class="p">(</span><span class="n">Dispatchers</span><span class="p">.</span><span class="na">IO</span><span class="p">)</span>
+<span class="p">}</span>
+
+<span class="c1">// For UI-related work (use sparingly)</span>
+<span class="kd">val</span><span class="w"> </span><span class="nv">router</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">TransmissionRouter</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">addTransformerSet</span><span class="p">(</span><span class="n">transformers</span><span class="p">)</span>
+<span class="w">    </span><span class="n">addDispatcher</span><span class="p">(</span><span class="n">Dispatchers</span><span class="p">.</span><span class="na">Main</span><span class="p">.</span><span class="na">immediate</span><span class="p">)</span>
+<span class="p">}</span>
+</code></pre></div>
+<h1 id="routerviewmodel">RouterViewModel</h1>
+<p><strong>RouterViewModel</strong> is a convenience wrapper around TransmissionRouter that extends <code>androidx.lifecycle.ViewModel</code>. It's fully Kotlin Multiplatform compatible and provides automatic setup, lifecycle management, and simplified stream handling across all platforms.</p>
+<h2 id="key-features">Key Features</h2>
+<ul>
+<li><strong>Automatic Setup</strong>: Router is configured and initialized automatically</li>
+<li><strong>Lifecycle Management</strong>: Router cleanup is handled in <code>onCleared()</code></li>
+<li><strong>Stream Collection</strong>: Data and effect streams are automatically collected in <code>viewModelScope</code></li>
+<li><strong>Hook Methods</strong>: Override <code>onData</code>, <code>onEffect</code>, <code>onProcessSignal</code>, and <code>onProcessEffect</code> for custom logic</li>
+<li><strong>Query Support</strong>: Built-in access to <code>QueryHandler</code> for querying transformer states</li>
+<li><strong>StateFlow Helpers</strong>: Built-in methods for converting streams to StateFlow</li>
+<li><strong>Error Handling</strong>: Built-in error handling with <code>onError</code> callback</li>
+</ul>
+<h2 id="basic-usage">Basic Usage</h2>
+<h3 id="simple-implementation">Simple Implementation</h3>
+<div class="highlight"><pre><span></span><code><span class="kd">class</span><span class="w"> </span><span class="nc">UserViewModel</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="n">RouterViewModel</span><span class="p">(</span>
+<span class="w">    </span><span class="n">setOf</span><span class="p">(</span>
+<span class="w">        </span><span class="n">UserTransformer</span><span class="p">(),</span>
+<span class="w">        </span><span class="n">AuthTransformer</span><span class="p">(),</span>
+<span class="w">        </span><span class="n">ProfileTransformer</span><span class="p">()</span>
+<span class="w">    </span><span class="p">)</span>
+<span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="c1">// Create StateFlow from data streams</span>
+<span class="w">    </span><span class="kd">val</span><span class="w"> </span><span class="nv">userState</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">streamDataAsState</span><span class="o">&lt;</span><span class="n">UserData</span><span class="o">&gt;</span><span class="p">(</span><span class="n">UserData</span><span class="p">.</span><span class="na">Empty</span><span class="p">)</span>
+<span class="w">    </span><span class="kd">val</span><span class="w"> </span><span class="nv">authState</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">streamDataAsState</span><span class="o">&lt;</span><span class="n">AuthData</span><span class="o">&gt;</span><span class="p">(</span><span class="n">AuthData</span><span class="p">.</span><span class="na">LoggedOut</span><span class="p">)</span>
+
+<span class="w">    </span><span class="c1">// Handle data updates</span>
+<span class="w">    </span><span class="kd">override</span><span class="w"> </span><span class="kd">fun</span><span class="w"> </span><span class="nf">onData</span><span class="p">(</span><span class="n">data</span><span class="p">:</span><span class="w"> </span><span class="n">Transmission</span><span class="p">.</span><span class="na">Data</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="k">when</span><span class="w"> </span><span class="p">(</span><span class="n">data</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="k">is</span><span class="w"> </span><span class="n">UserData</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="n">logUserUpdate</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+<span class="w">            </span><span class="k">is</span><span class="w"> </span><span class="n">AuthData</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="n">handleAuthChange</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="c1">// Handle effects</span>
+<span class="w">    </span><span class="kd">override</span><span class="w"> </span><span class="kd">fun</span><span class="w"> </span><span class="nf">onEffect</span><span class="p">(</span><span class="n">effect</span><span class="p">:</span><span class="w"> </span><span class="n">Transmission</span><span class="p">.</span><span class="na">Effect</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="k">when</span><span class="w"> </span><span class="p">(</span><span class="n">effect</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="k">is</span><span class="w"> </span><span class="n">NavigationEffect</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="n">navigateTo</span><span class="p">(</span><span class="n">effect</span><span class="p">.</span><span class="na">destination</span><span class="p">)</span>
+<span class="w">            </span><span class="k">is</span><span class="w"> </span><span class="n">ErrorEffect</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="n">showError</span><span class="p">(</span><span class="n">effect</span><span class="p">.</span><span class="na">message</span><span class="p">)</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="c1">// User actions</span>
+<span class="w">    </span><span class="kd">fun</span><span class="w"> </span><span class="nf">login</span><span class="p">(</span><span class="n">credentials</span><span class="p">:</span><span class="w"> </span><span class="n">Credentials</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">processSignal</span><span class="p">(</span><span class="n">AuthSignal</span><span class="p">.</span><span class="na">Login</span><span class="p">(</span><span class="n">credentials</span><span class="p">))</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="kd">fun</span><span class="w"> </span><span class="nf">updateProfile</span><span class="p">(</span><span class="n">profile</span><span class="p">:</span><span class="w"> </span><span class="n">Profile</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">processSignal</span><span class="p">(</span><span class="n">UserSignal</span><span class="p">.</span><span class="na">UpdateProfile</span><span class="p">(</span><span class="n">profile</span><span class="p">))</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div>
+<h3 id="advanced-configuration">Advanced Configuration</h3>
+<div class="highlight"><pre><span></span><code><span class="kd">class</span><span class="w"> </span><span class="nc">FeatureViewModel</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="n">RouterViewModel</span><span class="p">(</span>
+<span class="w">    </span><span class="n">loader</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">FeatureTransformerSetLoader</span><span class="p">(),</span>
+<span class="w">    </span><span class="n">config</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">RouterViewModelConfig</span><span class="p">(</span>
+<span class="w">        </span><span class="n">capacity</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Capacity</span><span class="p">.</span><span class="na">High</span><span class="p">,</span>
+<span class="w">        </span><span class="n">dispatcher</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Dispatchers</span><span class="p">.</span><span class="na">IO</span><span class="p">,</span>
+<span class="w">        </span><span class="n">identity</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Contract</span><span class="p">.</span><span class="na">identity</span><span class="p">(</span><span class="s">&quot;feature-router&quot;</span><span class="p">)</span>
+<span class="w">    </span><span class="p">)</span>
+<span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="c1">// Type-safe stream access</span>
+<span class="w">    </span><span class="kd">val</span><span class="w"> </span><span class="nv">errorStream</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">streamEffect</span><span class="o">&lt;</span><span class="n">ErrorEffect</span><span class="o">&gt;</span><span class="p">()</span>
+<span class="w">    </span><span class="kd">val</span><span class="w"> </span><span class="nv">loadingData</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">streamData</span><span class="o">&lt;</span><span class="n">LoadingData</span><span class="o">&gt;</span><span class="p">()</span>
+
+<span class="w">    </span><span class="c1">// Custom error handling</span>
+<span class="w">    </span><span class="kd">override</span><span class="w"> </span><span class="kd">fun</span><span class="w"> </span><span class="nf">onError</span><span class="p">(</span><span class="n">throwable</span><span class="p">:</span><span class="w"> </span><span class="n">Throwable</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">logError</span><span class="p">(</span><span class="s">&quot;Router error&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">throwable</span><span class="p">)</span>
+<span class="w">        </span><span class="n">processEffect</span><span class="p">(</span><span class="n">ErrorEffect</span><span class="p">(</span><span class="s">&quot;System error occurred&quot;</span><span class="p">))</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="c1">// Post-processing hooks</span>
+<span class="w">    </span><span class="kd">override</span><span class="w"> </span><span class="kd">fun</span><span class="w"> </span><span class="nf">onProcessSignal</span><span class="p">(</span><span class="n">signal</span><span class="p">:</span><span class="w"> </span><span class="n">Transmission</span><span class="p">.</span><span class="na">Signal</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">analytics</span><span class="p">.</span><span class="na">trackSignal</span><span class="p">(</span><span class="n">signal</span><span class="o">::</span><span class="n">class</span><span class="p">.</span><span class="na">simpleName</span><span class="p">)</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="c1">// Query transformer states</span>
+<span class="w">    </span><span class="kd">suspend</span><span class="w"> </span><span class="kd">fun</span><span class="w"> </span><span class="nf">getCurrentUserData</span><span class="p">():</span><span class="w"> </span><span class="n">UserData? </span><span class="p">{</span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="n">queryHandler</span><span class="p">.</span><span class="na">getData</span><span class="p">(</span><span class="n">UserTransformer</span><span class="p">.</span><span class="na">dataContract</span><span class="p">)</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div>
+<h2 id="configuration-options">Configuration Options</h2>
+<h3 id="routerviewmodelconfig">RouterViewModelConfig</h3>
+<div class="highlight"><pre><span></span><code><span class="kd">data</span><span class="w"> </span><span class="kd">class</span><span class="w"> </span><span class="nc">RouterViewModelConfig</span><span class="p">(</span>
+<span class="w">    </span><span class="kd">val</span><span class="w"> </span><span class="nv">capacity</span><span class="p">:</span><span class="w"> </span><span class="n">Capacity</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Capacity</span><span class="p">.</span><span class="na">Default</span><span class="p">,</span><span class="w">           </span><span class="c1">// Buffer capacity</span>
+<span class="w">    </span><span class="kd">val</span><span class="w"> </span><span class="nv">dispatcher</span><span class="p">:</span><span class="w"> </span><span class="n">CoroutineDispatcher</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Dispatchers</span><span class="p">.</span><span class="na">Default</span><span class="p">,</span><span class="w"> </span><span class="c1">// Coroutine dispatcher</span>
+<span class="w">    </span><span class="kd">val</span><span class="w"> </span><span class="nv">identity</span><span class="p">:</span><span class="w"> </span><span class="n">Contract</span><span class="p">.</span><span class="na">Identity</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Contract</span><span class="p">.</span><span class="na">identity</span><span class="p">()</span><span class="w">       </span><span class="c1">// Router identity</span>
+<span class="p">)</span>
+</code></pre></div>
+<h3 id="usage-with-configuration">Usage with Configuration</h3>
+<div class="highlight"><pre><span></span><code><span class="c1">// High-performance configuration</span>
+<span class="kd">val</span><span class="w"> </span><span class="nv">config</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">RouterViewModelConfig</span><span class="p">(</span>
+<span class="w">    </span><span class="n">capacity</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Capacity</span><span class="p">.</span><span class="na">High</span><span class="p">,</span>
+<span class="w">    </span><span class="n">dispatcher</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Dispatchers</span><span class="p">.</span><span class="na">IO</span>
+<span class="p">)</span>
+
+<span class="kd">class</span><span class="w"> </span><span class="nc">MyViewModel</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="n">RouterViewModel</span><span class="p">(</span><span class="n">transformers</span><span class="p">,</span><span class="w"> </span><span class="n">config</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="c1">// Implementation</span>
+<span class="p">}</span>
+</code></pre></div>
+<h2 id="stream-helpers">Stream Helpers</h2>
+<h3 id="stateflow-creation">StateFlow Creation</h3>
+<div class="highlight"><pre><span></span><code><span class="kd">class</span><span class="w"> </span><span class="nc">ShoppingViewModel</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="n">RouterViewModel</span><span class="p">(</span><span class="n">shoppingTransformers</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="c1">// Automatic StateFlow conversion</span>
+<span class="w">    </span><span class="kd">val</span><span class="w"> </span><span class="nv">cartState</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">streamDataAsState</span><span class="o">&lt;</span><span class="n">CartData</span><span class="o">&gt;</span><span class="p">(</span><span class="n">CartData</span><span class="p">.</span><span class="na">Empty</span><span class="p">)</span>
+<span class="w">    </span><span class="kd">val</span><span class="w"> </span><span class="nv">productsState</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">streamDataAsState</span><span class="o">&lt;</span><span class="n">ProductListData</span><span class="o">&gt;</span><span class="p">(</span><span class="n">ProductListData</span><span class="p">.</span><span class="na">Loading</span><span class="p">)</span>
+<span class="w">    </span><span class="kd">val</span><span class="w"> </span><span class="nv">checkoutState</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">streamDataAsState</span><span class="o">&lt;</span><span class="n">CheckoutData</span><span class="o">&gt;</span><span class="p">(</span><span class="n">CheckoutData</span><span class="p">.</span><span class="na">Idle</span><span class="p">)</span>
+
+<span class="w">    </span><span class="c1">// Custom sharing behavior</span>
+<span class="w">    </span><span class="kd">val</span><span class="w"> </span><span class="nv">userPreferences</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">streamDataAsState</span><span class="o">&lt;</span><span class="n">UserPreferencesData</span><span class="o">&gt;</span><span class="p">(</span>
+<span class="w">        </span><span class="n">initialValue</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">UserPreferencesData</span><span class="p">.</span><span class="na">Default</span><span class="p">,</span>
+<span class="w">        </span><span class="n">started</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">SharingStarted</span><span class="p">.</span><span class="na">Eagerly</span>
+<span class="w">    </span><span class="p">)</span>
+<span class="p">}</span>
+</code></pre></div>
+<h3 id="type-safe-stream-access">Type-Safe Stream Access</h3>
+<div class="highlight"><pre><span></span><code><span class="kd">class</span><span class="w"> </span><span class="nc">ChatViewModel</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="n">RouterViewModel</span><span class="p">(</span><span class="n">chatTransformers</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="c1">// Access specific data types</span>
+<span class="w">    </span><span class="kd">val</span><span class="w"> </span><span class="nv">messageFlow</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">streamData</span><span class="o">&lt;</span><span class="n">MessageData</span><span class="o">&gt;</span><span class="p">()</span>
+<span class="w">    </span><span class="kd">val</span><span class="w"> </span><span class="nv">userStatusFlow</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">streamData</span><span class="o">&lt;</span><span class="n">UserStatusData</span><span class="o">&gt;</span><span class="p">()</span>
+
+<span class="w">    </span><span class="c1">// Access specific effect types  </span>
+<span class="w">    </span><span class="kd">val</span><span class="w"> </span><span class="nv">notificationEffects</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">streamEffect</span><span class="o">&lt;</span><span class="n">NotificationEffect</span><span class="o">&gt;</span><span class="p">()</span>
+<span class="w">    </span><span class="kd">val</span><span class="w"> </span><span class="nv">navigationEffects</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">streamEffect</span><span class="o">&lt;</span><span class="n">NavigationEffect</span><span class="o">&gt;</span><span class="p">()</span>
+
+<span class="w">    </span><span class="k">init</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="c1">// Custom stream handling</span>
+<span class="w">        </span><span class="n">viewModelScope</span><span class="p">.</span><span class="na">launch</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="n">navigationEffects</span><span class="p">.</span><span class="na">collect</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">effect</span><span class="w"> </span><span class="o">-&gt;</span>
+<span class="w">                </span><span class="n">handleNavigation</span><span class="p">(</span><span class="n">effect</span><span class="p">)</span>
+<span class="w">            </span><span class="p">}</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div>
+<h2 id="dependency-injection-integration">Dependency Injection Integration</h2>
+<h3 id="hilt-example_1">Hilt Example</h3>
+<div class="highlight"><pre><span></span><code><span class="nd">@HiltViewModel</span>
+<span class="kd">class</span><span class="w"> </span><span class="nc">MainViewModel</span><span class="w"> </span><span class="nd">@Inject</span><span class="w"> </span><span class="k">constructor</span><span class="p">(</span>
+<span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="kd">val</span><span class="w"> </span><span class="nv">transformerSetLoader</span><span class="p">:</span><span class="w"> </span><span class="n">MainTransformerSetLoader</span>
+<span class="p">)</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="n">RouterViewModel</span><span class="p">(</span>
+<span class="w">    </span><span class="n">loader</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">transformerSetLoader</span><span class="p">,</span>
+<span class="w">    </span><span class="n">config</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">RouterViewModelConfig</span><span class="p">(</span><span class="n">capacity</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Capacity</span><span class="p">.</span><span class="na">High</span><span class="p">)</span>
+<span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">val</span><span class="w"> </span><span class="nv">mainState</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">streamDataAsState</span><span class="o">&lt;</span><span class="n">MainScreenData</span><span class="o">&gt;</span><span class="p">(</span><span class="n">MainScreenData</span><span class="p">.</span><span class="na">Loading</span><span class="p">)</span>
+
+<span class="w">    </span><span class="kd">fun</span><span class="w"> </span><span class="nf">refreshData</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">processSignal</span><span class="p">(</span><span class="n">RefreshSignal</span><span class="p">)</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div>
+<h3 id="koin-example_1">Koin Example</h3>
+<div class="highlight"><pre><span></span><code><span class="kd">val</span><span class="w"> </span><span class="nv">viewModelModule</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">module</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">viewModel</span><span class="w"> </span><span class="p">{</span><span class="w"> </span>
+<span class="w">        </span><span class="n">UserViewModel</span><span class="p">(</span>
+<span class="w">            </span><span class="n">transformerSet</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">get</span><span class="o">&lt;</span><span class="n">Set</span><span class="o">&lt;</span><span class="n">Transformer</span><span class="o">&gt;&gt;</span><span class="p">(),</span>
+<span class="w">            </span><span class="n">config</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">RouterViewModelConfig</span><span class="p">(</span>
+<span class="w">                </span><span class="n">dispatcher</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">get</span><span class="p">(</span><span class="n">named</span><span class="p">(</span><span class="s">&quot;ioDispatcher&quot;</span><span class="p">))</span>
+<span class="w">            </span><span class="p">)</span>
+<span class="w">        </span><span class="p">)</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+
+<span class="kd">class</span><span class="w"> </span><span class="nc">UserViewModel</span><span class="p">(</span>
+<span class="w">    </span><span class="n">transformerSet</span><span class="p">:</span><span class="w"> </span><span class="n">Set</span><span class="o">&lt;</span><span class="n">Transformer</span><span class="o">&gt;</span><span class="p">,</span>
+<span class="w">    </span><span class="n">config</span><span class="p">:</span><span class="w"> </span><span class="n">RouterViewModelConfig</span>
+<span class="p">)</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="n">RouterViewModel</span><span class="p">(</span><span class="n">transformerSet</span><span class="p">,</span><span class="w"> </span><span class="n">config</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="c1">// Implementation</span>
+<span class="p">}</span>
+</code></pre></div>
+<h2 id="error-handling_1">Error Handling</h2>
+<div class="highlight"><pre><span></span><code><span class="kd">class</span><span class="w"> </span><span class="nc">RobustViewModel</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="n">RouterViewModel</span><span class="p">(</span><span class="n">transformers</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">override</span><span class="w"> </span><span class="kd">fun</span><span class="w"> </span><span class="nf">onError</span><span class="p">(</span><span class="n">throwable</span><span class="p">:</span><span class="w"> </span><span class="n">Throwable</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="k">when</span><span class="w"> </span><span class="p">(</span><span class="n">throwable</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="k">is</span><span class="w"> </span><span class="n">NetworkException</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="n">handleNetworkError</span><span class="p">(</span><span class="n">throwable</span><span class="p">)</span>
+<span class="w">            </span><span class="k">is</span><span class="w"> </span><span class="n">ValidationException</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="n">handleValidationError</span><span class="p">(</span><span class="n">throwable</span><span class="p">)</span>
+<span class="w">            </span><span class="k">else</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="p">{</span>
+<span class="w">                </span><span class="n">logError</span><span class="p">(</span><span class="s">&quot;Unexpected router error&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">throwable</span><span class="p">)</span>
+<span class="w">                </span><span class="n">processEffect</span><span class="p">(</span><span class="n">ErrorEffect</span><span class="p">(</span><span class="s">&quot;Something went wrong&quot;</span><span class="p">))</span>
+<span class="w">            </span><span class="p">}</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="kd">override</span><span class="w"> </span><span class="kd">fun</span><span class="w"> </span><span class="nf">onProcessSignal</span><span class="p">(</span><span class="n">signal</span><span class="p">:</span><span class="w"> </span><span class="n">Transmission</span><span class="p">.</span><span class="na">Signal</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="c1">// Log all processed signals for debugging</span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">BuildConfig</span><span class="p">.</span><span class="na">DEBUG</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="n">Log</span><span class="p">.</span><span class="na">d</span><span class="p">(</span><span class="s">&quot;RouterViewModel&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;Processed signal: </span><span class="si">$</span><span class="n">signal</span><span class="s">&quot;</span><span class="p">)</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div>
+<h2 id="multiplatform-support">Multiplatform Support</h2>
+<p>RouterViewModel is built using <code>androidx.lifecycle.ViewModel</code> which is fully multiplatform:</p>
+<div class="highlight"><pre><span></span><code><span class="k">import</span><span class="w"> </span><span class="nn">androidx.lifecycle.ViewModel</span>
+<span class="k">import</span><span class="w"> </span><span class="nn">androidx.lifecycle.viewModelScope</span>
+</code></pre></div>
+<p>This means you can use RouterViewModel across all supported platforms:
+- <strong>Android</strong>: Native AndroidX ViewModel support
+- <strong>iOS</strong>: Full lifecycle management via androidx.lifecycle-viewmodel
+- <strong>Desktop</strong>: JVM-based lifecycle management<br />
+- <strong>Web</strong>: Kotlin/JS lifecycle management</p>
+<h3 id="platform-specific-considerations">Platform-Specific Considerations</h3>
+<p>While RouterViewModel works on all platforms, you may want different configurations per platform:</p>
+<div class="highlight"><pre><span></span><code><span class="c1">// Platform-specific configurations</span>
+<span class="kd">expect</span><span class="w"> </span><span class="kd">fun</span><span class="w"> </span><span class="nf">defaultRouterConfig</span><span class="p">():</span><span class="w"> </span><span class="n">RouterViewModelConfig</span>
+
+<span class="c1">// androidMain</span>
+<span class="kd">actual</span><span class="w"> </span><span class="kd">fun</span><span class="w"> </span><span class="nf">defaultRouterConfig</span><span class="p">()</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">RouterViewModelConfig</span><span class="p">(</span>
+<span class="w">    </span><span class="n">capacity</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Capacity</span><span class="p">.</span><span class="na">High</span><span class="p">,</span>
+<span class="w">    </span><span class="n">dispatcher</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Dispatchers</span><span class="p">.</span><span class="na">Main</span><span class="p">.</span><span class="na">immediate</span>
+<span class="p">)</span>
+
+<span class="c1">// iosMain  </span>
+<span class="kd">actual</span><span class="w"> </span><span class="kd">fun</span><span class="w"> </span><span class="nf">defaultRouterConfig</span><span class="p">()</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">RouterViewModelConfig</span><span class="p">(</span>
+<span class="w">    </span><span class="n">capacity</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Capacity</span><span class="p">.</span><span class="na">Default</span><span class="p">,</span>
+<span class="w">    </span><span class="n">dispatcher</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Dispatchers</span><span class="p">.</span><span class="na">Main</span>
+<span class="p">)</span>
+
+<span class="c1">// Usage</span>
+<span class="kd">class</span><span class="w"> </span><span class="nc">MyViewModel</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="n">RouterViewModel</span><span class="p">(</span>
+<span class="w">    </span><span class="n">transformers</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">myTransformers</span><span class="p">,</span>
+<span class="w">    </span><span class="n">config</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">defaultRouterConfig</span><span class="p">()</span>
+<span class="p">)</span>
+
+<span class="err">##</span><span class="w"> </span><span class="n">Comparison</span><span class="p">:</span><span class="w"> </span><span class="n">Direct</span><span class="w"> </span><span class="n">Router</span><span class="w"> </span><span class="n">vs</span><span class="w"> </span><span class="n">RouterViewModel</span>
+
+<span class="err">###</span><span class="w"> </span><span class="n">Direct</span><span class="w"> </span><span class="n">TransmissionRouter</span>
+
+<span class="err">```</span><span class="n">kotlin</span>
+<span class="kd">class</span><span class="w"> </span><span class="nc">ManualViewModel</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="n">ViewModel</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="kd">val</span><span class="w"> </span><span class="nv">router</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">TransmissionRouter</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">addTransformerSet</span><span class="p">(</span><span class="n">transformers</span><span class="p">)</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="kd">val</span><span class="w"> </span><span class="nv">dataState</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">router</span><span class="p">.</span><span class="na">streamData</span><span class="o">&lt;</span><span class="n">MyData</span><span class="o">&gt;</span><span class="p">()</span>
+<span class="w">        </span><span class="p">.</span><span class="na">stateIn</span><span class="p">(</span><span class="n">viewModelScope</span><span class="p">,</span><span class="w"> </span><span class="n">SharingStarted</span><span class="p">.</span><span class="na">WhileSubscribed</span><span class="p">(),</span><span class="w"> </span><span class="n">MyData</span><span class="p">.</span><span class="na">Empty</span><span class="p">)</span>
+
+<span class="w">    </span><span class="k">init</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">viewModelScope</span><span class="p">.</span><span class="na">launch</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="n">router</span><span class="p">.</span><span class="na">streamEffect</span><span class="o">&lt;</span><span class="n">MyEffect</span><span class="o">&gt;</span><span class="p">().</span><span class="na">collect</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">effect</span><span class="w"> </span><span class="o">-&gt;</span>
+<span class="w">                </span><span class="n">handleEffect</span><span class="p">(</span><span class="n">effect</span><span class="p">)</span>
+<span class="w">            </span><span class="p">}</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="kd">fun</span><span class="w"> </span><span class="nf">processUserAction</span><span class="p">(</span><span class="n">action</span><span class="p">:</span><span class="w"> </span><span class="n">MySignal</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">router</span><span class="p">.</span><span class="na">process</span><span class="p">(</span><span class="n">action</span><span class="p">)</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="kd">override</span><span class="w"> </span><span class="kd">fun</span><span class="w"> </span><span class="nf">onCleared</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">router</span><span class="p">.</span><span class="na">clear</span><span class="p">()</span>
+<span class="w">        </span><span class="k">super</span><span class="p">.</span><span class="na">onCleared</span><span class="p">()</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div>
+<h3 id="routerviewmodel_1">RouterViewModel</h3>
+<div class="highlight"><pre><span></span><code><span class="kd">class</span><span class="w"> </span><span class="nc">SimpleViewModel</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="n">RouterViewModel</span><span class="p">(</span><span class="n">transformers</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">val</span><span class="w"> </span><span class="nv">dataState</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">streamDataAsState</span><span class="o">&lt;</span><span class="n">MyData</span><span class="o">&gt;</span><span class="p">(</span><span class="n">MyData</span><span class="p">.</span><span class="na">Empty</span><span class="p">)</span>
+
+<span class="w">    </span><span class="kd">override</span><span class="w"> </span><span class="kd">fun</span><span class="w"> </span><span class="nf">onEffect</span><span class="p">(</span><span class="n">effect</span><span class="p">:</span><span class="w"> </span><span class="n">Transmission</span><span class="p">.</span><span class="na">Effect</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">effect</span><span class="w"> </span><span class="k">is</span><span class="w"> </span><span class="n">MyEffect</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="n">handleEffect</span><span class="p">(</span><span class="n">effect</span><span class="p">)</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="kd">fun</span><span class="w"> </span><span class="nf">processUserAction</span><span class="p">(</span><span class="n">action</span><span class="p">:</span><span class="w"> </span><span class="n">MySignal</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">processSignal</span><span class="p">(</span><span class="n">action</span><span class="p">)</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="c1">// Cleanup is automatic!</span>
+<span class="p">}</span>
+</code></pre></div>
+<h2 id="best-practices-for-routerviewmodel">Best Practices for RouterViewModel</h2>
+<h3 id="1-use-stateflow-for-ui-state">1. Use StateFlow for UI State</h3>
+<div class="highlight"><pre><span></span><code><span class="kd">class</span><span class="w"> </span><span class="nc">GoodViewModel</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="n">RouterViewModel</span><span class="p">(</span><span class="n">transformers</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="c1">// ✅ Good: Direct StateFlow creation</span>
+<span class="w">    </span><span class="kd">val</span><span class="w"> </span><span class="nv">uiState</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">streamDataAsState</span><span class="o">&lt;</span><span class="n">UiState</span><span class="o">&gt;</span><span class="p">(</span><span class="n">UiState</span><span class="p">.</span><span class="na">Loading</span><span class="p">)</span>
+
+<span class="w">    </span><span class="c1">// ❌ Avoid: Manual StateFlow conversion in ViewModels</span>
+<span class="w">    </span><span class="c1">// val uiState = streamData&lt;UiState&gt;()</span>
+<span class="w">    </span><span class="c1">//     .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), UiState.Loading)</span>
+<span class="p">}</span>
+</code></pre></div>
+<h3 id="2-handle-effects-properly">2. Handle Effects Properly</h3>
+<div class="highlight"><pre><span></span><code><span class="kd">class</span><span class="w"> </span><span class="nc">EffectHandlingViewModel</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="n">RouterViewModel</span><span class="p">(</span><span class="n">transformers</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">override</span><span class="w"> </span><span class="kd">fun</span><span class="w"> </span><span class="nf">onEffect</span><span class="p">(</span><span class="n">effect</span><span class="p">:</span><span class="w"> </span><span class="n">Transmission</span><span class="p">.</span><span class="na">Effect</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="k">when</span><span class="w"> </span><span class="p">(</span><span class="n">effect</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="k">is</span><span class="w"> </span><span class="n">NavigationEffect</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="p">{</span>
+<span class="w">                </span><span class="c1">// Handle navigation - don&#39;t process signals here</span>
+<span class="w">                </span><span class="n">navigationManager</span><span class="p">.</span><span class="na">navigateTo</span><span class="p">(</span><span class="n">effect</span><span class="p">.</span><span class="na">destination</span><span class="p">)</span>
+<span class="w">            </span><span class="p">}</span>
+<span class="w">            </span><span class="k">is</span><span class="w"> </span><span class="n">ValidationEffect</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="p">{</span>
+<span class="w">                </span><span class="c1">// Handle validation feedback</span>
+<span class="w">                </span><span class="n">showValidationError</span><span class="p">(</span><span class="n">effect</span><span class="p">.</span><span class="na">message</span><span class="p">)</span>
+<span class="w">            </span><span class="p">}</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div>
+<h3 id="3-use-configuration-for-performance">3. Use Configuration for Performance</h3>
+<div class="highlight"><pre><span></span><code><span class="c1">// ✅ Good: Configure based on use case</span>
+<span class="kd">class</span><span class="w"> </span><span class="nc">HighThroughputViewModel</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="n">RouterViewModel</span><span class="p">(</span>
+<span class="w">    </span><span class="n">transformers</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">heavyTransformers</span><span class="p">,</span>
+<span class="w">    </span><span class="n">config</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">RouterViewModelConfig</span><span class="p">(</span>
+<span class="w">        </span><span class="n">capacity</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Capacity</span><span class="p">.</span><span class="na">High</span><span class="p">,</span>
+<span class="w">        </span><span class="n">dispatcher</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Dispatchers</span><span class="p">.</span><span class="na">Default</span>
+<span class="w">    </span><span class="p">)</span>
+<span class="p">)</span>
+
+<span class="kd">class</span><span class="w"> </span><span class="nc">IOIntensiveViewModel</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="n">RouterViewModel</span><span class="p">(</span>
+<span class="w">    </span><span class="n">transformers</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">networkTransformers</span><span class="p">,</span>
+<span class="w">    </span><span class="n">config</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">RouterViewModelConfig</span><span class="p">(</span>
+<span class="w">        </span><span class="n">dispatcher</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Dispatchers</span><span class="p">.</span><span class="na">IO</span>
+<span class="w">    </span><span class="p">)</span>
+<span class="p">)</span>
+</code></pre></div>
+<h2 id="best-practices">Best Practices</h2>
+<ol>
+<li><strong>Single Router per Feature</strong>: Use one router per logical feature or module</li>
+<li><strong>Proper Cleanup</strong>: Always call <code>router.clear()</code> when done</li>
+<li><strong>Appropriate Capacity</strong>: Choose capacity based on your app's throughput needs</li>
+<li><strong>Error Handling</strong>: Implement proper error handling in transformers</li>
+<li><strong>Stream Management</strong>: Use appropriate lifecycle scopes for data stream collection</li>
+<li><strong>Testing</strong>: The router is designed to be easily testable - see <a href="../testing/">Testing</a> guide</li>
+</ol>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+  <script>var tabs=__md_get("__tabs");if(Array.isArray(tabs))e:for(var set of document.querySelectorAll(".tabbed-set")){var labels=set.querySelector(".tabbed-labels");for(var tab of tabs)for(var label of labels.getElementsByTagName("label"))if(label.innerText.trim()===tab){var input=document.getElementById(label.htmlFor);input.checked=!0;continue e}}</script>
+
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+    
+      
+      <nav class="md-footer__inner md-grid" aria-label="Footer" >
+        
+          
+          <a href="../transformer/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Transformer">
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+            </div>
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Previous
+              </span>
+              <div class="md-ellipsis">
+                Transformer
+              </div>
+            </div>
+          </a>
+        
+        
+          
+          <a href="../dataholder/" class="md-footer__link md-footer__link--next" aria-label="Next: DataHolder">
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Next
+              </span>
+              <div class="md-ellipsis">
+                DataHolder
+              </div>
+            </div>
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11z"/></svg>
+            </div>
+          </a>
+        
+      </nav>
+    
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+    <div class="md-copyright__highlight">
+      Copyright &copy; 2024 Trendyol
+    </div>
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      <script id="__config" type="application/json">{"base": "..", "features": ["content.code.copy", "content.code.select", "content.code.annotate", "content.tabs.link", "content.tooltips", "header.autohide", "navigation.top", "navigation.tracking", "navigation.sections", "navigation.indexes", "navigation.footer", "search.highlight", "search.share", "search.suggest", "toc.integrate"], "search": "../assets/javascripts/workers/search.d50fe291.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.13a4f30d.min.js"></script>
+      
+    
+  </body>
+</html>
