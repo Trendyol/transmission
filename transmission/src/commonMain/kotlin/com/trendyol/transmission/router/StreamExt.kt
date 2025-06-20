@@ -14,24 +14,24 @@ import kotlinx.coroutines.flow.stateIn
 import kotlin.jvm.JvmName
 
 @JvmName("streamData")
-fun TransmissionRouter.streamData(): Flow<Transmission.Data> {
+fun StreamOwner.streamData(): Flow<Transmission.Data> {
     return this.dataStream
 }
 
 @JvmName("streamDataWithType")
-inline fun <reified T : Transmission.Data> TransmissionRouter.streamData(): Flow<T> {
+inline fun <reified T : Transmission.Data> StreamOwner.streamData(): Flow<T> {
     return this.dataStream.filterIsInstance<T>()
 }
 
 @JvmName("streamDataWithAction")
-inline fun <reified T : Transmission.Data> TransmissionRouter.streamData(
+inline fun <reified T : Transmission.Data> StreamOwner.streamData(
     noinline action: suspend (T) -> Unit
 ): Flow<T> {
     return this.dataStream.filterIsInstance<T>().onEach(action)
 }
 
 @JvmName("streamEffect")
-inline fun <reified T : Transmission.Effect> TransmissionRouter.streamEffect(): Flow<T> {
+inline fun <reified T : Transmission.Effect> StreamOwner.streamEffect(): Flow<T> {
     return this.effectStream.filterIsInstance<T>()
 }
 
@@ -41,13 +41,13 @@ fun TransmissionRouter.streamEffect(): Flow<Transmission.Effect> {
 }
 
 @JvmName("streamEffectWithAction")
-inline fun <reified T : Transmission.Effect> TransmissionRouter.streamEffect(
+inline fun <reified T : Transmission.Effect> StreamOwner.streamEffect(
     noinline action: suspend (T) -> Unit
 ): Flow<T> {
     return this.effectStream.filterIsInstance<T>().onEach(action)
 }
 
-inline fun <reified T : Transmission.Data> TransmissionRouter.streamDataAsState(
+inline fun <reified T : Transmission.Data> StreamOwner.streamDataAsState(
     scope: CoroutineScope,
     initialValue: T,
     sharingStarted: SharingStarted = SharingStarted.WhileSubscribed(),
@@ -64,6 +64,6 @@ inline fun <reified T : Transmission.Data> Flow<T>.asState(
 }
 
 @ExperimentalTransmissionApi
-inline fun <reified D : Any> TransmissionRouter.oneShotPayloadStream(): Flow<D> {
+inline fun <reified D : Any> StreamOwner.oneShotPayloadStream(): Flow<D> {
     return this.effectStream.filterIsInstance<RouterEffectWithType<D>>().map { it.payload }
 }
