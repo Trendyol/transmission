@@ -52,12 +52,11 @@ jobs:
     - name: Generate API documentation
       run: ./gradlew generateApiDocs --no-daemon --stacktrace
 
-    # --- COPY STEP: Move Dokka output into MkDocs site ---
     - name: Copy Dokka output to MkDocs site
       run: |
         mkdir -p docs/api/0.x
         rm -rf docs/api/0.x/*
-        cp -r build/dokka/htmlMultiModule/* docs/api/0.x/
+        cp -r build/site/api/0.x/* docs/api/0.x/
 
     - name: Build MkDocs site
       run: mkdocs build --verbose
