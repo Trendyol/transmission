@@ -2,6 +2,7 @@ plugins {
     id("com.trendyol.transmission.android.library")
     id("com.trendyol.transmission.kotlin.multiplatform")
     id("com.trendyol.transmission.publish")
+    id("com.trendyol.transmission.dokka")
 }
 
 android {
@@ -22,3 +23,5 @@ kotlin {
         }
     }
 }
+
+

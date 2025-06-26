@@ -6,9 +6,15 @@
 
 # Transmission
 
-Documentation in progress
+A Kotlin Multiplatform library providing a powerful router-based architecture for managing data flow and transformations in your applications.
 
-### [https://trendyol.github.io/transmission/](https://trendyol.github.io/transmission/)
+## Documentation
+
+- **📖 Online Documentation**: [https://trendyol.github.io/transmission/](https://trendyol.github.io/transmission/) *(Auto-deployed from main branch)*
+- **🔧 Generate Locally**: `./gradlew generateDocs`
+- **📋 Getting Started**: See [docs/api-overview.md](docs/api-overview.md)
+- **⚙️ Setup Guide**: See [docs/github-pages-setup.md](docs/github-pages-setup.md)
+
 
 License
 --------

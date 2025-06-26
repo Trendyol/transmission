@@ -31,6 +31,10 @@ gradlePlugin {
             id =  "com.trendyol.transmission.kotlin.multiplatform"
             implementationClass = "com.trendyol.transmission.KotlinMultiplatformConventionPlugin"
         }
+        register("dokka") {
+            id = "com.trendyol.transmission.dokka"
+            implementationClass = "com.trendyol.transmission.DokkaConventionPlugin"
+        }
     }
 }
 
@@ -38,4 +42,5 @@ dependencies {
     implementation(libs.gradle.maven.publish.plugin)
     compileOnly(libs.android.gradlePlugin)
     compileOnly(libs.kotlin.gradlePlugin)
+    compileOnly(libs.dokka.gradlePlugin)
 }
