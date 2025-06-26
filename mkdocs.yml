@@ -4,6 +4,7 @@ site_description: "Experimental asynchronous communication for Business Logic"
 site_author: Trendyol
 repo_url: https://github.com/trendyol/transmission
 remote_branch: gh-pages
+site_dir: build/site
 
 copyright: 'Copyright &copy; 2024 Trendyol'
 
@@ -64,6 +65,10 @@ theme:
   - search.share
   - search.suggest
   - toc.integrate
+
+extra:
+  # External API documentation link
+  api_docs_url: "api/0.x/"
 
 nav:
   - 'Introduction': index.md

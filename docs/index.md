@@ -1,14 +1,53 @@
 # Transmission
 
+🚀 **Experimental asynchronous communication for Business Logic**
+
+[![Kotlin](https://img.shields.io/badge/kotlin-multiplatform-orange.svg)](http://kotlinlang.org)
+[![Build Status](https://github.com/trendyol/transmission/workflows/Build/badge.svg)](https://github.com/trendyol/transmission/actions)
+[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
+
 Transmission is an experimental asynchronous communication library for Kotlin Multiplatform projects, designed to create a structured communication network between different business logic components. It provides a clean, testable architecture that enables different parts of your application to communicate without direct references.
+
+## Quick Start
+
+```kotlin
+// Define your data transformation
+class UserTransformer : Transformer<UserData, UserResult> {
+    override suspend fun transform(data: UserData): UserResult {
+        return UserResult(processedData = data.process())
+    }
+}
+
+// Set up the transmission router
+val router = TransmissionRouter.builder()
+    .add<UserTransformer>()
+    .build()
+
+// Use it in your application
+val result = router.transform<UserData, UserResult>(userData)
+```
+
+## Documentation
+
+- **[Getting Started](how_to_use.md)** - Learn the basics and start using Transmission
+- **[Setup Guide](setup.md)** - Installation and configuration instructions
+- **[Transformers](transformer.md)** - Core data transformation concepts
+- **[Router System](router.md)** - Advanced routing and communication features
+- **[Testing](testing.md)** - Testing strategies and utilities
+
+## API Reference
+
+📚 **[API Documentation](api/0.x/)** - Complete API reference with detailed documentation for all classes and methods.
 
 ## Core Concepts
 
-Transmission is built around three primary concepts:
-
-- **[Transmission](transmissions.md)**: The fundamental unit of information (Signal, Effect, Data)
+- **[Transmissions](transmissions.md)**: Data flow objects that carry information through your application
 - **[Transformer](transformer.md)**: Components that process transmissions and handle business logic
 - **[TransmissionRouter](router.md)**: Manages the flow of transmissions between transformers
+
+## Architecture Overview
+
+Transmission follows a structured communication pattern where components communicate through well-defined channels without direct dependencies, making your code more testable and maintainable.
 
 ## Key Features
 
@@ -18,104 +57,12 @@ Transmission is built around three primary concepts:
 - **Asynchronous By Design**: Built for asynchronous operations from the ground up
 - **Kotlin Multiplatform**: Works across all Kotlin targets
 
-## Architecture Overview
+## Community & Support
 
-```mermaid
-graph TB
-    UI[UI Layer] --> |Signals| Router[TransmissionRouter]
-    Router --> |Distributes| T1[Transformer 1]
-    Router --> |Distributes| T2[Transformer 2] 
-    Router --> |Distributes| T3[Transformer 3]
-    T1 --> |Effects| Router
-    T2 --> |Effects| Router
-    T3 --> |Effects| Router
-    T1 --> |Data| Router
-    T2 --> |Data| Router
-    T3 --> |Data| Router
-    Router --> |Data Stream| UI
-    T1 -.-> |Query/Compute| T2
-    T2 -.-> |Query/Compute| T3
-```
+- 🐛 [Report Issues](https://github.com/trendyol/transmission/issues)
+- 💡 [Feature Requests](https://github.com/trendyol/transmission/discussions)
+- 📖 [Documentation](https://trendyol.github.io/transmission/)
 
-## Quick Start
+---
 
-### 1. Define Transmissions
-
-```kotlin
-// Signals from UI
-sealed interface CounterSignal : Transmission.Signal {
-    data object Increment : CounterSignal
-    data object Decrement : CounterSignal
-}
-
-// Data for UI consumption  
-data class CounterData(val count: Int) : Transmission.Data
-```
-
-### 2. Create a Transformer
-
-```kotlin
-class CounterTransformer : Transformer() {
-    private var count = 0
-    
-    override val handlers: Handlers = handlers {
-        onSignal<CounterSignal.Increment> {
-            count++
-            send(CounterData(count))
-        }
-        
-        onSignal<CounterSignal.Decrement> {
-            count--
-            send(CounterData(count))
-        }
-    }
-}
-```
-
-### 3. Set up Router
-
-```kotlin
-val router = TransmissionRouter {
-    addTransformerSet(setOf(CounterTransformer()))
-}
-```
-
-### 4. Use in UI
-
-```kotlin
-// Send signals
-router.process(CounterSignal.Increment)
-
-// Observe data
-router.streamData<CounterData>()
-    .collect { data ->
-        // Update UI with data.count
-    }
-```
-
-## Project Structure
-
-```
-transmission/
-├── transmission/           # Core library
-├── transmission-test/      # Testing utilities  
-├── samples/               # Example implementations
-│   ├── counter/          # Simple counter example
-│   └── components/       # Complex multi-component example
-└── docs/                 # Documentation
-```
-
-## Getting Started
-
-1. **[Setup](setup.md)** - Add Transmission to your project
-2. **[How to Use](how_to_use.md)** - Basic usage guide
-3. **[Transmissions](transmissions.md)** - Understanding Signal, Effect, and Data
-4. **[Transformer](transformer.md)** - Creating business logic components
-5. **[TransmissionRouter](router.md)** - Managing communication flow
-
-## Examples
-
-Check out the complete examples in the `samples` directory:
-
-- **Counter Sample**: Simple increment/decrement counter demonstrating basic concepts
-- **Components Sample**: Complex example with multiple transformers, effects, and inter-transformer communication
+*Made with ❤️ by the Trendyol team*
