@@ -1,11 +1,11 @@
 name: Generate and Deploy Documentation
 
 on:
-  # push:
-  #   branches: [ main, master ]
-  # pull_request:
-  #   branches: [ main, master ]
-  # Allow manual trigger
+ # push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+  Allow manual trigger
   workflow_dispatch:
 
 # Sets permissions of the GITHUB_TOKEN to allow deployment to GitHub Pages
@@ -42,9 +42,29 @@ jobs:
     - name: Grant execute permission for gradlew
       run: chmod +x gradlew
       
-    - name: Generate documentation
-      run: ./gradlew generateDocs --no-daemon --stacktrace
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.x'
+        
+    - name: Install MkDocs and dependencies
+      run: |
+        pip install mkdocs-material
+        pip install pymdown-extensions
+        
+    - name: Generate API documentation
+      run: ./gradlew generateApiDocs --no-daemon --stacktrace
       
+    - name: Build MkDocs site
+      run: mkdocs build --verbose
+      
+    - name: Verify documentation structure
+      run: |
+        echo "📁 Documentation structure:"
+        find build/site -type f -name "*.html" | head -10
+        echo "🔍 API documentation:"
+        ls -la build/site/api/0.x/ || echo "API docs not found"
+        
     - name: Setup Pages
       if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
       uses: actions/configure-pages@v4
@@ -53,7 +73,7 @@ jobs:
       if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
       uses: actions/upload-pages-artifact@v3
       with:
-        path: build/dokka/htmlMultiModule
+        path: build/site
         
   deploy:
     if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
