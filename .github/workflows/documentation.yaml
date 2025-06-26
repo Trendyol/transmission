@@ -1,9 +1,9 @@
 name: documentation
 on:
-  push:
-    branches:
-      - master 
-      - main
+  # push:
+  #   branches:
+  #     - master 
+  #     - main
 permissions:
   contents: write
 jobs:
