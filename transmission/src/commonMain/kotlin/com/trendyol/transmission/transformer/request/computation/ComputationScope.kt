@@ -12,6 +12,22 @@ fun Transformer.computations(scope: ComputationScope.() -> Unit = {}): Computati
     return Computations()
 }
 
+/**
+ * Creates and registers computations for this transformer.
+ * 
+ * @deprecated Use [computations] instead. This method is kept for binary compatibility.
+ * @param scope DSL lambda for defining computations
+ * @return A [Computations] instance representing the registered computations
+ */
+@Deprecated(
+    message = "Use computations instead",
+    replaceWith = ReplaceWith("computations(scope)"),
+    level = DeprecationLevel.WARNING
+)
+fun Transformer.createComputations(scope: ComputationScope.() -> Unit = {}): Computations {
+    return computations(scope)
+}
+
 fun Computations.extendComputations(
     transformer: Transformer,
     scope: ComputationScope.() -> Unit = {}

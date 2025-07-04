@@ -59,6 +59,22 @@ fun Transformer.handlers(scope: HandlerScope.() -> Unit = {}): Handlers {
 }
 
 /**
+ * Creates and registers signal and effect handlers for this transformer.
+ * 
+ * @deprecated Use [handlers] instead. This method is kept for binary compatibility.
+ * @param scope DSL lambda for defining handlers
+ * @return A [Handlers] instance representing the registered handlers
+ */
+@Deprecated(
+    message = "Use handlers instead",
+    replaceWith = ReplaceWith("handlers(scope)"),
+    level = DeprecationLevel.WARNING
+)
+fun Transformer.createHandlers(scope: HandlerScope.() -> Unit = {}): Handlers {
+    return handlers(scope)
+}
+
+/**
  * Registers a handler for effects of type [T].
  * 
  * The handler lambda will be invoked whenever an effect of the specified type is processed
