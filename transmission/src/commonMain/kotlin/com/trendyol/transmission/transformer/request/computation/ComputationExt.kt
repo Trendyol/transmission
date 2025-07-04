@@ -13,8 +13,8 @@ import com.trendyol.transmission.transformer.request.QueryHandler
  * Can be queried using [QueryHandler.compute]
  * @param computation Computation to get the result [Transmission.Data]
  */
-fun <C : Contract.Computation<T>, T : Any?> ComputationScope.register(
-    contract: C,
+fun <T : Any?> ComputationScope.register(
+    contract: Contract.Computation<T>,
     computation: suspend QueryHandler.() -> T,
 ) {
     this.computationRegistry.buildWith(contract.key, contract.useCache, computation)
@@ -28,8 +28,8 @@ fun <C : Contract.Computation<T>, T : Any?> ComputationScope.register(
  * Can be queried using [QueryHandler.compute]
  * @param computation Computation to get the result [Transmission.Data]
  */
-fun <C : Contract.ComputationWithArgs<A, T>, A : Any, T : Any?> ComputationScope.register(
-    contract: C,
+fun <A : Any, T : Any?> ComputationScope.register(
+    contract: Contract.ComputationWithArgs<A,T>,
     computation: suspend QueryHandler.(args: A) -> T,
 ) {
     this.computationRegistry.buildWith(contract.key, contract.useCache, computation)
