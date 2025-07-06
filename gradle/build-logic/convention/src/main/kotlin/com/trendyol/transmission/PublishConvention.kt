@@ -15,8 +15,6 @@ class PublishConvention : Plugin<Project> {
         extensions.configure<MavenPublishBaseExtension>("mavenPublishing") {
             publishToMavenCentral(SonatypeHost.CENTRAL_PORTAL)
 
-            signAllPublications()
-
             pom {
                 name.set(project.name.replaceFirstChar { it.uppercase() })
                 description.set("Experimental library for asynchronous communication")
@@ -43,6 +41,8 @@ class PublishConvention : Plugin<Project> {
                     developerConnection.set("scm:git:ssh://git@github.com:Trendyol/transmission.git")
                 }
             }
+
+            signAllPublications()
 
         }
     }

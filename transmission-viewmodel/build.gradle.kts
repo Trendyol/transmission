@@ -6,7 +6,7 @@ plugins {
 }
 
 android {
-    namespace = "com.trendyol.transmission.test"
+    namespace = "com.trendyol.transmission.viewmodel"
 }
 
 kotlin {
@@ -16,6 +16,7 @@ kotlin {
             api(project(":transmission"))
             implementation(libs.kotlinx.coroutines.core)
             implementation(libs.kotlinx.coroutines.test)
+            implementation(libs.lifecycle.viewmodel.compose)
             implementation(libs.junit)
             implementation(kotlin("test"))
             implementation(libs.turbine)

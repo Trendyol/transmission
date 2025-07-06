@@ -1,16 +1,15 @@
 package com.trendyol.transmission.components
 
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.trendyol.transmission.Transmission
 import com.trendyol.transmission.components.colorpicker.ColorPickerTransformer
 import com.trendyol.transmission.components.input.InputTransformer
 import com.trendyol.transmission.effect.RouterEffect
-import com.trendyol.transmission.router.TransmissionRouter
 import com.trendyol.transmission.router.asState
 import com.trendyol.transmission.router.streamData
 import com.trendyol.transmission.router.streamDataAsState
-import com.trendyol.transmission.router.streamEffect
+import com.trendyol.transmission.transformer.Transformer
+import com.trendyol.transmissionviewmodel.RouterViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -19,59 +18,44 @@ import kotlinx.coroutines.launch
 import kotlin.time.Duration.Companion.seconds
 
 class ComponentViewModel(
-    private val router: TransmissionRouter
-) : ViewModel() {
+    transformerList: List<Transformer>
+) : RouterViewModel(transformerList.toSet()) {
 
-    val inputUiState = router
+    val inputUiState = streamOwner
         .streamData<InputUiState> { _transmissionList.value = listOf() }
         .asState(viewModelScope, InputUiState())
 
-    val outputUiState = router.streamDataAsState(viewModelScope, OutputUiState())
-    val colorPickerUiState = router.streamDataAsState(viewModelScope, ColorPickerUiState())
-    val multiOutputUiState = router.streamDataAsState(viewModelScope, MultiOutputUiState())
+    val outputUiState = streamDataAsState(OutputUiState())
+    val colorPickerUiState = streamDataAsState(ColorPickerUiState())
+    val multiOutputUiState = streamDataAsState(MultiOutputUiState())
 
     private val _transmissionList = MutableStateFlow<List<String>>(emptyList())
     val transmissionList = _transmissionList.asStateFlow()
 
-    init {
-        viewModelScope.launch {
-            launch {
-                router.streamData().collect(::onData)
-            }
-            launch {
-                router.streamEffect().collect(::onEffect)
-            }
-        }
-    }
-
-    fun processSignal(signal: Transmission.Signal) {
-        router.process(signal)
+    override fun onProcessSignal(signal: Transmission.Signal) {
+        super.onProcessSignal(signal)
         _transmissionList.update { it.plus("Signal: $signal") }
     }
 
-    private fun onEffect(effect: Transmission.Effect) = viewModelScope.launch {
-        _transmissionList.update { it.plus("Effect: $effect") }
-        if (effect is RouterEffect) {
-            when (effect.payload) {
-                is OutputUiState -> {
-                    _transmissionList.update { it.plus("Generic Effect: $effect") }
+    override fun onEffect(effect: Transmission.Effect) {
+        viewModelScope.launch {
+            _transmissionList.update { it.plus("Effect: $effect") }
+            if (effect is RouterEffect) {
+                when (effect.payload) {
+                    is OutputUiState -> {
+                        _transmissionList.update { it.plus("Generic Effect: $effect") }
+                    }
                 }
             }
+            val inputData = queryHandler.getData(InputTransformer.holderContract)
+            delay(1.seconds)
+            val colorPicker = queryHandler.getData(ColorPickerTransformer.holderContract)
+            _transmissionList.update { it.plus("Current InputData: $inputData") }
+            _transmissionList.update { it.plus("Current ColorPickerData: $colorPicker") }
         }
-        val inputData = router.queryHelper.getData(InputTransformer.holderContract)
-        delay(1.seconds)
-        val colorPicker =
-            router.queryHelper.getData(ColorPickerTransformer.holderContract)
-        _transmissionList.update { it.plus("Current InputData: $inputData") }
-        _transmissionList.update { it.plus("Current ColorPickerData: $colorPicker") }
     }
 
-    private fun onData(data: Transmission.Data) {
+    override fun onData(data: Transmission.Data) {
         _transmissionList.update { it.plus("Data: $data") }
     }
-
-    override fun onCleared() {
-        router.clear()
-    }
-
 }

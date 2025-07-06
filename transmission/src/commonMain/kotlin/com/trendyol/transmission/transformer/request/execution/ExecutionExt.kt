@@ -29,8 +29,8 @@ fun ExecutionScope.register(
  * Can be queried using [QueryHandler.execute]
  * @param execution execution to get the result [Transmission.Data]
  */
-fun <C : Contract.ExecutionWithArgs<A>, A : Any> ExecutionScope.register(
-    contract: C,
+fun <A : Any> ExecutionScope.register(
+    contract: Contract.ExecutionWithArgs<A>,
     execution: suspend QueryHandler.(args: A) -> Unit,
 ) {
     this.executionRegistry.buildWith(contract.key, execution)

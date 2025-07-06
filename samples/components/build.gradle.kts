@@ -31,6 +31,7 @@ kotlin {
             implementation(libs.lifecycle.viewmodel.compose)
             implementation(compose.runtime)
             implementation(project(":transmission"))
+            implementation(project(":transmission-viewmodel"))
             implementation(compose.foundation)
             implementation(compose.material3)
             implementation(compose.ui)
