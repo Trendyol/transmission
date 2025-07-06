@@ -5,8 +5,8 @@ plugins {
     id("org.jetbrains.intellij.platform") version "2.6.0"
 }
 
-group = "com.trendyol.transmission"
-version = "1.0.0"
+group = providers.gradleProperty("GROUP").get()
+version = providers.gradleProperty("VERSION_NAME").get()
 
 repositories {
     mavenCentral()
