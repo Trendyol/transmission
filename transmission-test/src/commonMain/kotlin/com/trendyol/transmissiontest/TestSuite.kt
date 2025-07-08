@@ -76,8 +76,8 @@ class TestSuite {
                 "com.trendyol.transmissiontest.TransmissionTest"
             )
     )
-    fun <C : Contract.Computation<D?>, D : Any> registerComputation(
-        contract: C,
+    fun <D : Any> registerComputation(
+        contract: Contract.Computation<D?>,
         data: () -> D?
     ): TestSuite {
         supplementaryTransformerSet += ComputationTransformer(contract, data)
@@ -92,8 +92,8 @@ class TestSuite {
                 "com.trendyol.transmissiontest.TransmissionTest"
             )
     )
-    fun <C : Contract.ComputationWithArgs<A, D?>, D : Any, A : Any> registerComputation(
-        contract: C,
+    fun <D : Any, A : Any> registerComputation(
+        contract: Contract.ComputationWithArgs<A, D?>,
         data: () -> D?
     ): TestSuite {
         supplementaryTransformerSet += ComputationWithArgsTransformer(contract, data)
@@ -109,11 +109,11 @@ class TestSuite {
                 "com.trendyol.transmissiontest.TransmissionTest"
             )
     )
-    fun <C : Contract.Checkpoint.WithArgs<A>, A : Any> registerCheckpoint(
-        checkpoint: C,
+    fun <A : Any> registerCheckpoint(
+        checkpoint: Contract.Checkpoint.WithArgs<A>,
         args: A
     ): TestSuite {
-        supplementaryTransformerSet += CheckpointWithArgsTransformer<C, A>(checkpoint, { args })
+        supplementaryTransformerSet += CheckpointWithArgsTransformer<A>(checkpoint, { args })
         orderedCheckpoints.plusAssign(checkpoint)
         return this
     }

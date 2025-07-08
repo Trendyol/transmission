@@ -28,7 +28,7 @@ class InputTransformerTest {
     @Test
     fun `GIVEN inputTransformer WHEN inputUpdate signal is sent THEN inputUpdate effect is published`() {
         sut.test()
-            .withCheckpoint(InputTransformer.colorCheckpoint, Color.Gray)
+            .checkpointWithArgs(InputTransformer.colorCheckpoint, Color.Gray)
             .testSignal(InputSignal.InputUpdate("test")) {
                 assertEquals(InputEffect.InputUpdate("test"), lastEffect())
                 assertEquals(InputUiState("test"), lastData())

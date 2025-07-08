@@ -9,8 +9,8 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 
 @OptIn(ExperimentalCoroutinesApi::class)
-internal class ComputationTransformer<C : Contract.Computation<D?>, D : Any?>(
-    contract: C, data: () -> D?
+internal class ComputationTransformer<D : Any?>(
+    contract: Contract.Computation<D>, data: () -> D
 ) : Transformer(dispatcher = UnconfinedTestDispatcher()) {
     override val computations: Computations = computations {
         register(contract) {

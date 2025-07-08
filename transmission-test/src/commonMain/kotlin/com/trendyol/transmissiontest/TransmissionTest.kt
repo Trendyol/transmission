@@ -16,7 +16,6 @@ import com.trendyol.transmissiontest.computation.ComputationTransformer
 import com.trendyol.transmissiontest.computation.ComputationWithArgsTransformer
 import com.trendyol.transmissiontest.data.DataTransformer
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.TestDispatcher
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
@@ -66,10 +65,10 @@ import kotlin.jvm.JvmName
  *     val transformer = ProfileTransformer()
  *     
  *     transformer.test()
- *         .withData(UserRepository.userContract) { 
+ *         .dataHolder(UserRepository.userContract) {
  *             UserData.LoggedIn(User("John", "john@example.com"))
  *         }
- *         .withComputation(ProfileService.profileContract) {
+ *         .computation(ProfileService.profileContract) {
  *             UserProfile("John", 25, "Engineer")
  *         }
  *         .testSignal(ProfileSignal.LoadProfile) {
@@ -145,13 +144,13 @@ private constructor(
      * Example usage:
      * ```kotlin
      * transformer.test()
-     *     .withData(UserRepository.currentUserContract) {
+     *     .dataHolder(UserRepository.currentUserContract) {
      *         UserData.LoggedIn(User("test_user", "test@example.com"))
      *     }
      *     .testSignal(ProfileSignal.Load) { /* assertions */ }
      * ```
      */
-    fun <D : Transmission.Data?> withData(
+    fun <D : Transmission.Data?> dataHolder(
             contract: Contract.DataHolder<D>,
             data: () -> D
     ): TransmissionTest {
@@ -175,15 +174,15 @@ private constructor(
      * Example usage:
      * ```kotlin
      * transformer.test()
-     *     .withComputation(AnalyticsService.userStatsContract) {
+     *     .computation(AnalyticsService.userStatsContract) {
      *         UserStats(loginCount = 5, lastLogin = Date())
      *     }
      *     .testSignal(ProfileSignal.LoadStats) { /* assertions */ }
      * ```
      */
-    fun <C : Contract.Computation<D?>, D : Any> withComputation(
-            contract: C,
-            data: () -> D?
+    fun <D : Any?> computation(
+            contract: Contract.Computation<D>,
+            data: () -> D
     ): TransmissionTest {
         mockTransformers += ComputationTransformer(contract, data)
         return this
@@ -209,14 +208,14 @@ private constructor(
      * Example usage:
      * ```kotlin
      * transformer.test()
-     *     .withComputation(SearchService.searchUsersContract) {
+     *     .computationWithArgs(SearchService.searchUsersContract) {
      *         listOf(User("john", "john@example.com"))
      *     }
      *     .testSignal(SearchSignal.SearchUsers("john")) { /* assertions */ }
      * ```
      */
-    fun <C : Contract.ComputationWithArgs<A, D?>, D : Any, A : Any> withComputation(
-            contract: C,
+    fun <D : Any, A : Any> computationWithArgs(
+            contract: Contract.ComputationWithArgs<A,D?>,
             data: () -> D?
     ): TransmissionTest {
         mockTransformers += ComputationWithArgsTransformer(contract, data)
@@ -240,7 +239,7 @@ private constructor(
      * Example usage:
      * ```kotlin
      * transformer.test()
-     *     .withCheckpoint(ValidationCheckpoint.userConfirmation, ConfirmationData("approved"))
+     *     .checkpointWithArgs(ValidationCheckpoint.userConfirmation, ConfirmationData("approved"))
      *     .testSignal(PaymentSignal.ProcessPayment(amount)) {
      *         // Test that payment was processed after confirmation
      *         val paymentData = lastData<PaymentData.Processed>()
@@ -249,11 +248,11 @@ private constructor(
      * ```
      */
     @ExperimentalTransmissionApi
-    fun <C : Contract.Checkpoint.WithArgs<A>, A : Any> withCheckpoint(
-            checkpoint: C,
+    fun <A : Any> checkpointWithArgs(
+            checkpoint: Contract.Checkpoint.WithArgs<A>,
             args: A
     ): TransmissionTest {
-        mockTransformers += CheckpointWithArgsTransformer<C, A>(checkpoint, { args })
+        mockTransformers += CheckpointWithArgsTransformer<A>(checkpoint, { args })
         orderedCheckpoints.plusAssign(checkpoint)
         return this
     }
@@ -272,7 +271,7 @@ private constructor(
      * Example usage:
      * ```kotlin
      * transformer.test()
-     *     .withCheckpoint(SecurityCheckpoint.adminApproval)
+     *     .checkpoint(SecurityCheckpoint.adminApproval)
      *     .testSignal(AdminSignal.DeleteUser(userId)) {
      *         // Test that user was deleted after admin approval
      *         val deletionData = lastData<UserData.Deleted>()
@@ -281,7 +280,7 @@ private constructor(
      * ```
      */
     @ExperimentalTransmissionApi
-    fun withCheckpoint(checkpoint: Contract.Checkpoint.Default): TransmissionTest {
+    fun checkpoint(checkpoint: Contract.Checkpoint.Default): TransmissionTest {
         mockTransformers += CheckpointTransformer({ checkpoint })
         orderedCheckpoints.plusAssign(checkpoint)
         return this
@@ -386,11 +385,15 @@ private constructor(
             val effectStream: MutableList<Transmission.Effect> = mutableListOf()
 
             try {
-                backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) {
-                    router!!.streamData().toList(dataStream)
+                backgroundScope.launch(UnconfinedTestDispatcher()) {
+                    router!!.streamData().collect { data ->
+                        dataStream.add(data)
+                    }
                 }
-                backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) {
-                    router!!.streamEffect().toList(effectStream)
+                backgroundScope.launch(UnconfinedTestDispatcher()) {
+                    router!!.streamEffect().collect { effect ->
+                        effectStream.add(effect)
+                    }
                 }
 
                 // Process initial transmissions
@@ -416,6 +419,9 @@ private constructor(
                             )
                 }
 
+                transformer.waitProcessingToFinish()
+                advanceUntilIdle()
+
                 // Process checkpoints
                 orderedCheckpoints.forEach {
                     when (it) {
@@ -423,9 +429,9 @@ private constructor(
                         is Contract.Checkpoint.WithArgs<*> ->
                                 router!!.process(CheckpointWithArgs(it))
                     }
+                    transformer.waitProcessingToFinish()
+                    advanceUntilIdle()
                 }
-
-                transformer.waitProcessingToFinish()
 
                 // Run the assertions
                 val testResult = TestResult(dataStream, effectStream)

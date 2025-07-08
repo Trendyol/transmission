@@ -4,6 +4,7 @@ import com.trendyol.transmission.components.ColorPickerUiState
 import com.trendyol.transmission.components.OutputUiState
 import com.trendyol.transmission.components.colorpicker.ColorPickerTransformer
 import com.trendyol.transmission.components.input.InputEffect
+import com.trendyol.transmission.components.output.OutputCalculationResult
 import com.trendyol.transmission.components.output.OutputTransformer
 import com.trendyol.transmission.effect.RouterEffect
 import com.trendyol.transmissiontest.test
@@ -43,7 +44,7 @@ class OutputTransformerTest {
     @Test
     fun `GIVEN sut WHEN inputUpdate effect comes and ColorPickerUIState exists THEN RouterPayloadEffect should be published`() {
         sut.test()
-            .withData(ColorPickerTransformer.holderContract) {
+            .dataHolder(ColorPickerTransformer.holderContract) {
                 ColorPickerUiState()
             }
             .testEffect(InputEffect.InputUpdate("test")) {

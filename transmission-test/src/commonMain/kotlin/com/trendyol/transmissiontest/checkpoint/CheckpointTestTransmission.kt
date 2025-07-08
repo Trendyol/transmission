@@ -5,6 +5,6 @@ import com.trendyol.transmission.transformer.request.Contract
 
 data object DefaultCheckPoint : Transmission.Signal
 
-data class CheckpointWithArgs<C : Contract.Checkpoint.WithArgs<A>, A : Any>(
-    val checkpoint: C,
+data class CheckpointWithArgs<A : Any>(
+    val checkpoint: Contract.Checkpoint.WithArgs<A>,
 ) : Transmission.Signal

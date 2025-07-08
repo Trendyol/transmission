@@ -10,12 +10,12 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 
 @OptIn(ExperimentalCoroutinesApi::class)
-internal class CheckpointWithArgsTransformer<C: Contract.Checkpoint.WithArgs<A>, A: Any>(
-    checkpoint: C, args: () -> A
+internal class CheckpointWithArgsTransformer<A: Any>(
+    checkpoint: Contract.Checkpoint.WithArgs<A>, args: () -> A
 ): Transformer(dispatcher = UnconfinedTestDispatcher()) {
     @OptIn(ExperimentalTransmissionApi::class)
     override val handlers: Handlers = handlers {
-        onSignal<CheckpointWithArgs<C, A>> {
+        onSignal<CheckpointWithArgs<A>> {
             validate(checkpoint, args())
         }
     }
