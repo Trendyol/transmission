@@ -8,6 +8,7 @@ import com.trendyol.transmission.router.streamData
 import com.trendyol.transmission.router.streamEffect
 import com.trendyol.transmission.transformer.Transformer
 import com.trendyol.transmission.transformer.request.Contract
+import com.trendyol.transmissiontest.TransmissionTest.TestResult
 import com.trendyol.transmissiontest.checkpoint.CheckpointTransformer
 import com.trendyol.transmissiontest.checkpoint.CheckpointWithArgs
 import com.trendyol.transmissiontest.checkpoint.CheckpointWithArgsTransformer
@@ -214,9 +215,9 @@ private constructor(
      *     .testSignal(SearchSignal.SearchUsers("john")) { /* assertions */ }
      * ```
      */
-    fun <D : Any, A : Any> computationWithArgs(
-        contract: Contract.ComputationWithArgs<A, D?>,
-        data: () -> D?
+    fun <D : Any?, A : Any> computationWithArgs(
+        contract: Contract.ComputationWithArgs<A, D>,
+        data: () -> D
     ): TransmissionTest {
         mockTransformers += ComputationWithArgsTransformer(contract, data)
         return this
