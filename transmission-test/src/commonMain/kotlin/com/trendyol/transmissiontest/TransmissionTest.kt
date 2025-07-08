@@ -25,12 +25,12 @@ import kotlin.jvm.JvmName
 
 /**
  * Comprehensive testing framework for Transmission components with a fluent DSL.
- * 
+ *
  * TransmissionTest provides a sophisticated testing framework specifically designed for testing
  * [Transformer] components in isolation or with controlled dependencies. It supports mocking
  * data holders, computations, executions, and checkpoint validation while providing a clean
  * fluent API for test setup and assertions.
- * 
+ *
  * ## Key Features:
  * - **Transformer Isolation**: Test transformers in isolation with mocked dependencies
  * - **Mock Support**: Mock data holders, computations, and executions from other transformers
@@ -39,15 +39,15 @@ import kotlin.jvm.JvmName
  * - **Coroutine Testing**: Built-in integration with kotlinx-coroutines-test
  * - **Initial Processing**: Support for processing transmissions before the main test
  * - **Type-Safe Assertions**: Type-safe methods for asserting on specific data/effect types
- * 
+ *
  * ## Basic Usage:
- * 
+ *
  * ### Testing Signal Processing:
  * ```kotlin
  * @Test
  * fun testUserLogin() = runTest {
  *     val transformer = UserTransformer()
- *     
+ *
  *     transformer.test()
  *         .testSignal(UserSignal.Login("username", "password")) {
  *             // Assert that login data was emitted
@@ -57,13 +57,13 @@ import kotlin.jvm.JvmName
  *         }
  * }
  * ```
- * 
+ *
  * ### Testing with Mocked Dependencies:
  * ```kotlin
  * @Test
  * fun testUserProfile() = runTest {
  *     val transformer = ProfileTransformer()
- *     
+ *
  *     transformer.test()
  *         .dataHolder(UserRepository.userContract) {
  *             UserData.LoggedIn(User("John", "john@example.com"))
@@ -78,13 +78,13 @@ import kotlin.jvm.JvmName
  *         }
  * }
  * ```
- * 
+ *
  * ### Testing Effect Processing:
  * ```kotlin
  * @Test
  * fun testCacheInvalidation() = runTest {
  *     val transformer = CacheTransformer()
- *     
+ *
  *     transformer.test()
  *         .testEffect(CacheEffect.Invalidate("user_data")) {
  *             // Assert that cache was cleared
@@ -93,13 +93,13 @@ import kotlin.jvm.JvmName
  *         }
  * }
  * ```
- * 
+ *
  * ### Testing with Initial Processing:
  * ```kotlin
  * @Test
  * fun testWithInitialState() = runTest {
  *     val transformer = DataTransformer()
- *     
+ *
  *     transformer.test()
  *         .withInitialProcessing(
  *             UserSignal.Login("user", "pass"),
@@ -111,18 +111,18 @@ import kotlin.jvm.JvmName
  *         }
  * }
  * ```
- * 
+ *
  * @param transformer The transformer to test
  * @param dispatcher The test dispatcher for controlling coroutine execution
- * 
+ *
  * @see Transformer.test for creating test instances
  * @see TestResult for assertion methods
  */
 @OptIn(ExperimentalCoroutinesApi::class)
 class TransmissionTest
 private constructor(
-        private val transformer: Transformer,
-        private val dispatcher: TestDispatcher = UnconfinedTestDispatcher()
+    private val transformer: Transformer,
+    private val dispatcher: TestDispatcher = UnconfinedTestDispatcher()
 ) {
     private var router: TransmissionRouter? = null
     private val mockTransformers: MutableList<Transformer> = mutableListOf()
@@ -131,16 +131,16 @@ private constructor(
 
     /**
      * Adds a mock data holder that provides data for the specified contract during testing.
-     * 
+     *
      * This method creates a mock transformer that provides data when other transformers
      * query the specified data holder contract. The data is provided by the lambda function
      * which is called each time the contract is queried.
-     * 
+     *
      * @param D The type of data provided by the contract
      * @param contract The data holder contract to mock
      * @param data Lambda function that provides the data when queried
      * @return This TransmissionTest instance for method chaining
-     * 
+     *
      * Example usage:
      * ```kotlin
      * transformer.test()
@@ -151,8 +151,8 @@ private constructor(
      * ```
      */
     fun <D : Transmission.Data?> dataHolder(
-            contract: Contract.DataHolder<D>,
-            data: () -> D
+        contract: Contract.DataHolder<D>,
+        data: () -> D
     ): TransmissionTest {
         mockTransformers += DataTransformer(contract, data)
         return this
@@ -160,17 +160,17 @@ private constructor(
 
     /**
      * Adds a mock computation that provides computed results for the specified contract during testing.
-     * 
+     *
      * This method creates a mock transformer that provides computation results when other transformers
      * request computation through the specified contract. The result is provided by the lambda function
      * which is called each time the computation is requested.
-     * 
+     *
      * @param C The computation contract type
      * @param D The type of data returned by the computation
      * @param contract The computation contract to mock
      * @param data Lambda function that provides the computation result
      * @return This TransmissionTest instance for method chaining
-     * 
+     *
      * Example usage:
      * ```kotlin
      * transformer.test()
@@ -181,8 +181,8 @@ private constructor(
      * ```
      */
     fun <D : Any?> computation(
-            contract: Contract.Computation<D>,
-            data: () -> D
+        contract: Contract.Computation<D>,
+        data: () -> D
     ): TransmissionTest {
         mockTransformers += ComputationTransformer(contract, data)
         return this
@@ -190,21 +190,21 @@ private constructor(
 
     /**
      * Adds a mock computation with arguments that provides computed results for the specified contract during testing.
-     * 
+     *
      * This method creates a mock transformer that provides computation results when other transformers
      * request computation with arguments through the specified contract. The result is provided by the lambda
      * function which is called each time the computation is requested with arguments.
-     * 
+     *
      * Note: Currently the arguments are not passed to the data lambda function due to the mock implementation.
      * This will be improved in future versions.
-     * 
+     *
      * @param C The computation contract type
      * @param D The type of data returned by the computation
      * @param A The type of arguments passed to the computation
      * @param contract The computation contract to mock
      * @param data Lambda function that provides the computation result
      * @return This TransmissionTest instance for method chaining
-     * 
+     *
      * Example usage:
      * ```kotlin
      * transformer.test()
@@ -215,8 +215,8 @@ private constructor(
      * ```
      */
     fun <D : Any, A : Any> computationWithArgs(
-            contract: Contract.ComputationWithArgs<A,D?>,
-            data: () -> D?
+        contract: Contract.ComputationWithArgs<A, D?>,
+        data: () -> D?
     ): TransmissionTest {
         mockTransformers += ComputationWithArgsTransformer(contract, data)
         return this
@@ -224,18 +224,18 @@ private constructor(
 
     /**
      * Adds a checkpoint with arguments that will be validated during testing.
-     * 
+     *
      * ⚠️ **Experimental API**: This API is experimental and may change or be removed in future versions.
-     * 
+     *
      * This method sets up a checkpoint that will be automatically validated with the provided arguments
      * during test execution. The checkpoint validation happens after the main test transmission is processed.
-     * 
+     *
      * @param C The checkpoint contract type
      * @param A The type of arguments for checkpoint validation
      * @param checkpoint The checkpoint contract to validate
      * @param args The arguments to provide during checkpoint validation
      * @return This TransmissionTest instance for method chaining
-     * 
+     *
      * Example usage:
      * ```kotlin
      * transformer.test()
@@ -249,8 +249,8 @@ private constructor(
      */
     @ExperimentalTransmissionApi
     fun <A : Any> checkpointWithArgs(
-            checkpoint: Contract.Checkpoint.WithArgs<A>,
-            args: A
+        checkpoint: Contract.Checkpoint.WithArgs<A>,
+        args: A
     ): TransmissionTest {
         mockTransformers += CheckpointWithArgsTransformer<A>(checkpoint, { args })
         orderedCheckpoints.plusAssign(checkpoint)
@@ -259,15 +259,15 @@ private constructor(
 
     /**
      * Adds a default checkpoint that will be validated during testing.
-     * 
+     *
      * ⚠️ **Experimental API**: This API is experimental and may change or be removed in future versions.
-     * 
+     *
      * This method sets up a checkpoint that will be automatically validated during test execution.
      * The checkpoint validation happens after the main test transmission is processed.
-     * 
+     *
      * @param checkpoint The checkpoint contract to validate
      * @return This TransmissionTest instance for method chaining
-     * 
+     *
      * Example usage:
      * ```kotlin
      * transformer.test()
@@ -288,14 +288,14 @@ private constructor(
 
     /**
      * Sets up initial transmissions that should be processed before the main test transmission.
-     * 
+     *
      * This method allows you to establish initial state by processing signals and effects
      * before the main test transmission. This is useful for testing scenarios that require
      * specific pre-conditions or state setup.
-     * 
+     *
      * @param transmissions Variable number of transmissions to process initially
      * @return This TransmissionTest instance for method chaining
-     * 
+     *
      * Example usage:
      * ```kotlin
      * transformer.test()
@@ -318,14 +318,14 @@ private constructor(
 
     /**
      * Executes a test with the given effect transmission and runs the provided assertions.
-     * 
+     *
      * This method processes the effect through the configured router and captures all resulting
      * data and effect streams for assertion. The assertions are executed with access to the
      * captured streams through the [TestResult] receiver.
-     * 
+     *
      * @param effect The effect transmission to test
      * @param assertions Lambda with [TestResult] receiver for making assertions
-     * 
+     *
      * Example usage:
      * ```kotlin
      * transformer.test()
@@ -333,7 +333,7 @@ private constructor(
      *         // Assert that cache invalidation triggered cleanup
      *         val clearEffect = lastEffect<CacheEffect.Cleared>()
      *         assertNotNull(clearEffect)
-     *         
+     *
      *         // Assert no data was emitted
      *         assertTrue(dataStream.isEmpty())
      *     }
@@ -345,14 +345,14 @@ private constructor(
 
     /**
      * Executes a test with the given signal transmission and runs the provided assertions.
-     * 
+     *
      * This method processes the signal through the configured router and captures all resulting
      * data and effect streams for assertion. The assertions are executed with access to the
      * captured streams through the [TestResult] receiver.
-     * 
+     *
      * @param signal The signal transmission to test
      * @param assertions Lambda with [TestResult] receiver for making assertions
-     * 
+     *
      * Example usage:
      * ```kotlin
      * transformer.test()
@@ -361,7 +361,7 @@ private constructor(
      *         val loginData = lastData<UserData.LoggedIn>()
      *         assertNotNull(loginData)
      *         assertEquals("username", loginData.user.username)
-     *         
+     *
      *         // Assert login effect was published
      *         val loginEffect = lastEffect<AuthEffect.LoginSuccessful>()
      *         assertNotNull(loginEffect)
@@ -400,9 +400,10 @@ private constructor(
                 initialTransmissions.forEach {
                     when (it) {
                         is Transmission.Data ->
-                                throw IllegalArgumentException(
-                                        "Transmission.Data should not be sent for processing"
-                                )
+                            throw IllegalArgumentException(
+                                "Transmission.Data should not be sent for processing"
+                            )
+
                         is Transmission.Effect -> router!!.process(it)
                         is Transmission.Signal -> router!!.process(it)
                     }
@@ -414,24 +415,23 @@ private constructor(
                     is Transmission.Signal -> router!!.process(transmission)
                     is Transmission.Effect -> router!!.process(transmission)
                     else ->
-                            throw IllegalArgumentException(
-                                    "Only Signal or Effect transmissions are supported for testing"
-                            )
+                        throw IllegalArgumentException(
+                            "Only Signal or Effect transmissions are supported for testing"
+                        )
                 }
 
-                transformer.waitProcessingToFinish()
-                advanceUntilIdle()
 
                 // Process checkpoints
                 orderedCheckpoints.forEach {
                     when (it) {
                         is Contract.Checkpoint.Default -> router!!.process(DefaultCheckPoint)
                         is Contract.Checkpoint.WithArgs<*> ->
-                                router!!.process(CheckpointWithArgs(it))
+                            router!!.process(CheckpointWithArgs(it))
                     }
                     transformer.waitProcessingToFinish()
-                    advanceUntilIdle()
                 }
+                transformer.waitProcessingToFinish()
+                advanceUntilIdle()
 
                 // Run the assertions
                 val testResult = TestResult(dataStream, effectStream)
@@ -445,26 +445,26 @@ private constructor(
 
     /**
      * Contains the captured streams and provides assertion methods for test validation.
-     * 
+     *
      * TestResult is provided as the receiver in test assertion blocks and gives access to all
      * data and effects that were emitted during test execution. It provides various methods
      * for finding, filtering, and asserting on the captured transmissions.
-     * 
+     *
      * @param dataStream List of all data transmissions captured during test execution
      * @param effectStream List of all effect transmissions captured during test execution
      */
     class TestResult(
-            val dataStream: List<Transmission.Data>,
-            val effectStream: List<Transmission.Effect>
+        val dataStream: List<Transmission.Data>,
+        val effectStream: List<Transmission.Effect>
     ) {
         /**
          * Returns the last data transmission of the specified type.
-         * 
+         *
          * This is useful for asserting on the final state of a transformer after processing.
-         * 
+         *
          * @param T The type of data to retrieve
          * @return The last data of type T, or null if none exists
-         * 
+         *
          * Example:
          * ```kotlin
          * val userData = lastData<UserData.LoggedIn>()
@@ -474,21 +474,21 @@ private constructor(
          */
         @JvmName("lastDataWithType")
         inline fun <reified T : Transmission.Data> lastData(): T? =
-                dataStream.filterIsInstance<T>().lastOrNull()
+            dataStream.filterIsInstance<T>().lastOrNull()
 
         /**
          * Returns the last data transmission of any type.
-         * 
+         *
          * @return The last data transmission, or null if none exists
          */
         fun lastData(): Transmission.Data? = dataStream.lastOrNull()
 
         /**
          * Returns the data transmission at the specified index.
-         * 
+         *
          * @param index Zero-based index of the data transmission to retrieve
          * @return The data at the specified index, or null if index is out of bounds
-         * 
+         *
          * Example:
          * ```kotlin
          * val firstData = nthData(0) // First data emitted
@@ -499,12 +499,12 @@ private constructor(
 
         /**
          * Returns the last effect transmission of the specified type.
-         * 
+         *
          * This is useful for asserting on side effects that should occur after processing.
-         * 
+         *
          * @param T The type of effect to retrieve
          * @return The last effect of type T, or null if none exists
-         * 
+         *
          * Example:
          * ```kotlin
          * val loginEffect = lastEffect<AuthEffect.LoginSuccessful>()
@@ -514,21 +514,21 @@ private constructor(
          */
         @JvmName("lastEffectWithType")
         inline fun <reified T : Transmission.Effect> lastEffect(): T? =
-                effectStream.filterIsInstance<T>().lastOrNull()
+            effectStream.filterIsInstance<T>().lastOrNull()
 
         /**
          * Returns the last effect transmission of any type.
-         * 
+         *
          * @return The last effect transmission, or null if none exists
          */
         fun lastEffect(): Transmission.Effect? = effectStream.lastOrNull()
 
         /**
          * Returns the effect transmission at the specified index.
-         * 
+         *
          * @param index Zero-based index of the effect transmission to retrieve
          * @return The effect at the specified index, or null if index is out of bounds
-         * 
+         *
          * Example:
          * ```kotlin
          * val firstEffect = nthEffect(0) // First effect emitted
@@ -539,12 +539,12 @@ private constructor(
 
         /**
          * Returns all data transmissions of the specified type.
-         * 
+         *
          * This is useful for asserting on multiple data emissions of the same type.
-         * 
+         *
          * @param T The type of data to retrieve
          * @return List of all data transmissions of type T
-         * 
+         *
          * Example:
          * ```kotlin
          * val allUserData = allData<UserData>()
@@ -553,16 +553,16 @@ private constructor(
          * ```
          */
         inline fun <reified T : Transmission.Data> allData(): List<T> =
-                dataStream.filterIsInstance<T>()
+            dataStream.filterIsInstance<T>()
 
         /**
          * Returns all effect transmissions of the specified type.
-         * 
+         *
          * This is useful for asserting on multiple effect emissions of the same type.
-         * 
+         *
          * @param T The type of effect to retrieve
          * @return List of all effect transmissions of type T
-         * 
+         *
          * Example:
          * ```kotlin
          * val allLogEvents = allEffects<LoggingEffect>()
@@ -570,15 +570,15 @@ private constructor(
          * ```
          */
         inline fun <reified T : Transmission.Effect> allEffects(): List<T> =
-                effectStream.filterIsInstance<T>()
+            effectStream.filterIsInstance<T>()
 
         /**
          * Finds the first data transmission of the specified type that matches the predicate.
-         * 
+         *
          * @param T The type of data to search for
          * @param predicate Function to test each data transmission
          * @return The first matching data transmission, or null if none found
-         * 
+         *
          * Example:
          * ```kotlin
          * val errorData = findData<ApiData> { it.hasError }
@@ -587,15 +587,15 @@ private constructor(
          * ```
          */
         inline fun <reified T : Transmission.Data> findData(predicate: (T) -> Boolean): T? =
-                dataStream.filterIsInstance<T>().firstOrNull(predicate)
+            dataStream.filterIsInstance<T>().firstOrNull(predicate)
 
         /**
          * Finds the first effect transmission of the specified type that matches the predicate.
-         * 
+         *
          * @param T The type of effect to search for
          * @param predicate Function to test each effect transmission
          * @return The first matching effect transmission, or null if none found
-         * 
+         *
          * Example:
          * ```kotlin
          * val navigationEffect = findEffect<NavigationEffect> { it.destination == "profile" }
@@ -604,15 +604,15 @@ private constructor(
          * ```
          */
         inline fun <reified T : Transmission.Effect> findEffect(predicate: (T) -> Boolean): T? =
-                effectStream.filterIsInstance<T>().firstOrNull(predicate)
+            effectStream.filterIsInstance<T>().firstOrNull(predicate)
 
         /**
          * Finds all data transmissions of the specified type that match the predicate.
-         * 
+         *
          * @param T The type of data to search for
          * @param predicate Function to test each data transmission
          * @return List of all matching data transmissions
-         * 
+         *
          * Example:
          * ```kotlin
          * val validUserData = findAllData<UserData> { it.isValid && it.hasProfile }
@@ -620,15 +620,15 @@ private constructor(
          * ```
          */
         inline fun <reified T : Transmission.Data> findAllData(predicate: (T) -> Boolean): List<T> =
-                dataStream.filterIsInstance<T>().filter(predicate)
+            dataStream.filterIsInstance<T>().filter(predicate)
 
         /**
          * Finds all effect transmissions of the specified type that match the predicate.
-         * 
+         *
          * @param T The type of effect to search for
          * @param predicate Function to test each effect transmission
          * @return List of all matching effect transmissions
-         * 
+         *
          * Example:
          * ```kotlin
          * val errorEffects = findAllEffects<ErrorEffect> { it.severity == ErrorSeverity.HIGH }
@@ -636,15 +636,15 @@ private constructor(
          * ```
          */
         inline fun <reified T : Transmission.Effect> findAllEffects(
-                predicate: (T) -> Boolean
+            predicate: (T) -> Boolean
         ): List<T> = effectStream.filterIsInstance<T>().filter(predicate)
 
         /**
          * Checks if any data transmission of the specified type exists in the captured stream.
-         * 
+         *
          * @param T The type of data to check for
          * @return True if at least one data transmission of type T exists, false otherwise
-         * 
+         *
          * Example:
          * ```kotlin
          * assertTrue(hasData<UserData.LoggedIn>())
@@ -655,10 +655,10 @@ private constructor(
 
         /**
          * Checks if any effect transmission of the specified type exists in the captured stream.
-         * 
+         *
          * @param T The type of effect to check for
          * @return True if at least one effect transmission of type T exists, false otherwise
-         * 
+         *
          * Example:
          * ```kotlin
          * assertTrue(hasEffect<NavigationEffect>())
@@ -666,19 +666,19 @@ private constructor(
          * ```
          */
         inline fun <reified T : Transmission.Effect> hasEffect(): Boolean =
-                effectStream.any { it is T }
+            effectStream.any { it is T }
     }
 
     companion object {
         /**
          * Creates a new TransmissionTest instance for testing the specified transformer.
-         * 
+         *
          * This is the primary factory method for creating test instances. The test will use
          * [UnconfinedTestDispatcher] by default for immediate execution of coroutines.
-         * 
+         *
          * @param transformer The transformer to test
          * @return A new TransmissionTest instance
-         * 
+         *
          * Example:
          * ```kotlin
          * val test = TransmissionTest.forTransformer(UserTransformer())
@@ -691,14 +691,14 @@ private constructor(
 
         /**
          * Creates a new TransmissionTest instance for testing the specified transformer with a custom dispatcher.
-         * 
+         *
          * This method allows you to control coroutine execution timing by providing a custom test dispatcher.
          * This can be useful for testing time-dependent behavior or controlling execution order.
-         * 
+         *
          * @param transformer The transformer to test
          * @param dispatcher The test dispatcher to use for coroutine execution
          * @return A new TransmissionTest instance
-         * 
+         *
          * Example:
          * ```kotlin
          * val testDispatcher = StandardTestDispatcher()
@@ -716,13 +716,13 @@ private constructor(
 
 /**
  * Extension function to create a TransmissionTest for this transformer.
- * 
+ *
  * This provides a more readable and fluent API for creating tests directly from transformer instances.
  * Uses [UnconfinedTestDispatcher] for immediate coroutine execution.
- * 
+ *
  * @receiver The transformer to test
  * @return A new TransmissionTest instance
- * 
+ *
  * Example:
  * ```kotlin
  * val transformer = UserTransformer()
@@ -740,14 +740,14 @@ fun Transformer.test(): TransmissionTest {
 
 /**
  * Extension function to create a TransmissionTest for this transformer with a custom dispatcher.
- * 
+ *
  * This provides a more readable and fluent API for creating tests with controlled coroutine execution.
  * Useful for testing time-dependent behavior or controlling execution order.
- * 
+ *
  * @receiver The transformer to test
  * @param dispatcher The test dispatcher to use for coroutine execution
  * @return A new TransmissionTest instance
- * 
+ *
  * Example:
  * ```kotlin
  * val testDispatcher = StandardTestDispatcher()
