@@ -8,9 +8,11 @@ import com.trendyol.transmission.components.input.InputEffect
 import com.trendyol.transmission.components.input.InputSignal
 import com.trendyol.transmission.components.input.InputTransformer
 import com.trendyol.transmissiontest.test
+import kotlinx.coroutines.test.StandardTestDispatcher
+import kotlinx.coroutines.test.TestCoroutineScheduler
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
-import kotlin.test.Test
 import kotlin.test.BeforeTest
+import kotlin.test.Test
 import kotlin.test.assertEquals
 
 class InputTransformerTest {
@@ -27,17 +29,17 @@ class InputTransformerTest {
     @OptIn(ExperimentalTransmissionApi::class)
     @Test
     fun `GIVEN inputTransformer WHEN inputUpdate signal is sent THEN inputUpdate effect is published`() {
-        sut.test()
-            .withCheckpoint(InputTransformer.colorCheckpoint, Color.Gray)
+        sut.test(testDispatcher)
+            .checkpointWithArgs(InputTransformer.colorCheckpoint, Color.Gray)
             .testSignal(InputSignal.InputUpdate("test")) {
-                assertEquals(InputEffect.InputUpdate("test"), lastEffect())
+               assertEquals(InputEffect.InputUpdate("test"), lastEffect())
                 assertEquals(InputUiState("test"), lastData())
             }
     }
 
     @Test
     fun `GIVEN inputTransformer WHEN BackgroundColorUpdate effect is received THEN color should be changed`() {
-        sut.test()
+        sut.test(testDispatcher)
             .testEffect(ColorPickerEffect.BackgroundColorUpdate(Color.Gray)) {
                 assertEquals(InputUiState(backgroundColor = Color.Gray), lastData())
             }

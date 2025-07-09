@@ -100,12 +100,16 @@ internal class TransformerQueryDelegate(
             ): A {
                 val queryIdentifier = IdentifierGenerator.generateIdentifier()
                 return suspendCancellableCoroutine<A> { continuation ->
-                    val validator = object : CheckpointValidator<Contract.Checkpoint.WithArgs<A>, A> {
-                        override suspend fun validate(contract: Contract.Checkpoint.WithArgs<A>, args: A): Boolean {
-                            continuation.resume(args)
-                            return true
+                    val validator =
+                        object : CheckpointValidator<Contract.Checkpoint.WithArgs<A>, A> {
+                            override suspend fun validate(
+                                contract: Contract.Checkpoint.WithArgs<A>,
+                                args: A
+                            ): Boolean {
+                                continuation.resume(args)
+                                return true
+                            }
                         }
-                    }
                     checkpointTrackerProvider()?.run {
                         registerContract(contract, queryIdentifier)
                         putOrCreate(queryIdentifier, validator)
@@ -116,7 +120,8 @@ internal class TransformerQueryDelegate(
             override suspend fun validate(contract: Contract.Checkpoint.Default) {
                 val validator = checkpointTrackerProvider()
                     ?.useValidator<Contract.Checkpoint.Default, Unit>(contract)
-                if (validator?.validate(contract, Unit) == true) {
+                validator ?: return
+                if (validator.validate(contract, Unit)) {
                     checkpointTrackerProvider()
                         ?.removeValidator(contract)
                 }
@@ -128,7 +133,8 @@ internal class TransformerQueryDelegate(
             ) {
                 val validator = checkpointTrackerProvider()
                     ?.useValidator<Contract.Checkpoint.WithArgs<A>, A>(contract)
-                if (validator?.validate(contract, args) == true) {
+                validator ?: return
+                if (validator.validate(contract, args)) {
                     checkpointTrackerProvider()
                         ?.removeValidator(contract)
                 }
@@ -138,7 +144,7 @@ internal class TransformerQueryDelegate(
 
     val queryHandler: QueryHandler = object : QueryHandler {
 
-        override suspend fun <D : Transmission.Data> getData(contract: Contract.DataHolder<D>): D? {
+        override suspend fun <D : Transmission.Data?> getData(contract: Contract.DataHolder<D>): D {
             val queryIdentifier = IdentifierGenerator.generateIdentifier()
             outGoingQuery.send(
                 QueryType.Data(
@@ -152,9 +158,9 @@ internal class TransformerQueryDelegate(
                 .first().data
         }
 
-        override suspend fun <D : Any> compute(
+        override suspend fun <D : Any?> compute(
             contract: Contract.Computation<D>, invalidate: Boolean
-        ): D? {
+        ): D {
             val queryIdentifier = IdentifierGenerator.generateIdentifier()
             outGoingQuery.send(
                 QueryType.Computation(
@@ -169,9 +175,9 @@ internal class TransformerQueryDelegate(
                 .first().data
         }
 
-        override suspend fun <A : Any, D : Any> compute(
-            contract: Contract.ComputationWithArgs<A,D>, args: A, invalidate: Boolean
-        ): D? {
+        override suspend fun <A : Any, D : Any?> compute(
+            contract: Contract.ComputationWithArgs<A, D>, args: A, invalidate: Boolean
+        ): D {
             val queryIdentifier = IdentifierGenerator.generateIdentifier()
             outGoingQuery.send(
                 QueryType.ComputationWithArgs(

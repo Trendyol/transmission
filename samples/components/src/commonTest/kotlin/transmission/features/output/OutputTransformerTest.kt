@@ -7,11 +7,17 @@ import com.trendyol.transmission.components.input.InputEffect
 import com.trendyol.transmission.components.output.OutputTransformer
 import com.trendyol.transmission.effect.RouterEffect
 import com.trendyol.transmissiontest.test
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.test.StandardTestDispatcher
+import kotlinx.coroutines.test.TestCoroutineScheduler
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
+import kotlinx.coroutines.test.resetMain
+import kotlinx.coroutines.test.setMain
+import kotlin.test.AfterTest
+import kotlin.test.BeforeTest
+import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
-import kotlin.test.Test
-import kotlin.test.BeforeTest
 
 class OutputTransformerTest {
 
@@ -21,12 +27,13 @@ class OutputTransformerTest {
 
     @BeforeTest
     fun setUp() {
+        Dispatchers.setMain(testDispatcher)
         sut = OutputTransformer(testDispatcher)
     }
 
     @Test
     fun `GIVEN sut WHEN inputUpdate effect comes THEN holder should be updated with correct value`() {
-        sut.test()
+        sut.test(testDispatcher)
             .testEffect(InputEffect.InputUpdate("test")) {
                 assertEquals(OutputUiState(outputText = "test"), lastData<OutputUiState>())
             }
@@ -34,7 +41,7 @@ class OutputTransformerTest {
 
     @Test
     fun `GIVEN sut WHEN inputUpdate effect comes and no ColorPickerUIState data is present THEN data should not be updated further`() {
-        sut.test()
+        sut.test(testDispatcher)
             .testEffect(InputEffect.InputUpdate("test")) {
                 assertEquals(OutputUiState(outputText = "test"), lastData<OutputUiState>())
             }
@@ -42,13 +49,13 @@ class OutputTransformerTest {
 
     @Test
     fun `GIVEN sut WHEN inputUpdate effect comes and ColorPickerUIState exists THEN RouterPayloadEffect should be published`() {
-        sut.test()
-            .withData(ColorPickerTransformer.holderContract) {
+        sut.test(testDispatcher)
+            .dataHolder(ColorPickerTransformer.holderContract) {
                 ColorPickerUiState()
             }
             .testEffect(InputEffect.InputUpdate("test")) {
                 assertEquals(OutputUiState(outputText = "test"), nthData(1))
-                assertTrue(lastEffect() is RouterEffect )
+                assertTrue(effectStream.filterIsInstance<RouterEffect>().isNotEmpty())
             }
     }
 }

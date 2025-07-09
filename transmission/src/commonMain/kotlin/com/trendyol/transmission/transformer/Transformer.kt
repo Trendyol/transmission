@@ -27,11 +27,13 @@ import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.SendChannel
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.filterNot
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.supervisorScope
 
@@ -97,6 +99,8 @@ open class Transformer(
 
     private val effectChannel: Channel<WrappedEffect> = Channel(capacity = capacity.value)
     internal val dataChannel: Channel<Transmission.Data> = Channel(capacity = capacity.value)
+
+    internal val dataEmissionInitialized = MutableStateFlow(false)
 
     private var checkpointProvider: () -> CheckpointTracker? = { null }
     private val requestDelegate by lazy {
@@ -218,6 +222,7 @@ open class Transformer(
 
     internal fun startDataPublishing(data: SendChannel<Transmission.Data>) {
         transformerScope.launch { dataChannel.receiveAsFlow().collect { data.send(it) } }
+        dataEmissionInitialized.update { true }
     }
 
     internal fun startEffectProcessing(

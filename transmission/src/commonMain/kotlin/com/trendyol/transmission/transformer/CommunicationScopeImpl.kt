@@ -35,22 +35,22 @@ internal class CommunicationScopeImpl(
         effectChannel.send(WrappedEffect(effect))
     }
 
-    override suspend fun <D : Transmission.Data> getData(contract: Contract.DataHolder<D>): D? {
+    override suspend fun <D : Transmission.Data?> getData(contract: Contract.DataHolder<D>): D {
         return queryDelegate.queryHandler.getData(contract)
     }
 
-    override suspend fun <D : Any> compute(
+    override suspend fun <D : Any?> compute(
         contract: Contract.Computation<D>,
         invalidate: Boolean
-    ): D? {
+    ): D {
         return queryDelegate.queryHandler.compute(contract, invalidate)
     }
 
-    override suspend fun <A : Any, D : Any> compute(
-        contract: Contract.ComputationWithArgs<A,D>,
+    override suspend fun <A : Any, D : Any?> compute(
+        contract: Contract.ComputationWithArgs<A, D>,
         args: A,
         invalidate: Boolean
-    ): D? {
+    ): D {
         return queryDelegate.queryHandler.compute(contract, args, invalidate)
     }
 

@@ -12,7 +12,7 @@ import kotlinx.coroutines.CoroutineDispatcher
 
 val colorPickerIdentity = Contract.identity()
 
-class ColorPickerTransformer constructor(
+class ColorPickerTransformer(
     private val defaultDispatcher: CoroutineDispatcher
 ) : Transformer(colorPickerIdentity, defaultDispatcher) {
 
@@ -21,7 +21,7 @@ class ColorPickerTransformer constructor(
     init {
         addHandlers {
             onSignal<ColorPickerSignal.SelectColor> { signal ->
-                holder.update { it.copy(selectedColorIndex = signal.index) }
+                holder.update { it?.copy(selectedColorIndex = signal.index) }
                 publish(
                     ColorPickerEffect.BackgroundColorUpdate(signal.selectedColor.copy(alpha = 0.1f))
                 )
@@ -32,13 +32,13 @@ class ColorPickerTransformer constructor(
             }
             onEffect<ColorPickerEffect.BackgroundColorUpdate> { effect ->
                 holder.update {
-                    it.copy(backgroundColor = effect.color)
+                    it?.copy(backgroundColor = effect.color)
                 }
             }
         }
     }
 
     companion object {
-        val holderContract = Contract.dataHolder<ColorPickerUiState>()
+        val holderContract = Contract.dataHolder<ColorPickerUiState?>()
     }
 }

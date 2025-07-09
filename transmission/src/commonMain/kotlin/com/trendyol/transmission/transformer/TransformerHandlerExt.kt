@@ -121,8 +121,8 @@ fun Transformer.addExecutions(scope: ExecutionScope.() -> Unit): Transformer {
 /**
  * Convenience extension to register a computation directly to a Transformer.
  */
-fun <C : Contract.Computation<T>, T : Any?> Transformer.registerComputation(
-    contract: C,
+fun <T : Any?> Transformer.registerComputation(
+    contract: Contract.Computation<T>,
     computation: suspend QueryHandler.() -> T
 ): Transformer {
     addComputations {
@@ -134,8 +134,8 @@ fun <C : Contract.Computation<T>, T : Any?> Transformer.registerComputation(
 /**
  * Convenience extension to register a computation with arguments directly to a Transformer.
  */
-fun <C : Contract.ComputationWithArgs<A, T>, A : Any, T : Any?> Transformer.registerComputation(
-    contract: C,
+fun <A : Any, T : Any?> Transformer.registerComputation(
+    contract: Contract.ComputationWithArgs<A, T>,
     computation: suspend QueryHandler.(args: A) -> T
 ): Transformer {
     addComputations {
@@ -160,8 +160,8 @@ fun Transformer.registerExecution(
 /**
  * Convenience extension to register an execution with arguments directly to a Transformer.
  */
-fun <C : Contract.ExecutionWithArgs<A>, A : Any> Transformer.registerExecution(
-    contract: C,
+fun <A : Any> Transformer.registerExecution(
+    contract: Contract.ExecutionWithArgs<A>,
     execution: suspend QueryHandler.(args: A) -> Unit
 ): Transformer {
     addExecutions {
