@@ -4,13 +4,10 @@ import com.trendyol.transmission.Transmission
 import com.trendyol.transmission.transformer.dataholder.HolderState
 import com.trendyol.transmission.transformer.request.computation.ComputationOwner
 import com.trendyol.transmission.transformer.request.execution.ExecutionOwner
-import kotlinx.coroutines.sync.Mutex
-import kotlinx.coroutines.sync.withLock
 
 internal class TransformerStorage {
 
     private val holderDataReference: MutableMap<String, Transmission.Data?> = mutableMapOf()
-    private val lock = Mutex()
 
     private var internalTransmissionHolderSet: HolderState = HolderState.Undefined
     private val computationMap: MutableMap<String, ComputationOwner> = mutableMapOf()
@@ -33,10 +30,8 @@ internal class TransformerStorage {
         else (internalTransmissionHolderSet as HolderState.Initialized).valueSet.contains(key)
     }
 
-    suspend fun updateHolderData(data: Transmission.Data, key: String) {
-        lock.withLock {
-            holderDataReference[key] = data
-        }
+    fun updateHolderData(data: Transmission.Data, key: String) {
+        holderDataReference[key] = data
     }
 
     fun updateHolderDataReferenceToTrack(dataHolderToTrack: String) {
