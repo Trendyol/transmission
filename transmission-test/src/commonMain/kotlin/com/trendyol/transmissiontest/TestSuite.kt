@@ -18,6 +18,7 @@ import com.trendyol.transmissiontest.data.DataTransformer
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.advanceUntilIdle
@@ -37,6 +38,7 @@ class TestSuite {
     private var orderedCheckpoints: MutableList<Contract.Checkpoint> = mutableListOf()
     private var transformer: Transformer? = null
     private lateinit var router: TransmissionRouter
+    private val dispatcher = StandardTestDispatcher()
     private val supplementaryTransformerSet: MutableList<Transformer> = mutableListOf()
 
     @Deprecated(
@@ -64,7 +66,7 @@ class TestSuite {
         contract: Contract.DataHolder<D>,
         data: () -> D
     ): TestSuite {
-        supplementaryTransformerSet += DataTransformer(contract, data)
+        supplementaryTransformerSet += DataTransformer(contract, data, dispatcher)
         return this
     }
 
@@ -80,7 +82,7 @@ class TestSuite {
         contract: Contract.Computation<D?>,
         data: () -> D?
     ): TestSuite {
-        supplementaryTransformerSet += ComputationTransformer(contract, data)
+        supplementaryTransformerSet += ComputationTransformer(contract, data, dispatcher)
         return this
     }
 
@@ -96,7 +98,7 @@ class TestSuite {
         contract: Contract.ComputationWithArgs<A, D?>,
         data: () -> D?
     ): TestSuite {
-        supplementaryTransformerSet += ComputationWithArgsTransformer(contract, data)
+        supplementaryTransformerSet += ComputationWithArgsTransformer(contract, data, dispatcher)
         return this
     }
 
@@ -113,7 +115,11 @@ class TestSuite {
         checkpoint: Contract.Checkpoint.WithArgs<A>,
         args: A
     ): TestSuite {
-        supplementaryTransformerSet += CheckpointWithArgsTransformer<A>(checkpoint, { args })
+        supplementaryTransformerSet += CheckpointWithArgsTransformer<A>(
+            checkpoint,
+            { args },
+            dispatcher
+        )
         orderedCheckpoints.plusAssign(checkpoint)
         return this
     }
@@ -128,7 +134,7 @@ class TestSuite {
             )
     )
     fun registerCheckpoint(checkpoint: Contract.Checkpoint.Default): TestSuite {
-        supplementaryTransformerSet += CheckpointTransformer({ checkpoint })
+        supplementaryTransformerSet += CheckpointTransformer({ checkpoint }, dispatcher)
         orderedCheckpoints.plusAssign(checkpoint)
         return this
     }

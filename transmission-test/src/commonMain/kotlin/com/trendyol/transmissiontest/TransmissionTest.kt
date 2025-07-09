@@ -16,7 +16,12 @@ import com.trendyol.transmissiontest.checkpoint.DefaultCheckPoint
 import com.trendyol.transmissiontest.computation.ComputationTransformer
 import com.trendyol.transmissiontest.computation.ComputationWithArgsTransformer
 import com.trendyol.transmissiontest.data.DataTransformer
+import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.consumeAsFlow
+import kotlinx.coroutines.flow.onStart
+import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.TestDispatcher
@@ -29,9 +34,9 @@ import kotlin.jvm.JvmName
  * Comprehensive testing framework for Transmission components with a fluent DSL.
  *
  * TransmissionTest provides a sophisticated testing framework specifically designed for testing
- * [Transformer] components in isolation or with controlled dependencies. It supports mocking
- * data holders, computations, executions, and checkpoint validation while providing a clean
- * fluent API for test setup and assertions.
+ * [Transformer] components in isolation or with controlled dependencies. It supports mocking data
+ * holders, computations, executions, and checkpoint validation while providing a clean fluent API
+ * for test setup and assertions.
  *
  * ## Key Features:
  * - **Transformer Isolation**: Test transformers in isolation with mocked dependencies
@@ -134,9 +139,9 @@ private constructor(
     /**
      * Adds a mock data holder that provides data for the specified contract during testing.
      *
-     * This method creates a mock transformer that provides data when other transformers
-     * query the specified data holder contract. The data is provided by the lambda function
-     * which is called each time the contract is queried.
+     * This method creates a mock transformer that provides data when other transformers query the
+     * specified data holder contract. The data is provided by the lambda function which is called
+     * each time the contract is queried.
      *
      * @param D The type of data provided by the contract
      * @param contract The data holder contract to mock
@@ -161,11 +166,12 @@ private constructor(
     }
 
     /**
-     * Adds a mock computation that provides computed results for the specified contract during testing.
+     * Adds a mock computation that provides computed results for the specified contract during
+     * testing.
      *
-     * This method creates a mock transformer that provides computation results when other transformers
-     * request computation through the specified contract. The result is provided by the lambda function
-     * which is called each time the computation is requested.
+     * This method creates a mock transformer that provides computation results when other
+     * transformers request computation through the specified contract. The result is provided by
+     * the lambda function which is called each time the computation is requested.
      *
      * @param C The computation contract type
      * @param D The type of data returned by the computation
@@ -182,23 +188,22 @@ private constructor(
      *     .testSignal(ProfileSignal.LoadStats) { /* assertions */ }
      * ```
      */
-    fun <D : Any?> computation(
-        contract: Contract.Computation<D>,
-        data: () -> D
-    ): TransmissionTest {
+    fun <D : Any?> computation(contract: Contract.Computation<D>, data: () -> D): TransmissionTest {
         mockTransformers += ComputationTransformer(contract, data, dispatcher)
         return this
     }
 
     /**
-     * Adds a mock computation with arguments that provides computed results for the specified contract during testing.
+     * Adds a mock computation with arguments that provides computed results for the specified
+     * contract during testing.
      *
-     * This method creates a mock transformer that provides computation results when other transformers
-     * request computation with arguments through the specified contract. The result is provided by the lambda
-     * function which is called each time the computation is requested with arguments.
+     * This method creates a mock transformer that provides computation results when other
+     * transformers request computation with arguments through the specified contract. The result is
+     * provided by the lambda function which is called each time the computation is requested with
+     * arguments.
      *
-     * Note: Currently the arguments are not passed to the data lambda function due to the mock implementation.
-     * This will be improved in future versions.
+     * Note: Currently the arguments are not passed to the data lambda function due to the mock
+     * implementation. This will be improved in future versions.
      *
      * @param C The computation contract type
      * @param D The type of data returned by the computation
@@ -227,10 +232,12 @@ private constructor(
     /**
      * Adds a checkpoint with arguments that will be validated during testing.
      *
-     * ⚠️ **Experimental API**: This API is experimental and may change or be removed in future versions.
+     * ⚠️ **Experimental API**: This API is experimental and may change or be removed in future
+     * versions.
      *
-     * This method sets up a checkpoint that will be automatically validated with the provided arguments
-     * during test execution. The checkpoint validation happens after the main test transmission is processed.
+     * This method sets up a checkpoint that will be automatically validated with the provided
+     * arguments during test execution. The checkpoint validation happens after the main test
+     * transmission is processed.
      *
      * @param C The checkpoint contract type
      * @param A The type of arguments for checkpoint validation
@@ -262,7 +269,8 @@ private constructor(
     /**
      * Adds a default checkpoint that will be validated during testing.
      *
-     * ⚠️ **Experimental API**: This API is experimental and may change or be removed in future versions.
+     * ⚠️ **Experimental API**: This API is experimental and may change or be removed in future
+     * versions.
      *
      * This method sets up a checkpoint that will be automatically validated during test execution.
      * The checkpoint validation happens after the main test transmission is processed.
@@ -291,9 +299,9 @@ private constructor(
     /**
      * Sets up initial transmissions that should be processed before the main test transmission.
      *
-     * This method allows you to establish initial state by processing signals and effects
-     * before the main test transmission. This is useful for testing scenarios that require
-     * specific pre-conditions or state setup.
+     * This method allows you to establish initial state by processing signals and effects before
+     * the main test transmission. This is useful for testing scenarios that require specific
+     * pre-conditions or state setup.
      *
      * @param transmissions Variable number of transmissions to process initially
      * @return This TransmissionTest instance for method chaining
@@ -383,20 +391,31 @@ private constructor(
         }
 
         runTest {
-            val dataStream: MutableList<Transmission.Data> = mutableListOf()
-            val effectStream: MutableList<Transmission.Effect> = mutableListOf()
-
             try {
+                val dataChannel = Channel<Transmission.Data>(Channel.UNLIMITED)
+                val effectChannel = Channel<Transmission.Effect>(Channel.UNLIMITED)
+
+                // Use CompletableDeferred to ensure collectors are ready before processing
+                val dataCollectorReady = CompletableDeferred<Unit>()
+                val effectCollectorReady = CompletableDeferred<Unit>()
+
                 backgroundScope.launch(dispatcher) {
-                    router!!.streamData().collect { data ->
-                        dataStream.add(data)
+                    launch {
+                        router!!.streamData()
+                            .onStart { dataCollectorReady.complete(Unit) }
+                            .collect { data -> dataChannel.send(data) }
+                    }
+                    launch {
+                        router!!.streamEffect()
+                            .onStart { effectCollectorReady.complete(Unit) }
+                            .collect { effect -> effectChannel.send(effect) }
                     }
                 }
-                backgroundScope.launch(dispatcher) {
-                    router!!.streamEffect().collect { effect ->
-                        effectStream.add(effect)
-                    }
-                }
+
+                // Wait for both collectors to be established before processing
+                dataCollectorReady.await()
+                effectCollectorReady.await()
+                advanceUntilIdle() // Process any pending coroutines
 
                 // Process initial transmissions
                 initialTransmissions.forEach {
@@ -422,7 +441,6 @@ private constructor(
                         )
                 }
 
-
                 // Process checkpoints
                 orderedCheckpoints.forEach {
                     when (it) {
@@ -432,11 +450,19 @@ private constructor(
                     }
                     transformer.waitProcessingToFinish()
                 }
+                advanceUntilIdle()
                 transformer.waitProcessingToFinish()
+
+                // Final wait to ensure all data has propagated through the shared data stream
                 advanceUntilIdle()
 
+                // After processing, close channels and collect all data
+                dataChannel.close()
+                effectChannel.close()
+                val finalDataStream = dataChannel.consumeAsFlow().toList()
+                val finalEffectStream = effectChannel.consumeAsFlow().toList()
                 // Run the assertions
-                val testResult = TestResult(dataStream, effectStream)
+                val testResult = TestResult(finalDataStream, finalEffectStream)
                 testResult.assertions()
             } finally {
                 advanceUntilIdle()
@@ -448,9 +474,9 @@ private constructor(
     /**
      * Contains the captured streams and provides assertion methods for test validation.
      *
-     * TestResult is provided as the receiver in test assertion blocks and gives access to all
-     * data and effects that were emitted during test execution. It provides various methods
-     * for finding, filtering, and asserting on the captured transmissions.
+     * TestResult is provided as the receiver in test assertion blocks and gives access to all data
+     * and effects that were emitted during test execution. It provides various methods for finding,
+     * filtering, and asserting on the captured transmissions.
      *
      * @param dataStream List of all data transmissions captured during test execution
      * @param effectStream List of all effect transmissions captured during test execution
@@ -692,10 +718,12 @@ private constructor(
         }
 
         /**
-         * Creates a new TransmissionTest instance for testing the specified transformer with a custom dispatcher.
+         * Creates a new TransmissionTest instance for testing the specified transformer with a
+         * custom dispatcher.
          *
-         * This method allows you to control coroutine execution timing by providing a custom test dispatcher.
-         * This can be useful for testing time-dependent behavior or controlling execution order.
+         * This method allows you to control coroutine execution timing by providing a custom test
+         * dispatcher. This can be useful for testing time-dependent behavior or controlling
+         * execution order.
          *
          * @param transformer The transformer to test
          * @param dispatcher The test dispatcher to use for coroutine execution
@@ -719,8 +747,8 @@ private constructor(
 /**
  * Extension function to create a TransmissionTest for this transformer.
  *
- * This provides a more readable and fluent API for creating tests directly from transformer instances.
- * Uses [UnconfinedTestDispatcher] for immediate coroutine execution.
+ * This provides a more readable and fluent API for creating tests directly from transformer
+ * instances. Uses [UnconfinedTestDispatcher] for immediate coroutine execution.
  *
  * @receiver The transformer to test
  * @return A new TransmissionTest instance
@@ -743,8 +771,8 @@ fun Transformer.test(): TransmissionTest {
 /**
  * Extension function to create a TransmissionTest for this transformer with a custom dispatcher.
  *
- * This provides a more readable and fluent API for creating tests with controlled coroutine execution.
- * Useful for testing time-dependent behavior or controlling execution order.
+ * This provides a more readable and fluent API for creating tests with controlled coroutine
+ * execution. Useful for testing time-dependent behavior or controlling execution order.
  *
  * @receiver The transformer to test
  * @param dispatcher The test dispatcher to use for coroutine execution
