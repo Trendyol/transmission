@@ -24,7 +24,7 @@ import kotlinx.coroutines.delay
 import kotlin.random.Random
 import kotlin.time.Duration.Companion.seconds
 
-class OutputTransformer constructor(
+class OutputTransformer(
     private val defaultDispatcher: CoroutineDispatcher
 ) : Transformer(dispatcher = defaultDispatcher) {
 

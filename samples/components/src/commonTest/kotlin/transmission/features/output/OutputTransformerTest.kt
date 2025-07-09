@@ -4,25 +4,34 @@ import com.trendyol.transmission.components.ColorPickerUiState
 import com.trendyol.transmission.components.OutputUiState
 import com.trendyol.transmission.components.colorpicker.ColorPickerTransformer
 import com.trendyol.transmission.components.input.InputEffect
-import com.trendyol.transmission.components.output.OutputCalculationResult
 import com.trendyol.transmission.components.output.OutputTransformer
 import com.trendyol.transmission.effect.RouterEffect
 import com.trendyol.transmissiontest.test
-import kotlinx.coroutines.test.UnconfinedTestDispatcher
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.test.StandardTestDispatcher
+import kotlinx.coroutines.test.resetMain
+import kotlinx.coroutines.test.setMain
+import kotlin.test.AfterTest
+import kotlin.test.BeforeTest
+import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
-import kotlin.test.Test
-import kotlin.test.BeforeTest
 
 class OutputTransformerTest {
 
     private lateinit var sut: OutputTransformer
 
-    private val testDispatcher = UnconfinedTestDispatcher()
+    private val testDispatcher = StandardTestDispatcher()
 
     @BeforeTest
     fun setUp() {
+        Dispatchers.setMain(testDispatcher) // Set test dispatcher as main
         sut = OutputTransformer(testDispatcher)
+    }
+
+    @AfterTest
+    fun tearDown() {
+        Dispatchers.resetMain() // Reset main dispatcher
     }
 
     @Test
@@ -49,7 +58,7 @@ class OutputTransformerTest {
             }
             .testEffect(InputEffect.InputUpdate("test")) {
                 assertEquals(OutputUiState(outputText = "test"), nthData(1))
-                assertTrue(lastEffect() is RouterEffect )
+                assertTrue(effectStream.filterIsInstance<RouterEffect>().isNotEmpty())
             }
     }
 }

@@ -8,20 +8,30 @@ import com.trendyol.transmission.components.input.InputEffect
 import com.trendyol.transmission.components.input.InputSignal
 import com.trendyol.transmission.components.input.InputTransformer
 import com.trendyol.transmissiontest.test
-import kotlinx.coroutines.test.UnconfinedTestDispatcher
-import kotlin.test.Test
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.test.StandardTestDispatcher
+import kotlinx.coroutines.test.resetMain
+import kotlinx.coroutines.test.setMain
+import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
+import kotlin.test.Test
 import kotlin.test.assertEquals
 
 class InputTransformerTest {
 
     private lateinit var sut: InputTransformer
 
-    private val testDispatcher = UnconfinedTestDispatcher()
+    private val testDispatcher = StandardTestDispatcher()
 
     @BeforeTest
     fun setUp() {
+        Dispatchers.setMain(testDispatcher) // Set test dispatcher as main
         sut = InputTransformer(testDispatcher)
+    }
+
+    @AfterTest
+    fun tearDown() {
+        Dispatchers.resetMain() // Reset main dispatcher
     }
 
     @OptIn(ExperimentalTransmissionApi::class)

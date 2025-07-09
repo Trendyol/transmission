@@ -12,7 +12,7 @@ import kotlinx.coroutines.CoroutineDispatcher
 
 val colorPickerIdentity = Contract.identity()
 
-class ColorPickerTransformer constructor(
+class ColorPickerTransformer(
     private val defaultDispatcher: CoroutineDispatcher
 ) : Transformer(colorPickerIdentity, defaultDispatcher) {
 
