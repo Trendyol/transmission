@@ -17,6 +17,7 @@ import com.trendyol.transmissiontest.computation.ComputationTransformer
 import com.trendyol.transmissiontest.computation.ComputationWithArgsTransformer
 import com.trendyol.transmissiontest.data.DataTransformer
 import kotlinx.coroutines.CompletableDeferred
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.consumeAsFlow
@@ -129,7 +130,7 @@ import kotlin.jvm.JvmName
 class TransmissionTest
 private constructor(
     private val transformer: Transformer,
-    private val dispatcher: TestDispatcher = StandardTestDispatcher()
+    private val dispatcher: CoroutineDispatcher = StandardTestDispatcher()
 ) {
     private var router: TransmissionRouter? = null
     private val mockTransformers: MutableList<Transformer> = mutableListOf()
@@ -450,7 +451,6 @@ private constructor(
                     }
                     transformer.waitProcessingToFinish()
                 }
-                advanceUntilIdle()
                 transformer.waitProcessingToFinish()
 
                 // Final wait to ensure all data has propagated through the shared data stream
@@ -713,8 +713,8 @@ private constructor(
          * test.testSignal(UserSignal.Login("user", "pass")) { /* assertions */ }
          * ```
          */
-        fun forTransformer(transformer: Transformer): TransmissionTest {
-            return TransmissionTest(transformer)
+        fun forTransformer(transformer: Transformer, dispatcher: CoroutineDispatcher): TransmissionTest {
+            return TransmissionTest(transformer, dispatcher)
         }
 
         /**
@@ -764,8 +764,8 @@ private constructor(
  *     }
  * ```
  */
-fun Transformer.test(): TransmissionTest {
-    return TransmissionTest.forTransformer(this)
+fun Transformer.test(dispatcher: CoroutineDispatcher = StandardTestDispatcher()): TransmissionTest {
+    return TransmissionTest.forTransformer(this, dispatcher)
 }
 
 /**
