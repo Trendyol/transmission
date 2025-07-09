@@ -53,7 +53,7 @@ interface TransmissionDataHolder<T : Transmission.Data?> {
      * }
      * ```
      */
-    fun update(updater: (T) -> @UnsafeVariance T)
+    suspend fun update(updater: (T) -> @UnsafeVariance T)
 
     /**
      * Updates the held value and returns the new value atomically.
@@ -80,10 +80,10 @@ interface TransmissionDataHolder<T : Transmission.Data?> {
 }
 
 internal class TransmissionDataHolderImpl<T : Transmission.Data?>(
-    initialValue: T,
-    publishUpdates: Boolean,
-    transformer: Transformer,
-    contract: Contract.DataHolder<T>
+    private val initialValue: T,
+    private val publishUpdates: Boolean,
+    private val transformer: Transformer,
+    private val contract: Contract.DataHolder<T>
 ) : TransmissionDataHolder<T> {
 
     private val holder = MutableStateFlow(initialValue)
@@ -99,20 +99,23 @@ internal class TransmissionDataHolderImpl<T : Transmission.Data?>(
     init {
         transformer.run {
             storage.updateHolderDataReferenceToTrack(contract.key)
-            transformerScope.launch {
-                holder.collect {
-                    it?.let { holderData ->
-                        storage.updateHolderData(holderData, contract.key)
-                        if (publishUpdates) {
-                            transformer.dataChannel.send(it)
-                        }
+            if (initialValue != null) {
+                storage.updateHolderData(initialValue, contract.key)
+                transformerScope.launch {
+                    dataEmissionInitialized.collect {
+                        if (it && publishUpdates) communicationScope.send(initialValue)
                     }
                 }
             }
         }
     }
 
-    override fun update(updater: (T) -> @UnsafeVariance T) {
+    override suspend fun update(updater: (T) -> @UnsafeVariance T) {
         holder.update(updater)
+        val holderData = holder.value ?: return
+        with(transformer) {
+            storage.updateHolderData(holderData, contract.key)
+            if (publishUpdates) communicationScope.send(holder.value)
+        }
     }
 }
