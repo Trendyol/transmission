@@ -9,10 +9,10 @@ internal class ComputationRegistry internal constructor(private val transformer:
         transformer.storage.clearComputations()
     }
 
-    internal fun <T : Any> buildWith(
+    internal fun <T : Any?> buildWith(
         key: String,
         useCache: Boolean = false,
-        computation: suspend QueryHandler.() -> T?
+        computation: suspend QueryHandler.() -> T
     ) {
         transformer.storage.registerComputation(
             key = key,
@@ -20,10 +20,10 @@ internal class ComputationRegistry internal constructor(private val transformer:
         )
     }
 
-    internal fun <A : Any, T : Any> buildWith(
+    internal fun <A : Any, T : Any?> buildWith(
         key: String,
         useCache: Boolean = false,
-        computation: suspend QueryHandler.(args: A) -> T?
+        computation: suspend QueryHandler.(args: A) -> T
     ) {
         transformer.storage.registerComputation(
             key = key,
