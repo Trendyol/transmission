@@ -18,6 +18,7 @@ import com.trendyol.transmissiontest.computation.ComputationWithArgsTransformer
 import com.trendyol.transmissiontest.data.DataTransformer
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.TestDispatcher
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.advanceUntilIdle
@@ -123,7 +124,7 @@ import kotlin.jvm.JvmName
 class TransmissionTest
 private constructor(
     private val transformer: Transformer,
-    private val dispatcher: TestDispatcher = UnconfinedTestDispatcher()
+    private val dispatcher: TestDispatcher = StandardTestDispatcher()
 ) {
     private var router: TransmissionRouter? = null
     private val mockTransformers: MutableList<Transformer> = mutableListOf()
@@ -155,7 +156,7 @@ private constructor(
         contract: Contract.DataHolder<D>,
         data: () -> D
     ): TransmissionTest {
-        mockTransformers += DataTransformer(contract, data)
+        mockTransformers += DataTransformer(contract, data, dispatcher)
         return this
     }
 
@@ -185,7 +186,7 @@ private constructor(
         contract: Contract.Computation<D>,
         data: () -> D
     ): TransmissionTest {
-        mockTransformers += ComputationTransformer(contract, data)
+        mockTransformers += ComputationTransformer(contract, data, dispatcher)
         return this
     }
 
@@ -219,7 +220,7 @@ private constructor(
         contract: Contract.ComputationWithArgs<A, D>,
         data: () -> D
     ): TransmissionTest {
-        mockTransformers += ComputationWithArgsTransformer(contract, data)
+        mockTransformers += ComputationWithArgsTransformer(contract, data, dispatcher)
         return this
     }
 
@@ -253,7 +254,7 @@ private constructor(
         checkpoint: Contract.Checkpoint.WithArgs<A>,
         args: A
     ): TransmissionTest {
-        mockTransformers += CheckpointWithArgsTransformer<A>(checkpoint, { args })
+        mockTransformers += CheckpointWithArgsTransformer<A>(checkpoint, { args }, dispatcher)
         orderedCheckpoints.plusAssign(checkpoint)
         return this
     }
@@ -282,7 +283,7 @@ private constructor(
      */
     @ExperimentalTransmissionApi
     fun checkpoint(checkpoint: Contract.Checkpoint.Default): TransmissionTest {
-        mockTransformers += CheckpointTransformer({ checkpoint })
+        mockTransformers += CheckpointTransformer({ checkpoint }, dispatcher)
         orderedCheckpoints.plusAssign(checkpoint)
         return this
     }
@@ -386,12 +387,12 @@ private constructor(
             val effectStream: MutableList<Transmission.Effect> = mutableListOf()
 
             try {
-                backgroundScope.launch(UnconfinedTestDispatcher()) {
+                backgroundScope.launch(dispatcher) {
                     router!!.streamData().collect { data ->
                         dataStream.add(data)
                     }
                 }
-                backgroundScope.launch(UnconfinedTestDispatcher()) {
+                backgroundScope.launch(dispatcher) {
                     router!!.streamEffect().collect { effect ->
                         effectStream.add(effect)
                     }
