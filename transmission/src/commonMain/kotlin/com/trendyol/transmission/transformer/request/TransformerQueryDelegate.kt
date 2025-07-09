@@ -120,7 +120,8 @@ internal class TransformerQueryDelegate(
             override suspend fun validate(contract: Contract.Checkpoint.Default) {
                 val validator = checkpointTrackerProvider()
                     ?.useValidator<Contract.Checkpoint.Default, Unit>(contract)
-                if (validator?.validate(contract, Unit) == true) {
+                validator ?: return
+                if (validator.validate(contract, Unit)) {
                     checkpointTrackerProvider()
                         ?.removeValidator(contract)
                 }
@@ -132,7 +133,8 @@ internal class TransformerQueryDelegate(
             ) {
                 val validator = checkpointTrackerProvider()
                     ?.useValidator<Contract.Checkpoint.WithArgs<A>, A>(contract)
-                if (validator?.validate(contract, args) == true) {
+                validator ?: return
+                if (validator.validate(contract, args)) {
                     checkpointTrackerProvider()
                         ?.removeValidator(contract)
                 }
