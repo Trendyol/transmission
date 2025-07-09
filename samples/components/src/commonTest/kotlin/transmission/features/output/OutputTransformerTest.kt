@@ -9,6 +9,8 @@ import com.trendyol.transmission.effect.RouterEffect
 import com.trendyol.transmissiontest.test
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.test.StandardTestDispatcher
+import kotlinx.coroutines.test.TestCoroutineScheduler
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.setMain
 import kotlin.test.AfterTest
@@ -21,22 +23,17 @@ class OutputTransformerTest {
 
     private lateinit var sut: OutputTransformer
 
-    private val testDispatcher = StandardTestDispatcher()
+    private val testDispatcher = UnconfinedTestDispatcher()
 
     @BeforeTest
     fun setUp() {
-        Dispatchers.setMain(testDispatcher) // Set test dispatcher as main
+        Dispatchers.setMain(testDispatcher)
         sut = OutputTransformer(testDispatcher)
-    }
-
-    @AfterTest
-    fun tearDown() {
-        Dispatchers.resetMain() // Reset main dispatcher
     }
 
     @Test
     fun `GIVEN sut WHEN inputUpdate effect comes THEN holder should be updated with correct value`() {
-        sut.test()
+        sut.test(testDispatcher)
             .testEffect(InputEffect.InputUpdate("test")) {
                 assertEquals(OutputUiState(outputText = "test"), lastData<OutputUiState>())
             }
@@ -44,7 +41,7 @@ class OutputTransformerTest {
 
     @Test
     fun `GIVEN sut WHEN inputUpdate effect comes and no ColorPickerUIState data is present THEN data should not be updated further`() {
-        sut.test()
+        sut.test(testDispatcher)
             .testEffect(InputEffect.InputUpdate("test")) {
                 assertEquals(OutputUiState(outputText = "test"), lastData<OutputUiState>())
             }
@@ -52,7 +49,7 @@ class OutputTransformerTest {
 
     @Test
     fun `GIVEN sut WHEN inputUpdate effect comes and ColorPickerUIState exists THEN RouterPayloadEffect should be published`() {
-        sut.test()
+        sut.test(testDispatcher)
             .dataHolder(ColorPickerTransformer.holderContract) {
                 ColorPickerUiState()
             }
