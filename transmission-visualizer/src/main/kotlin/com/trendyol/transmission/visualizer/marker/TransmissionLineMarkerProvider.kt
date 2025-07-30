@@ -5,6 +5,7 @@ import com.intellij.codeInsight.daemon.LineMarkerProvider
 import com.intellij.icons.AllIcons
 import com.intellij.openapi.editor.markup.GutterIconRenderer
 import com.intellij.psi.PsiElement
+import com.intellij.psi.impl.source.tree.LeafPsiElement
 import com.intellij.util.containers.ContainerUtil
 import com.trendyol.transmission.visualizer.detection.DetectedTransmission
 import com.trendyol.transmission.visualizer.detection.TransmissionDetector
@@ -21,7 +22,7 @@ class TransmissionLineMarkerProvider : LineMarkerProvider {
     private val fileDetectionCache = ContainerUtil.createConcurrentWeakKeySoftValueMap<KtFile, CachedDetectionResult>()
 
     override fun getLineMarkerInfo(element: PsiElement): LineMarkerInfo<*>? = runCatching {
-        if (!isTransmissionNameIdentifier(element)) {
+        if (!isTransmissionNameIdentifier(element) || element !is LeafPsiElement) {
             return null
         }
 
